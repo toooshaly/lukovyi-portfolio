@@ -1,6 +1,48 @@
 @import "tailwindcss";
 
 /* ==========================================================================
+   Шрифти (самохостяться з /public/fonts — жодних зовнішніх запитів)
+   General Sans  -> заміна PP Neue Montreal (заголовки, текст)
+   Geist Mono    -> заміна Suisse Int'l Mono (лейбли, нумерація)
+   font-display: swap — текст видно одразу, шрифт підмінюється без «стрибка».
+   ========================================================================== */
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "General Sans";
+  src: url("/fonts/GeneralSans-Semibold.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Medium.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ==========================================================================
    Design tokens — джерело правди для кольорів, шрифтів і типографіки.
    Значення взяті з поточного Webflow-сайту (lukovyi.webflow.io).
    Tailwind v4 автоматично генерує утиліти з цих змінних:
@@ -21,10 +63,10 @@
      Реальні гарнітури сайту (PP Neue Montreal + Suisse Int'l Mono) —
      ліцензійні. Поки що працює системний запасний стек; коли додамо
      файли шрифтів, вони підхопляться першими автоматично. */
-  --font-sans: "PP Neue Montreal", "General Sans", ui-sans-serif, system-ui,
-    -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-mono: "Suisse Int'l Mono", "Geist Mono", ui-monospace, "SF Mono",
-    Menlo, Consolas, monospace;
+  --font-sans: "General Sans", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas,
+    monospace;
 }
 
 /* ==========================================================================
