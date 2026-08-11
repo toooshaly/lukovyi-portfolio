@@ -1,46 +1,167 @@
 ---
 title: "SPORTS AI-PRO"
 category: "Mobile App"
-summary: "AI-powered sports predictions app — redesigned onboarding and paywall to lift conversion."
+summary: "An AI sports-prediction app that worked — but didn't look like it. I led a full redesign for trust and clarity: a component library and three new features, shipped as v2.0.0, with a full design system in v3."
 order: 1
 featured: true
-year: "2025"
-role: "UX/UI Design, Product Design"
-timeline: "TODO: тривалість"
-client: "TODO: клієнт / компанія"
+year: "2025—2026"
+role: "UX/UI/Product Designer"
+timeline: "~1 year (v2) + ~1.5 months (v3)"
+client: "Sports AI-Pro"
 metrics:
-  - value: "TODO%"
-    label: "Conversion rate"
-  - value: "TODO%"
-    label: "Retention"
-  - value: "TODO"
-    label: "TODO metric"
+  - value: "+304%"
+    label: "Revenue growth · first full month"
+  - value: "v2.0.0"
+    label: "Launched 31 Dec 2025"
+  - value: "~4.2%"
+    label: "iOS conversion"
 seoTitle: "SPORTS AI-PRO — Mobile App UX/UI Case Study | Anton Lukovyi"
-seoDescription: "How I redesigned SPORTS AI-PRO's onboarding and paywall to improve conversion — a mobile app UX/UI case study by Anton Lukovyi."
+seoDescription: "How I redesigned SPORTS AI-PRO's interface for trust and clarity — a component library and three new features shipped as v2.0.0, then a full design system in v3. Revenue grew 304% in the first month."
 ---
 
-{/* НАЙСИЛЬНІШИЙ КЕЙС. Встав реальні тексти й метрики нижче замість TODO. */}
+## TL;DR
 
-## Overview
+**Background.** A working AI sports-prediction app with an outdated design — no design system, a fragmented interface.
 
-TODO: 2–3 речення про застосунок SPORTS AI-PRO, для кого він і яка була мета проєкту.
+**Problem.** The product looked unreliable — a critical flaw for an app that asks people to make betting decisions.
 
-## The problem
+**Approach.** Two cycles. First a full v2 redesign — structure, visual language, launch assets. Then measurement, reading the data, and rebuilding the product on a design system in v3.
 
-TODO: яку проблему вирішували (напр. висока відмова на онбордингу, низька конверсія в підписку, пейвол без trial).
+**Outcome.** Launched v2.0.0 on 31 December 2025. Revenue grew 304% in the first full month.
 
-## My role
+## 01 — Starting point
 
-TODO: що саме ти робив (дослідження, воркфлоу, UI, прототип, хендофф).
+### The technology worked. The interface didn't communicate it.
 
-## Process
+Opening the app, users met inconsistent typography, unpredictable navigation and data-heavy screens with no clear hierarchy. For a product that asks people to bet on AI confidence scores, visual trust isn't a nice-to-have. It is the product.
 
-TODO: етапи — research → wireframes → UI → тестування. Можна списком.
+Beyond redesigning what existed, three key features had to be designed from scratch: AI model re-training — the product's core feature — bookmaker odds comparison, and the betslip.
 
-## Solution
+The app worked technically, but a dated, fragmented interface undermined trust — and trust is what a product that tells you where to bet stands on. The founder's goal: bring design and experience up to the level of the technology underneath.
 
-TODO: що змінив і чому. Опиши ключові екрани (онбординг, пейвол, головний флоу).
+## 02 — Ownership
 
-## Results
+### Sole designer — from audit to handoff.
 
-TODO: реальні цифри та вплив. Саме тут — метрики конверсії, які роблять цей кейс найсильнішим.
+I owned the entire design process — audit, UX flows, UI, three new features, the component library and developer handoff — working directly with the founder.
+
+This was a solo project with no existing design system, no ready components and no prior UX documentation. Everything in this case reflects my own work and decisions.
+
+## 03 — Research
+
+### Three patterns were breaking user trust.
+
+I went through every screen and documented the specific places where the interface broke trust. Every insight came from what was actually in the product — not from guesswork.
+
+**1. The key number didn't stand out.** Confidence scores — the reason people open the app — carried the same weight as team names: same size, same colour, edge of the screen. There was nothing for the eye to catch, and a strong prediction looked exactly like a weak one. Separately, the light grey surfaces failed — highlighted match rows and league pills. White text on them fell below acceptable contrast.
+
+**2. Data spilled out with no hierarchy or grouping.** On the team screen — six identical rows in a row: Avg goals, Avg goals conceded, Avg shots on target, Avg corners, Avg fouls, Avg yellow cards. Identical bars, equal weight, no grouping. On the stats screen the form ring, the tournament dropdown, the recent-matches strip and the league table sat one after another with no sections. Instead of leading the eye from primary to secondary, the screen showed everything at once.
+
+**3. The interface felt like several different products.** Button styles differed between screens, navigation icons varied, and the bottom menu was labelled sometimes in Polish, sometimes in English. Without a single system the app lost coherence — and with it the sense of reliability.
+
+> **Insight.** None of these problems was technical. All three were about how the interface communicates trust.
+
+## 04 — Approach
+
+### Trust is a consequence of structure, not decoration.
+
+{/* TODO: короткий intro + 3 принципи (row 01/02/03) — тексти у Figma названі "title/desc", не зчитались. Дошлю зі скриншотів або з тексту Anton. */}
+
+## 05 — Core work
+
+### Redesigning the prediction screens, plus three new features built from scratch.
+
+Alongside reworking the core prediction screens, three features were designed from zero:
+
+- **Bookmaker odds comparison** — the user sees odds from different bookmakers for an event and moves through to partners.
+- **AI model re-training** — the product's core feature: tuning the model to a specific match, sport and bet type.
+- **The betslip** — where selected predictions accumulate and the combined probability is visible.
+
+{/* TODO: детальні описи кожної фічі + v1/v2/v3 порівняння — у Figma "body/quote", доповню. */}
+
+## 06 — Scalability
+
+### One component library on shared styles.
+
+{/* TODO: тіло секції (у Figma "body") — доповню. */}
+
+## 07 — Beyond the app
+
+### A paywall that feels like part of the product.
+
+Launch assets carried the same visual language as the app. App Store screens led with the value:
+
+- Get AI-powered insights for every sport — 16 sports, 5850 leagues worldwide, thousands of predictions daily, advanced AI analytics & stats.
+- Build your custom AI model.
+- Create your personal Prediction Slip.
+- Analyse leagues & teams.
+- Explore detailed stats.
+- Head-to-head stats for smarter picks.
+
+## 08 — Impact
+
+### The release gave a strong start. Analytics showed where the real bottleneck was.
+
+{/* TODO: таблиця воронки (arc table) + висновки — дані у Figma "cell/body", доповню. */}
+
+## 09 — Retention
+
+### The next design problem is retention.
+
+{/* TODO: тіло секції — доповню. */}
+
+## 10 — V3: what is already built
+
+### From findings to the next version.
+
+#### The design system v2 never had
+
+Before v3 we had a component library and colour styles — but not a system. There were no tokens or variables: the client did not want to invest in them, and I assembled screens quickly to get results to him faster. Development shipped v2 without a system too. That worked right up until the product started to grow.
+
+Before v3 I proposed doing it properly, and this time the argument landed. Tokens and variables appeared, components expanded and came together as a full system in a separate file, and the app began to be rebuilt on it.
+
+The effect is structural: a change is made in one place and propagates across every screen. What used to mean manually walking through dozens of mockups now takes minutes, and new features assemble from ready components instead of being drawn from scratch. Iterations got faster, and inconsistencies between screens disappeared as a category.
+
+#### Workflow: AI → Figma → system
+
+This is not "AI draws the design". It is a pipeline where generation takes the routine, while framing the problem, the decisions and the quality stay with me.
+
+In v2 no such pipeline existed: there was no MCP link to Figma yet, and mockups were made by hand. The ability to close the loop only arrived during v3 — and the process changed completely.
+
+The steps: receive a brief from the client → in Claude Code rewrite it into a structured, unambiguous brief for generation (the most important step — mockup quality is set by the framing, not by a random prompt) → pass it to Claude Design for a first version → several iterations through Claude Code → Claude Design until the mockup is right → show the client → once approved, move it into Figma → finish by hand (grid, spacing, states) → second review → extract components into the design system → review, fix, publish the library → assemble the next screens from published components.
+
+The gain is not that there is less drawing. The gain is that the cycle "brief → approved mockup → component in the system" closes in a single pass, and the system grows together with the product.
+
+#### iOS only — a decision from the data
+
+The conversion segmentation in section 08 — ≈4.2% on iOS versus ≈1% on Android — had a direct consequence: we dropped the Android version. That meant deliberately letting go of 85% of the audience — the part that barely pays — and concentrating the entire v3 effort on iOS, where conversion is four times higher. The decision rested on a segment's ability to pay, not on its size.
+
+#### Onboarding leads with Retrain AI
+
+Model re-training is the core feature of Sports AI-Pro, and in the new onboarding it comes first: from the very first minutes the user tunes the AI to a specific match, sport and their own bet type, rather than building a betslip.
+
+The hypothesis: a finished answer from an AI leaves the user passive, while control over it draws them in. Someone who has tuned the model to their own view has a reason to come back and check the result. This is where we expect the effect on retention.
+
+The screen structure and scroll behaviour were also rebuilt — the feature broke on long lists.
+
+#### Trial: the result is visible before payment
+
+Two paywall variants — an annual plan with a 7-day trial and weekly access with a 3-day one. Both first show exactly what is being unlocked: 16 sports, custom AI models, personalised betslips, detailed team stats.
+
+The hypothesis from section 09: if the value is visible before payment, fewer people drop off in the first week.
+
+#### Depth worth coming back for
+
+Reworked prediction cards and match details, a new H2H, an Analysis Panel with new charts. The betslip remains as a supporting feature — the place where selected predictions accumulate and the combined probability is visible.
+
+Bookmaker odds are being added: the user sees odds from different bookmakers for an event and moves through to the app's partners. This used to send them outside — now it is both a reason to stay in the product and a monetisation channel. For the Polish market first.
+
+**Accessibility.** Interface contrast was checked, including for different types of colour vision deficiency.
+
+## What I learned
+
+{/* TODO: рефлексія (у Figma "kicker/h2/body") — доповню. */}
+
+---
+
+**Project facts.** Industry: Mobile App · Location: Remote · Role: UX/UI/Product Designer · Year: 2025—2026 · Timeline: ~1 year (v2) + ~1.5 months (v3) · Team: founders + 2 developers · Scope: UX audit, full redesign, design system, paywalls, App Store assets, landing page, handoff · Status: v2 live · v3 in implementation.
