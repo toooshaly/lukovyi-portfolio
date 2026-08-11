@@ -1,96 +1,526 @@
 ---
-import { getCollection } from "astro:content";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import Container from "../components/Container.astro";
-import MonoLabel from "../components/MonoLabel.astro";
-import Button from "../components/Button.astro";
-import ProjectCard from "../components/ProjectCard.astro";
-import { SITE } from "../consts";
+import DesktopLayout from "../layouts/DesktopLayout.astro";
+import { SITE, SOCIALS } from "../consts";
 
-const projects = (
-  await getCollection("projects", ({ data }) =>
-    import.meta.env.PROD ? !data.draft : true,
-  )
-).sort((a, b) => {
-  // Виділений кейс — першим, далі за order
-  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
-  return a.data.order - b.data.order;
-});
+const social = (label: string) =>
+  SOCIALS.find((s) => s.label === label)?.href ?? "#";
+
+// Іконки робочого столу (плейсхолдер-емодзі — Anton замінить на Figma-арт).
+// Гібрид: внутрішні ведуть на справжні сторінки (SEO збережено).
+const icons = [
+  { label: "Case Studies", emoji: "📁", href: "/projects", external: false },
+  { label: "About Me", emoji: "📖", href: "/about-me", external: false },
+  { label: "Contact", emoji: "✉️", href: "/contact", external: false },
+  { label: "Resume", emoji: "📄", href: "#", external: false },
+  { label: "Dribbble", emoji: "🏀", href: social("Dribbble"), external: true },
+  { label: "Behance", emoji: "🎨", href: social("Behance"), external: true },
+  { label: "Photos", emoji: "📷", href: "#", external: false },
+  { label: "LinkedIn", emoji: "💼", href: social("LinkedIn"), external: true },
+];
+
+const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
 ---
 
-<BaseLayout title={`${SITE.name} — ${SITE.role}`}>
-  <!-- Hero -->
-  <Container class="py-20 sm:py-28">
-    <div class="flex items-center gap-3">
-      <span class="h-2 w-2 rounded-full bg-accent"></span>
-      <MonoLabel>Available for new project</MonoLabel>
+<DesktopLayout>
+  <!-- ЕКРАН БЛОКУВАННЯ -->
+  <div id="lock" class="lock">
+    <div class="lock-top">
+      <div class="lock-date" id="lockDate">—</div>
+      <div class="lock-clock" id="lockClock">00:00</div>
     </div>
-
-    <h1 class="mt-6 max-w-4xl text-5xl font-medium leading-[1.05] text-paper sm:text-7xl">
-      Hello, my name is <span class="text-accent">{SITE.name}</span>
-    </h1>
-    <p class="mt-6 font-mono text-sm uppercase tracking-widest text-muted">
-      {SITE.role}
-    </p>
-
-    <p class="mt-8 max-w-2xl text-xl leading-relaxed text-muted">
-      Every Pixel Has a Reason. Every Reason Has a Person. I help startups and
-      businesses create intuitive, user-centered interfaces — from research and
-      wireframes to pixel-perfect designs ready for development.
-    </p>
-
-    <div class="mt-10 flex flex-wrap gap-4">
-      <Button href="/contact" variant="primary">Contact with me</Button>
-      <Button href="/projects" variant="secondary">View projects</Button>
+    <div class="lock-user">
+      <div class="avatar" aria-hidden="true">✳</div>
+      <div class="lock-name">{SITE.name}</div>
+      <div class="lock-role">{SITE.role}</div>
+      <button class="unlock-btn" id="unlockBtn">🔓 Click to unlock</button>
     </div>
-  </Container>
+    <div class="lock-hint">Click anywhere to unlock</div>
+  </div>
 
-  <!-- Projects -->
-  <Container class="py-16">
-    <div class="flex items-end justify-between gap-6 border-t border-line pt-12">
-      <div>
-        <MonoLabel>Projects</MonoLabel>
-        <h2 class="mt-4 max-w-2xl text-4xl font-medium text-paper sm:text-5xl">
-          Discover projects that delight clients and engage users.
-        </h2>
+  <!-- РОБОЧИЙ СТІЛ -->
+  <div id="desktop" class="desktop" hidden>
+    <!-- Menu bar -->
+    <header class="menubar">
+      <div class="menu-left">
+        <span class="menu-logo" aria-hidden="true">✳</span>
+        <strong class="menu-name">{SITE.name}</strong>
+        <span class="menu-item">File</span>
+        <span class="menu-item">Work</span>
+        <span class="menu-item">Help</span>
       </div>
-      <a
-        href="/projects"
-        class="hidden shrink-0 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent sm:block"
-        >All projects →</a
-      >
+      <div class="menu-right">
+        <a href={social("Instagram")} target="_blank" rel="noopener" aria-label="Instagram">◎</a>
+        <a href={social("LinkedIn")} target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+        <span id="barDate">—</span>
+        <span id="barClock">00:00</span>
+      </div>
+    </header>
+
+    <!-- Робоча зона -->
+    <div class="workspace">
+      <div class="stage">
+        <!-- Інтро-картка -->
+        <section class="intro">
+          <div class="intro-avatar" aria-hidden="true">✳</div>
+          <div>
+            <p class="intro-kicker">{SITE.role}</p>
+            <p class="intro-text">
+              I turn complex ideas into intuitive, user-centered interfaces —
+              from research and wireframes to pixel-perfect designs ready for
+              development. Based in {SITE.location}.
+            </p>
+            <a class="intro-more" href="/about-me">More about me →</a>
+          </div>
+        </section>
+
+        <!-- Іконки -->
+        <section class="icons" aria-label="Desktop">
+          {
+            icons.map((i) => (
+              <a
+                class="icon"
+                href={i.href}
+                {...(i.external
+                  ? { target: "_blank", rel: "noopener noreferrer" }
+                  : {})}
+              >
+                <span class="icon-glyph" aria-hidden="true">
+                  {i.emoji}
+                </span>
+                <span class="icon-label">{i.label}</span>
+              </a>
+            ))
+          }
+        </section>
+      </div>
+
+      <!-- Віджети -->
+      <aside class="widgets" aria-label="Widgets">
+        <div class="widget">
+          <div class="widget-title">Choose a theme</div>
+          <div class="swatches">
+            <button class="sw" style="background:#b3c7dd" aria-label="Blue"></button>
+            <button class="sw" style="background:#e7d3c6" aria-label="Sand"></button>
+            <button class="sw" style="background:#cfe0cd" aria-label="Green"></button>
+            <button class="sw" style="background:#2b2f36" aria-label="Dark"></button>
+          </div>
+        </div>
+        <div class="widget">
+          <div class="widget-title">{SITE.location}</div>
+          <div class="weather">
+            <span class="temp">22°</span>
+            <span class="cond">Mostly clear</span>
+          </div>
+        </div>
+        <div class="widget">
+          <div class="widget-title">Now building</div>
+          <div class="np">
+            <div class="np-art" aria-hidden="true">✳</div>
+            <div>
+              <div class="np-line">desluko.com</div>
+              <div class="np-sub">Portfolio · v1</div>
+            </div>
+          </div>
+        </div>
+      </aside>
     </div>
 
-    <div class="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2">
-      {
-        projects.map((p, i) => (
-          <ProjectCard
-            title={p.data.title}
-            category={p.data.category}
-            href={`/projects/${p.id}`}
-            num={String(i + 1).padStart(2, "0")}
-            status={p.data.status}
-            cover={p.data.cover}
-          />
-        ))
-      }
-    </div>
-  </Container>
+    <!-- Dock -->
+    <footer class="dock">
+      {dock.map((d) => <div class="dock-app" title={d}>{d[0]}</div>)}
+    </footer>
+  </div>
+</DesktopLayout>
 
-  <!-- About teaser -->
-  <Container class="py-16">
-    <div class="border-t border-line pt-12">
-      <MonoLabel>About me</MonoLabel>
-      <p class="mt-6 max-w-3xl text-2xl font-medium leading-snug text-paper">
-        I'm a freelance UX/UI designer from {SITE.location}, helping businesses
-        grow through design that creates meaningful connections with their
-        audience.
-      </p>
-      <a
-        href="/about-me"
-        class="mt-8 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline"
-        >More about me →</a
-      >
-    </div>
-  </Container>
-</BaseLayout>
+<style>
+  /* ===== Екран блокування ===== */
+  .lock {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3.5rem 0 2rem;
+    background: var(--wall);
+    cursor: pointer;
+    transition:
+      opacity 0.6s ease,
+      transform 0.6s ease,
+      filter 0.6s ease;
+  }
+  .lock.is-open {
+    opacity: 0;
+    transform: scale(1.04);
+    filter: blur(6px);
+    pointer-events: none;
+  }
+  .lock-top {
+    text-align: center;
+    color: #eef3fb;
+  }
+  .lock-date {
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.9;
+  }
+  .lock-clock {
+    font-size: clamp(5rem, 16vw, 12rem);
+    font-weight: 300;
+    line-height: 0.9;
+    letter-spacing: -0.03em;
+    transform: scaleY(1.35);
+    transform-origin: top center;
+    margin-top: 0.6rem;
+    text-shadow: 0 2px 30px rgba(23, 37, 66, 0.25);
+  }
+  .lock-user {
+    text-align: center;
+    color: #f3f6fb;
+  }
+  .avatar {
+    width: 68px;
+    height: 68px;
+    margin: 0 auto 0.75rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    backdrop-filter: blur(8px);
+    font-size: 1.6rem;
+  }
+  .lock-name {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .lock-role {
+    font-size: 0.7rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    opacity: 0.85;
+    margin-top: 0.2rem;
+  }
+  .unlock-btn {
+    margin-top: 1rem;
+    padding: 0.5rem 1.1rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.28);
+    color: #fff;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    transition: background 0.2s;
+  }
+  .unlock-btn:hover {
+    background: rgba(255, 255, 255, 0.42);
+  }
+  .lock-hint {
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 0.7rem;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+  }
+
+  /* ===== Робочий стіл ===== */
+  .desktop {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    animation: fadein 0.5s ease both;
+  }
+  @keyframes fadein {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  .menubar {
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: rgba(255, 255, 255, 0.35);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+  .menu-left,
+  .menu-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .menu-name {
+    font-weight: 700;
+  }
+  .menu-item,
+  .menu-right a {
+    opacity: 0.75;
+  }
+  .menu-item:hover,
+  .menu-right a:hover {
+    opacity: 1;
+  }
+
+  .workspace {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    padding: 2.2rem 1.6rem 0;
+    overflow: hidden;
+  }
+  .stage {
+    max-width: 820px;
+    width: 100%;
+  }
+
+  .intro {
+    display: flex;
+    gap: 1.1rem;
+    max-width: 680px;
+    margin: 1rem 0 2.5rem;
+  }
+  .intro-avatar {
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    background: var(--panel-strong);
+    box-shadow: var(--shadow);
+    font-size: 1.5rem;
+  }
+  .intro-kicker {
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .intro-text {
+    margin-top: 0.4rem;
+    font-size: 0.92rem;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 40ch;
+  }
+  .intro-more {
+    display: inline-block;
+    margin-top: 0.6rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--ink);
+    border-bottom: 1px solid currentColor;
+  }
+
+  .icons {
+    display: grid;
+    grid-template-columns: repeat(4, 96px);
+    gap: 1.6rem 1.2rem;
+  }
+  .icon {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: center;
+    color: var(--ink);
+  }
+  .icon-glyph {
+    width: 72px;
+    height: 72px;
+    display: grid;
+    place-items: center;
+    font-size: 2.4rem;
+    border-radius: 18px;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    box-shadow: var(--shadow);
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .icon:hover .icon-glyph {
+    transform: translateY(-4px) scale(1.04);
+    box-shadow: 0 18px 44px rgba(23, 37, 66, 0.26);
+  }
+  .icon-label {
+    font-size: 0.78rem;
+    font-weight: 500;
+    padding: 1px 8px;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.4);
+  }
+
+  .widgets {
+    width: 260px;
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  .widget {
+    background: var(--panel-strong);
+    border: 1px solid var(--panel-border);
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+  }
+  .widget-title {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--ink-soft);
+    font-weight: 700;
+  }
+  .swatches {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 0.7rem;
+  }
+  .sw {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  }
+  .weather {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+  }
+  .temp {
+    font-size: 2rem;
+    font-weight: 300;
+  }
+  .cond {
+    font-size: 0.8rem;
+    color: var(--ink-soft);
+  }
+  .np {
+    margin-top: 0.6rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+  }
+  .np-art {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: var(--wall);
+    display: grid;
+    place-items: center;
+    color: #fff;
+  }
+  .np-line {
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .np-sub {
+    font-size: 0.75rem;
+    color: var(--ink-soft);
+  }
+
+  .dock {
+    align-self: center;
+    display: flex;
+    gap: 0.6rem;
+    margin: 0 auto 0.9rem;
+    padding: 0.5rem 0.7rem;
+    background: rgba(255, 255, 255, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+  }
+  .dock-app {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(160deg, #6f88ae, #47597c);
+    box-shadow: 0 4px 12px rgba(23, 37, 66, 0.25);
+    transition: transform 0.16s ease;
+    cursor: default;
+  }
+  .dock-app:hover {
+    transform: translateY(-8px) scale(1.08);
+  }
+
+  @media (max-width: 760px) {
+    .widgets {
+      display: none;
+    }
+    .icons {
+      grid-template-columns: repeat(3, 90px);
+    }
+    .lock-clock {
+      transform: scaleY(1.2);
+    }
+  }
+</style>
+
+<script>
+  // Живий годинник (menu bar + lock)
+  function pad(n: number) {
+    return String(n).padStart(2, "0");
+  }
+  function tick() {
+    const now = new Date();
+    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    const date = now.toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+    const set = (id: string, v: string) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = v;
+    };
+    set("lockClock", time);
+    set("barClock", time);
+    set("lockDate", date);
+    set("barDate", date);
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // Розблокування
+  const lock = document.getElementById("lock");
+  const desktop = document.getElementById("desktop");
+  function unlock() {
+    if (!lock || !desktop) return;
+    desktop.hidden = false;
+    lock.classList.add("is-open");
+    sessionStorage.setItem("unlocked", "1");
+    window.setTimeout(() => {
+      lock.style.display = "none";
+    }, 650);
+  }
+  // Якщо вже розблоковано в цій сесії — не показуємо lock знову
+  if (sessionStorage.getItem("unlocked") === "1") {
+    if (lock) lock.style.display = "none";
+    if (desktop) desktop.hidden = false;
+  } else {
+    lock?.addEventListener("click", unlock);
+  }
+</script>
