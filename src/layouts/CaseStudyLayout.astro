@@ -19,6 +19,19 @@ const d = entry.data;
 
 const title = d.seoTitle ?? `${d.title} — ${d.category} | ${SITE.name}`;
 const description = d.seoDescription ?? d.summary;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
+
+// Схема кейсу для пошуковиків (пов'язана з Person із BaseLayout)
+const caseSchema = {
+  "@context": "https://schema.org",
+  "@type": "CreativeWork",
+  name: d.title,
+  about: d.category,
+  abstract: d.summary,
+  url: canonicalURL,
+  creator: { "@id": `${SITE.url}/#person` },
+  ...(d.year ? { dateCreated: d.year } : {}),
+};
 
 const meta = [
   { label: "Role", value: d.role },
@@ -28,7 +41,12 @@ const meta = [
 ].filter((m) => m.value && !m.value.startsWith("TODO"));
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+  title={title}
+  description={description}
+  ogType="article"
+  jsonLd={caseSchema}
+>
   <article>
     <!-- Шапка -->
     <Container class="pt-16 pb-10 sm:pt-24">

@@ -1,23 +1,29 @@
 ---
 /**
  * BaseLayout — спільний каркас для всіх сторінок.
- * Задає <head> (мета, canonical, favicon, стилі) і обгортку сторінки.
- * Header/Footer під'єднаємо на кроці 3.
+ * Задає <head> (SEO-мета, OG, Twitter, JSON-LD, canonical, favicon)
+ * і обгортку сторінки (header + main + footer).
  */
 import "../styles/global.css";
-import { SITE } from "../consts";
+import { SITE, SOCIALS } from "../consts";
 import SiteHeader from "../components/SiteHeader.astro";
 import SiteFooter from "../components/SiteFooter.astro";
 
 interface Props {
-  /** Заголовок вкладки браузера + <title> (унікальний на кожній сторінці) */
+  /** <title> + заголовок вкладки (унікальний на кожній сторінці) */
   title: string;
   /** Meta description (унікальний на кожній сторінці) */
   description?: string;
-  /** Перевизначити canonical URL за потреби */
+  /** Перевизначити canonical URL */
   canonical?: string;
-  /** Прибрати сторінку з індексації пошуковиків */
+  /** Прибрати сторінку з індексації */
   noindex?: boolean;
+  /** OG-зображення (шлях від кореня). За замовчуванням — брендоване. */
+  ogImage?: string;
+  /** Тип OG: "website" (сторінки) або "article" (кейси) */
+  ogType?: "website" | "article";
+  /** Додаткова JSON-LD схема сторінки (напр. CreativeWork для кейсу) */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
@@ -25,9 +31,39 @@ const {
   description = SITE.description,
   canonical,
   noindex = false,
+  ogImage = "/og-default.png",
+  ogType = "website",
+  jsonLd,
 } = Astro.props;
 
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
+const ogImageURL = new URL(ogImage, Astro.site).href;
+
+// Site-wide identity — присутня на кожній сторінці
+const baseSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": `${SITE.url}/#person`,
+      name: SITE.name,
+      jobTitle: SITE.role,
+      url: SITE.url,
+      email: `mailto:${SITE.email}`,
+      address: { "@type": "PostalAddress", addressLocality: SITE.location },
+      sameAs: SOCIALS.map((s) => s.href),
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE.url}/#website`,
+      name: SITE.name,
+      url: SITE.url,
+      publisher: { "@id": `${SITE.url}/#person` },
+    },
+  ],
+};
+
+const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 ---
 
 <!doctype html>
@@ -36,13 +72,45 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    <!-- Primary -->
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
 
+    <!-- Open Graph -->
+    <meta property="og:type" content={ogType} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.role}`} />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
+
+    <!-- Icons / misc -->
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#040008" />
     <meta name="generator" content={Astro.generator} />
+
+    <!-- JSON-LD -->
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(baseSchema)}
+    />
+    {
+      pageSchemas.map((s) => (
+        <script type="application/ld+json" set:html={JSON.stringify(s)} />
+      ))
+    }
   </head>
 
   <body class="flex min-h-screen flex-col">
