@@ -6,8 +6,7 @@
 export const SITE = {
   name: "Anton Lukovyi",
   role: "Freelance UX/UI Designer",
-  // TODO: замінити на фінальний домен після налаштування деплою на Netlify
-  url: "https://lukovyi.netlify.app",
+  url: "https://desluko.com",
   email: "lukovyiwork@gmail.com",
   location: "Celle, Germany",
   description:
@@ -25,8 +24,7 @@ export const NAV = [
 /** Соцмережі (реальні URL з поточного сайту). */
 export const SOCIALS = [
   { label: "LinkedIn", href: "https://www.linkedin.com/in/anton-lukovyi/" },
-  // TODO: підтвердити URL Instagram
-  { label: "Instagram", href: "https://www.instagram.com/" },
+  { label: "Instagram", href: "https://www.instagram.com/desluko" },
   { label: "Behance", href: "https://www.behance.net/antonlukovyiproject" },
   { label: "Dribbble", href: "https://dribbble.com/Lukovyi" },
   { label: "Telegram", href: "https://t.me/tooshaly" },

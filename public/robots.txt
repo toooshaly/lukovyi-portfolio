@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://lukovyi.netlify.app/sitemap-index.xml
+Sitemap: https://desluko.com/sitemap-index.xml

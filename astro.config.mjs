@@ -8,8 +8,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   // Фінальний домен сайту. Потрібен для sitemap.xml і canonical URL.
-  // TODO: замінити на реальний домен після деплою (має збігатися з SITE.url у src/consts.ts).
-  site: "https://lukovyi.netlify.app",
+  site: "https://desluko.com",
 
   vite: {
     plugins: [tailwindcss()]
