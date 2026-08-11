@@ -66,25 +66,53 @@ I went through every screen and documented the specific places where the interfa
 
 ### Trust is a consequence of structure, not decoration.
 
-{/* TODO: короткий intro + 3 принципи (row 01/02/03) — тексти у Figma названі "title/desc", не зчитались. Дошлю зі скриншотів або з тексту Anton. */}
+Three principles drove every design decision.
+
+**1. Hierarchy first, surface second.** Before touching colour or form, I decided on every screen what was primary, what was secondary and what could go. The confidence score became the anchor of the card — everything else was built around it. The visual language only arrived once the structure already worked in black and white.
+
+**2. One meaning per signal.** Every colour, surface and icon had to mean exactly one thing. Grey stopped meaning "selected", "collapsed" and "tappable" at the same time. It sounds like hygiene, but in a product that tells people where to put money, a predictable interface is what trust in the prediction grows out of.
+
+**3. New features are comprehension problems, not screens.** Odds comparison, the betslip and model re-training all arrived as "draw me a screen" requests. Each one was really the question "how do I show a person what the model is doing, so they can act on it?" So design started from the user's decision, not from a layout.
 
 ## 05 — Core work
 
 ### Redesigning the prediction screens, plus three new features built from scratch.
 
-Alongside reworking the core prediction screens, three features were designed from zero:
+#### Match screen + odds comparison — "Users had no way to compare odds."
 
-- **Bookmaker odds comparison** — the user sees odds from different bookmakers for an event and moves through to partners.
-- **AI model re-training** — the product's core feature: tuning the model to a specific match, sport and bet type.
-- **The betslip** — where selected predictions accumulate and the combined probability is visible.
+On the old match screen the main prediction (1 / X / 2) was lost under a long table of secondary stats — cards, shots, corners. The core issue: the user saw a prediction but had no way to tell where the bet was better value.
 
-{/* TODO: детальні описи кожної фічі + v1/v2/v3 порівняння — у Figma "body/quote", доповню. */}
+I rebuilt the screen around the decision. The prediction became a Full Time (1X2) block — team names, percentages and visual bars, sorted by probability. The key new feature is the Compare odds table: odds from several bookmakers (Fuksiarz, BetFan, LV Bet) in a single 1 / X / 2 format, with the best value in each column highlighted and a "Compare 5 bookmakers" action.
+
+Why this is better: one screen shows both the prediction and where the bet is better value — the decision happens without leaving the app. The essentials (prediction + odds) now sit at the top, secondary stats go deeper. An English-language interface and responsible-gambling markers (18+, Play responsibly) are a step toward a wider market.
+
+![Match screen redesign — v1 to v2 to v3](./sports-ai-pro-odds.png)
+
+#### AI re-training — "The re-training logic already existed. An interface a user could actually operate did not."
+
+Model re-training is the core feature of Sports AI-Pro: it is what separates the product from an ordinary prediction aggregator. The founder wanted to give users control over the AI model — to tune its weights to their own read of a match. The re-training logic already existed; there was no interface for it. My job was the screen through which it could be operated.
+
+I reduced the controls to three elements: a radar chart showing the current weight of each factor, sliders to change them, and lock states to pin whatever the user does not want touched. The factor set adapts per sport — in football it is attack, defence, set pieces, fouls and tempo; in basketball, efficiency and control; in tennis, serve and aces. One action closes the screen: Re-train AI.
+
+The key decision here was not visual but experiential: the feature has to feel like an instrument you operate, not a settings panel. Hence a legible radar chart instead of a list of numbers, instant slider feedback, and a single unambiguous action button.
+
+![AI re-training — v1 to v2](./sports-ai-pro-retrain.png)
+
+#### The betslip
+
+A supporting feature — the place where selected predictions accumulate and the combined probability is visible.
 
 ## 06 — Scalability
 
 ### One component library on shared styles.
 
-{/* TODO: тіло секції (у Figma "body") — доповню. */}
+I built a full component library in Figma — typography, colour styles, prediction and betslip cards, chips, segmented controls, tab bars, bottom navigation, bottom sheets, progress bars, probability indicators, button states, forms, locked/unlocked states. Every component with variants and states: a fix at library level propagates to every screen.
+
+Components were designed not for football but for every sport in the app — and those have different stat models: football has H2H and goals, tennis has sets, basketball has quarters. So prediction cards, probability indicators and stat blocks are built as configurable structures, not fixed layouts for one scenario. Football appears in this case as the reference; everything else assembles from the same components with no separate design per sport.
+
+At this stage it was a library, not a design system: shared components and colour styles, but no tokens or variables. The full system came later, in v3 — see section 10.
+
+![Component library — buttons, navbar, inputs, cards and states](./sports-ai-pro-system.png)
 
 ## 07 — Beyond the app
 
@@ -103,13 +131,21 @@ Launch assets carried the same visual language as the app. App Store screens led
 
 ### The release gave a strong start. Analytics showed where the real bottleneck was.
 
-{/* TODO: таблиця воронки (arc table) + висновки — дані у Figma "cell/body", доповню. */}
+| Metric | Dec '25 | Jan '26 · peak | May '26 |
+| --- | ---: | ---: | ---: |
+| Revenue / mo | $159 | **$558** | $225 |
+| MRR | $159 | **$503** | $148 |
+| Active subscriptions | 14 | **30** | 19 |
+| New paid subscriptions | 12 | **29** | 11 |
+| Purchase conversion | 2.4% | **3.3%** | 3.2% |
+
+The redesign lifted purchase conversion and drove a strong January peak. But revenue peaked and then fell back by spring — acquisition and first-purchase worked; keeping subscribers did not.
 
 ## 09 — Retention
 
 ### The next design problem is retention.
 
-{/* TODO: тіло секції — доповню. */}
+The funnel made the priority obvious: the bottleneck was not the first screen but what happens after it. The value shows up before the subscription; the reason to come back does not. That reframed v3 — from polishing screens to designing for the return visit: onboarding that hands the user control of the model, and a paywall that proves its worth before payment.
 
 ## 10 — V3: what is already built
 
@@ -161,7 +197,13 @@ Bookmaker odds are being added: the user sees odds from different bookmakers for
 
 ## What I learned
 
-{/* TODO: рефлексія (у Figma "kicker/h2/body") — доповню. */}
+### Measure design where it actually has influence — and honestly give the rest to traffic and seasonality.
+
+The most important lessons came not from the release but from the data after it. Design did its part — trust in the predictions and purchase conversion (7-day rose from ~2.1% to ~3.0%) — but the real bottleneck turned out not to be where I expected: not the first screen, but retention. That taught me two things: to separate design's contribution from traffic and seasonality honestly, and to start from a metric design can actually move, rather than from the most visible screen.
+
+A professional conclusion about the product: in AI-based apps, interface logic and visual design are inseparable. A user does not trust a feature they cannot model in their head — so confidence states, probability labels and explanations of the source mattered more than aesthetics.
+
+The product is in active development, and this case will grow with it. The next stage is work on retention (onboarding, trial, activation); I will add the results of those iterations here once they are live.
 
 ---
 
