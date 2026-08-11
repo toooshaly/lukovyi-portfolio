@@ -10,6 +10,7 @@ import "../styles/global.css";
 import { SITE, SOCIALS } from "../consts";
 import MenuBar from "../components/os/MenuBar.astro";
 import Dock from "../components/os/Dock.astro";
+import Desktop from "../components/os/Desktop.astro";
 
 interface Props {
   title?: string;
@@ -96,6 +97,7 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 
   <body class="os-body">
     {showChrome && <MenuBar />}
+    {showChrome && <Desktop />}
     <slot />
     {showChrome && <Dock />}
   </body>
@@ -160,6 +162,8 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
 </style>
 
 <script>
+  import { navigate } from "astro:transitions/client";
+
   // Живий годинник + застосування збереженої теми. Guard, щоб View Transitions
   // не плодили кілька інтервалів.
   function pad(n: number) { return String(n).padStart(2, "0"); }
@@ -180,8 +184,41 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     const w = window as any;
     if (!w.__clock) w.__clock = setInterval(tick, 1000);
   }
+  // Інтерактив робочого столу (персистентний, тож слухачі вішаємо один раз)
+  function initDesktop() {
+    const w = window as any;
+    if (w.__desktopInit) return;
+    w.__desktopInit = true;
+
+    document.querySelectorAll<HTMLButtonElement>(".sw").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = btn.dataset.theme || "";
+        if (t) document.documentElement.dataset.theme = t;
+        else document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("os-theme", t);
+      });
+    });
+
+    const pw = document.getElementById("pw");
+    let target = "/projects";
+    document.querySelectorAll<HTMLAnchorElement>('.icon[data-pw="1"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        target = a.getAttribute("href") || "/projects";
+        if (pw) pw.hidden = false;
+      });
+    });
+    document.getElementById("pwCancel")?.addEventListener("click", () => { if (pw) pw.hidden = true; });
+    document.getElementById("pwUnlock")?.addEventListener("click", () => {
+      if (pw) pw.hidden = true;
+      navigate(target);
+    });
+    pw?.addEventListener("click", (e) => { if (e.target === pw && pw) pw.hidden = true; });
+  }
+
   applyTheme();
   initClock();
+  initDesktop();
   // Після кожного переходу View Transitions — оновити тему й час
   document.addEventListener("astro:page-load", () => { applyTheme(); tick(); });
 </script>
