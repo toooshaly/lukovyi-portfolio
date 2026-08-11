@@ -1,5 +1,6 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import OSLayout from "../layouts/OSLayout.astro";
+import WindowFrame from "../components/os/WindowFrame.astro";
 import Container from "../components/Container.astro";
 import MonoLabel from "../components/MonoLabel.astro";
 import Button from "../components/Button.astro";
@@ -8,11 +9,12 @@ import { SITE, SOCIALS } from "../consts";
 const interests = ["#VideoEnthusiast", "#PhotographyLover"];
 ---
 
-<BaseLayout
+<OSLayout
   title={`About — ${SITE.name}`}
   description="Anton Lukovyi — freelance UX/UI designer and Webflow developer helping businesses grow through design."
 >
-  <Container class="py-16 sm:py-24">
+  <WindowFrame title="About Me">
+    <Container class="py-16 sm:py-24">
     <MonoLabel>About me</MonoLabel>
     <h1 class="mt-4 max-w-4xl text-5xl font-medium leading-tight text-paper sm:text-6xl">
       Hello, my name is {SITE.name}
@@ -73,5 +75,6 @@ const interests = ["#VideoEnthusiast", "#PhotographyLover"];
       <Button href="/projects" variant="primary">My work</Button>
       <Button href="/contact" variant="secondary">Get in touch</Button>
     </div>
-  </Container>
-</BaseLayout>
+    </Container>
+  </WindowFrame>
+</OSLayout>

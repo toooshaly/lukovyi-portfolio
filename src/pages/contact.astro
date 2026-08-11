@@ -1,5 +1,6 @@
 ---
-import BaseLayout from "../layouts/BaseLayout.astro";
+import OSLayout from "../layouts/OSLayout.astro";
+import WindowFrame from "../components/os/WindowFrame.astro";
 import Container from "../components/Container.astro";
 import MonoLabel from "../components/MonoLabel.astro";
 import { SITE, SOCIALS } from "../consts";
@@ -8,11 +9,12 @@ const fieldClass =
   "mt-2 w-full rounded-xl border border-line bg-ink-soft px-4 py-3 text-paper placeholder:text-muted-dark focus:border-accent focus:outline-none";
 ---
 
-<BaseLayout
+<OSLayout
   title={`Contact — ${SITE.name}`}
   description="Get in touch with Anton Lukovyi — freelance UX/UI designer. Available for new projects."
 >
-  <Container class="py-16 sm:py-24">
+  <WindowFrame title="Contact">
+    <Container class="py-16 sm:py-24">
     <MonoLabel>Let's chat!</MonoLabel>
     <h1 class="mt-4 max-w-3xl text-5xl font-medium text-paper sm:text-6xl">
       Have a project in mind? Let's talk.
@@ -87,5 +89,6 @@ const fieldClass =
         </div>
       </aside>
     </div>
-  </Container>
-</BaseLayout>
+    </Container>
+  </WindowFrame>
+</OSLayout>

@@ -1,33 +1,25 @@
 ---
-import { getCollection } from "astro:content";
-import DesktopLayout from "../layouts/DesktopLayout.astro";
+import OSLayout from "../layouts/OSLayout.astro";
 import { SITE, SOCIALS } from "../consts";
 
 const social = (label: string) =>
   SOCIALS.find((s) => s.label === label)?.href ?? "#";
 
-const projects = (
-  await getCollection("projects", ({ data }) =>
-    import.meta.env.PROD ? !data.draft : true,
-  )
-).sort((a, b) => a.data.order - b.data.order);
-
-// Іконки робочого столу. `open` = id вікна; `href` = зовнішнє посилання.
+// Іконки столу. Внутрішні лінки відкриваються як вікна (View Transitions);
+// Case Studies перехоплюється декоративною модалкою-паролем.
 const icons = [
-  { label: "Case Studies", emoji: "📁", open: "casestudies" },
-  { label: "About Me", emoji: "📖", open: "about" },
-  { label: "Contact", emoji: "✉️", open: "contact" },
-  { label: "Resume", emoji: "📄", open: "resume" },
-  { label: "Photos", emoji: "📷", open: "photos" },
-  { label: "Dribbble", emoji: "🏀", href: social("Dribbble") },
-  { label: "Behance", emoji: "🎨", href: social("Behance") },
-  { label: "LinkedIn", emoji: "💼", href: social("LinkedIn") },
+  { label: "Case Studies", emoji: "📁", href: "/projects", pw: true },
+  { label: "About Me", emoji: "📖", href: "/about-me" },
+  { label: "Contact", emoji: "✉️", href: "/contact" },
+  { label: "Resume", emoji: "📄", href: `mailto:${SITE.email}`, ext: true },
+  { label: "Photos", emoji: "📷", href: social("Instagram"), ext: true },
+  { label: "Dribbble", emoji: "🏀", href: social("Dribbble"), ext: true },
+  { label: "Behance", emoji: "🎨", href: social("Behance"), ext: true },
+  { label: "LinkedIn", emoji: "💼", href: social("LinkedIn"), ext: true },
 ];
-
-const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
 ---
 
-<DesktopLayout>
+<OSLayout showChrome={true}>
   <!-- ЕКРАН БЛОКУВАННЯ -->
   <div id="lock" class="lock">
     <div class="lock-top">
@@ -44,23 +36,7 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
   </div>
 
   <!-- РОБОЧИЙ СТІЛ -->
-  <div id="desktop" class="desktop" hidden>
-    <header class="menubar">
-      <div class="menu-left">
-        <span class="menu-logo" aria-hidden="true">✳</span>
-        <strong class="menu-name">{SITE.name}</strong>
-        <span class="menu-item" data-open="about">About</span>
-        <span class="menu-item" data-open="casestudies">Work</span>
-        <span class="menu-item" data-open="contact">Contact</span>
-      </div>
-      <div class="menu-right">
-        <a href={social("Instagram")} target="_blank" rel="noopener" aria-label="Instagram">◎</a>
-        <a href={social("LinkedIn")} target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
-        <span id="barDate">—</span>
-        <span id="barClock">00:00</span>
-      </div>
-    </header>
-
+  <div class="desktop">
     <div class="workspace">
       <div class="stage">
         <section class="intro">
@@ -78,19 +54,17 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
 
         <section class="icons" aria-label="Desktop">
           {
-            icons.map((i) =>
-              i.href ? (
-                <a class="icon" href={i.href} target="_blank" rel="noopener noreferrer">
-                  <span class="icon-glyph" aria-hidden="true">{i.emoji}</span>
-                  <span class="icon-label">{i.label}</span>
-                </a>
-              ) : (
-                <button class="icon" data-open={i.open}>
-                  <span class="icon-glyph" aria-hidden="true">{i.emoji}</span>
-                  <span class="icon-label">{i.label}</span>
-                </button>
-              ),
-            )
+            icons.map((i) => (
+              <a
+                class="icon"
+                href={i.href}
+                data-pw={i.pw ? "1" : undefined}
+                {...(i.ext ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+              >
+                <span class="icon-glyph" aria-hidden="true">{i.emoji}</span>
+                <span class="icon-label">{i.label}</span>
+              </a>
+            ))
           }
         </section>
       </div>
@@ -124,97 +98,6 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
         </div>
       </aside>
     </div>
-
-    <footer class="dock">
-      {dock.map((d) => <div class="dock-app" title={d}>{d[0]}</div>)}
-    </footer>
-  </div>
-
-  <!-- ВІКНА (приховані; JS показує) -->
-  <div id="windows" hidden>
-    <!-- Case Studies (Finder) -->
-    <section class="window" data-window="casestudies" style="width:min(720px,92vw)">
-      <div class="titlebar">
-        <div class="lights"><i class="l-close" data-close></i><i class="l-min"></i><i class="l-max"></i></div>
-        <span class="title">Case Studies</span>
-        <span></span>
-      </div>
-      <div class="window-body">
-        <div class="finder">
-          {
-            projects.map((p) => (
-              <a class="finder-item" href={`/projects/${p.id}`}>
-                <span class="finder-glyph" aria-hidden="true">🗂️</span>
-                <span class="finder-name">{p.data.title}</span>
-                <span class="finder-cat">{p.data.category}</span>
-              </a>
-            ))
-          }
-        </div>
-      </div>
-    </section>
-
-    <!-- About -->
-    <section class="window" data-window="about" style="width:min(560px,92vw)">
-      <div class="titlebar">
-        <div class="lights"><i class="l-close" data-close></i><i class="l-min"></i><i class="l-max"></i></div>
-        <span class="title">About Me</span><span></span>
-      </div>
-      <div class="window-body prose-win">
-        <h2>{SITE.name}</h2>
-        <p class="win-kicker">{SITE.role} · {SITE.location}</p>
-        <p>
-          I'm a freelance UX/UI designer helping businesses grow through
-          exceptional design — from research and wireframes to pixel-perfect,
-          dev-ready interfaces. My work spans SaaS dashboards, mobile apps and
-          e-commerce.
-        </p>
-        <a class="win-cta" href="/about-me">Open full About page →</a>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="window" data-window="contact" style="width:min(480px,92vw)">
-      <div class="titlebar">
-        <div class="lights"><i class="l-close" data-close></i><i class="l-min"></i><i class="l-max"></i></div>
-        <span class="title">Contact</span><span></span>
-      </div>
-      <div class="window-body prose-win">
-        <p class="win-kicker">Let's chat!</p>
-        <a class="win-email" href={`mailto:${SITE.email}`}>{SITE.email}</a>
-        <div class="win-socials">
-          {SOCIALS.map((s) => (
-            <a href={s.href} target="_blank" rel="noopener noreferrer">{s.label}</a>
-          ))}
-        </div>
-        <a class="win-cta" href="/contact">Open contact page →</a>
-      </div>
-    </section>
-
-    <!-- Resume -->
-    <section class="window" data-window="resume" style="width:min(480px,92vw)">
-      <div class="titlebar">
-        <div class="lights"><i class="l-close" data-close></i><i class="l-min"></i><i class="l-max"></i></div>
-        <span class="title">Resume</span><span></span>
-      </div>
-      <div class="window-body prose-win">
-        <p>Resume — coming soon. Add a PDF to <code>/public</code> and link it here.</p>
-        <a class="win-cta" href={`mailto:${SITE.email}`}>Request my CV →</a>
-      </div>
-    </section>
-
-    <!-- Photos -->
-    <section class="window" data-window="photos" style="width:min(560px,92vw)">
-      <div class="titlebar">
-        <div class="lights"><i class="l-close" data-close></i><i class="l-min"></i><i class="l-max"></i></div>
-        <span class="title">Photos</span><span></span>
-      </div>
-      <div class="window-body">
-        <div class="photos-grid">
-          {Array.from({ length: 6 }).map(() => <div class="photo-ph" />)}
-        </div>
-      </div>
-    </section>
   </div>
 
   <!-- Модалка-пароль (декоративна) -->
@@ -233,10 +116,9 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
       </div>
     </div>
   </div>
-</DesktopLayout>
+</OSLayout>
 
 <style>
-  /* ===== Екран блокування ===== */
   .lock { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3.5rem 0 2rem; background: var(--wall); cursor: pointer; transition: opacity .6s ease, transform .6s ease, filter .6s ease; }
   .lock.is-open { opacity: 0; transform: scale(1.04); filter: blur(6px); pointer-events: none; }
   .lock-top { text-align: center; color: #eef3fb; }
@@ -250,16 +132,8 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
   .unlock-btn:hover { background: rgba(255,255,255,.42); }
   .lock-hint { color: rgba(255,255,255,.75); font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; }
 
-  /* ===== Робочий стіл ===== */
-  .desktop { position: fixed; inset: 0; display: flex; flex-direction: column; animation: fadein .5s ease both; }
-  @keyframes fadein { from { opacity: 0 } to { opacity: 1 } }
-  .menubar { height: 30px; display: flex; align-items: center; justify-content: space-between; padding: 0 14px; background: var(--panel); backdrop-filter: blur(18px); border-bottom: 1px solid var(--panel-border); font-size: .8rem; color: var(--ink); }
-  .menu-left, .menu-right { display: flex; align-items: center; gap: 16px; }
-  .menu-name { font-weight: 700; }
-  .menu-item, .menu-right a { opacity: .75; cursor: pointer; }
-  .menu-item:hover, .menu-right a:hover { opacity: 1; }
-
-  .workspace { flex: 1; display: flex; justify-content: space-between; gap: 2rem; padding: 2.2rem 1.6rem 0; overflow: hidden; }
+  .desktop { position: fixed; inset: 0; padding-top: 30px; padding-bottom: 84px; }
+  .workspace { height: 100%; display: flex; justify-content: space-between; gap: 2rem; padding: 2.2rem 1.6rem 0; overflow: hidden; }
   .stage { max-width: 820px; width: 100%; }
   .intro { display: flex; gap: 1.1rem; max-width: 680px; margin: 1rem 0 2.5rem; }
   .intro-avatar { flex: none; width: 64px; height: 64px; border-radius: 14px; display: grid; place-items: center; background: var(--panel-strong); box-shadow: var(--shadow); font-size: 1.5rem; }
@@ -286,41 +160,6 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
   .np-line { font-weight: 600; font-size: .9rem; }
   .np-sub { font-size: .75rem; color: var(--ink-soft); }
 
-  .dock { align-self: center; display: flex; gap: .6rem; margin: 0 auto .9rem; padding: .5rem .7rem; background: var(--panel); border: 1px solid var(--panel-border); border-radius: 20px; box-shadow: var(--shadow); backdrop-filter: blur(20px); }
-  .dock-app { width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-weight: 700; color: #fff; background: linear-gradient(160deg, #6f88ae, #47597c); box-shadow: 0 4px 12px rgba(23,37,66,.25); transition: transform .16s ease; }
-  .dock-app:hover { transform: translateY(-8px) scale(1.08); }
-
-  /* ===== Вікна ===== */
-  .window { display: none; position: fixed; top: 90px; left: 50%; transform: translateX(-50%); background: var(--panel-strong); border: 1px solid var(--panel-border); border-radius: 14px; box-shadow: 0 24px 70px rgba(23,37,66,.32); backdrop-filter: blur(24px); overflow: hidden; color: var(--ink); }
-  .titlebar { display: flex; align-items: center; justify-content: space-between; height: 38px; padding: 0 12px; background: var(--panel); border-bottom: 1px solid var(--panel-border); cursor: grab; user-select: none; }
-  .titlebar:active { cursor: grabbing; }
-  .lights { display: flex; gap: 7px; }
-  .lights i { width: 12px; height: 12px; border-radius: 50%; display: block; }
-  .l-close { background: #ff5f57; cursor: pointer; }
-  .l-min { background: #febc2e; }
-  .l-max { background: #28c840; }
-  .title { font-size: .8rem; font-weight: 600; color: var(--ink-soft); }
-  .window-body { padding: 1.1rem 1.3rem 1.4rem; max-height: 70vh; overflow: auto; }
-
-  .finder { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; }
-  .finder-item { display: flex; flex-direction: column; align-items: center; gap: .35rem; text-align: center; padding: .8rem .4rem; border-radius: 12px; color: var(--ink); transition: background .15s; }
-  .finder-item:hover { background: var(--panel); }
-  .finder-glyph { font-size: 2rem; }
-  .finder-name { font-size: .8rem; font-weight: 600; }
-  .finder-cat { font-size: .68rem; color: var(--ink-soft); }
-
-  .prose-win h2 { font-size: 1.3rem; font-weight: 700; }
-  .win-kicker { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; margin: .2rem 0 .8rem; }
-  .prose-win p { font-size: .9rem; line-height: 1.55; color: var(--ink); }
-  .win-cta { display: inline-block; margin-top: 1rem; font-size: .82rem; font-weight: 600; color: var(--ink); border-bottom: 1px solid currentColor; }
-  .win-email { display: block; font-size: 1.2rem; font-weight: 600; color: var(--ink); margin-bottom: .8rem; }
-  .win-socials { display: flex; flex-wrap: wrap; gap: .8rem; }
-  .win-socials a { font-size: .85rem; color: var(--ink-soft); }
-  .win-socials a:hover { color: var(--ink); }
-  .photos-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; }
-  .photo-ph { aspect-ratio: 1; border-radius: 10px; background: var(--wall); opacity: .6; }
-
-  /* ===== Модалка-пароль ===== */
   .pw-overlay { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: rgba(20,30,50,.35); backdrop-filter: blur(3px); }
   .pw-card { width: min(360px, 90vw); background: #fff; border-radius: 16px; padding: 1.6rem; text-align: center; box-shadow: 0 30px 80px rgba(0,0,0,.35); color: #1c2530; }
   .pw-lock { width: 40px; height: 40px; margin: 0 auto .8rem; display: grid; place-items: center; border-radius: 10px; background: #111; font-size: 1.1rem; }
@@ -340,99 +179,50 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
 </style>
 
 <script>
-  function pad(n: number) { return String(n).padStart(2, "0"); }
-  function tick() {
-    const now = new Date();
-    const time = `${pad(now.getHours())}:${pad(now.getMinutes())}`;
-    const date = now.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-    const set = (id: string, v: string) => { const el = document.getElementById(id); if (el) el.textContent = v; };
-    set("lockClock", time); set("barClock", time); set("lockDate", date); set("barDate", date);
-  }
-  tick(); setInterval(tick, 1000);
+  function initHome() {
+    const lock = document.getElementById("lock");
+    const desktop = document.querySelector(".desktop") as HTMLElement | null;
+    if (!lock) return;
 
-  // ===== Розблокування =====
-  const lock = document.getElementById("lock");
-  const desktop = document.getElementById("desktop");
-  function unlock() {
-    if (!lock || !desktop) return;
-    desktop.hidden = false;
-    lock.classList.add("is-open");
-    sessionStorage.setItem("unlocked", "1");
-    window.setTimeout(() => { lock.style.display = "none"; }, 650);
-  }
-  if (sessionStorage.getItem("unlocked") === "1") {
-    if (lock) lock.style.display = "none";
-    if (desktop) desktop.hidden = false;
-  } else {
-    lock?.addEventListener("click", unlock);
-  }
+    // Розблокування (лише на головній)
+    function unlock() {
+      lock!.classList.add("is-open");
+      sessionStorage.setItem("unlocked", "1");
+      window.setTimeout(() => { lock!.style.display = "none"; }, 650);
+    }
+    if (sessionStorage.getItem("unlocked") === "1") {
+      lock.style.display = "none";
+    } else {
+      lock.style.display = "";
+      lock.classList.remove("is-open");
+      lock.addEventListener("click", unlock, { once: true });
+    }
 
-  // ===== Теми =====
-  const savedTheme = localStorage.getItem("os-theme");
-  if (savedTheme) document.documentElement.dataset.theme = savedTheme;
-  document.querySelectorAll<HTMLButtonElement>(".sw").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const t = btn.dataset.theme || "";
-      if (t) document.documentElement.dataset.theme = t;
-      else document.documentElement.removeAttribute("data-theme");
-      localStorage.setItem("os-theme", t);
+    // Перемикач тем
+    document.querySelectorAll<HTMLButtonElement>(".sw").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = btn.dataset.theme || "";
+        if (t) document.documentElement.dataset.theme = t;
+        else document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("os-theme", t);
+      });
     });
-  });
 
-  // ===== Менеджер вікон =====
-  const winRoot = document.getElementById("windows");
-  let zTop = 300;
-  function openWindow(id: string) {
-    if (winRoot) winRoot.hidden = false;
-    const w = document.querySelector<HTMLElement>(`.window[data-window="${id}"]`);
-    if (!w) return;
-    w.style.display = "block";
-    w.style.zIndex = String(++zTop);
-    // легкий каскад, щоб вікна не збігались
-    const openCount = document.querySelectorAll<HTMLElement>('.window[style*="display: block"]').length;
-    w.style.top = 80 + openCount * 24 + "px";
+    // Модалка-пароль на Case Studies (декоративна, не блокує реальну сторінку)
+    const pw = document.getElementById("pw");
+    let target = "/projects";
+    document.querySelectorAll<HTMLAnchorElement>('.icon[data-pw="1"]').forEach((a) => {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        target = a.getAttribute("href") || "/projects";
+        if (pw) pw.hidden = false;
+      });
+    });
+    document.getElementById("pwCancel")?.addEventListener("click", () => { if (pw) pw.hidden = true; });
+    document.getElementById("pwUnlock")?.addEventListener("click", () => { window.location.href = target; });
+    pw?.addEventListener("click", (e) => { if (e.target === pw && pw) pw.hidden = true; });
   }
-  function closeWindow(w: HTMLElement) { w.style.display = "none"; }
 
-  // Відкриття з іконок + меню
-  document.querySelectorAll<HTMLElement>("[data-open]").forEach((el) => {
-    el.addEventListener("click", () => {
-      const id = el.dataset.open!;
-      if (id === "casestudies") { showPw(); return; }
-      openWindow(id);
-    });
-  });
-
-  // Закриття + фокус + перетягування
-  document.querySelectorAll<HTMLElement>(".window").forEach((w) => {
-    w.addEventListener("mousedown", () => { w.style.zIndex = String(++zTop); });
-    w.querySelector<HTMLElement>("[data-close]")?.addEventListener("click", () => closeWindow(w));
-    const bar = w.querySelector<HTMLElement>(".titlebar");
-    if (!bar) return;
-    let sx = 0, sy = 0, ox = 0, oy = 0, drag = false;
-    bar.addEventListener("mousedown", (e) => {
-      drag = true;
-      const r = w.getBoundingClientRect();
-      // перемикаємось на абсолютні координати (прибираємо translateX)
-      w.style.left = r.left + "px";
-      w.style.top = r.top + "px";
-      w.style.transform = "none";
-      sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top;
-      e.preventDefault();
-    });
-    window.addEventListener("mousemove", (e) => {
-      if (!drag) return;
-      w.style.left = ox + (e.clientX - sx) + "px";
-      w.style.top = Math.max(34, oy + (e.clientY - sy)) + "px";
-    });
-    window.addEventListener("mouseup", () => { drag = false; });
-  });
-
-  // ===== Модалка-пароль (декоративна: не блокує реальні сторінки) =====
-  const pw = document.getElementById("pw");
-  function showPw() { if (pw) pw.hidden = false; }
-  function hidePw() { if (pw) pw.hidden = true; }
-  document.getElementById("pwCancel")?.addEventListener("click", hidePw);
-  document.getElementById("pwUnlock")?.addEventListener("click", () => { hidePw(); openWindow("casestudies"); });
-  pw?.addEventListener("click", (e) => { if (e.target === pw) hidePw(); });
+  initHome();
+  document.addEventListener("astro:page-load", initHome);
 </script>

@@ -1,0 +1,48 @@
+---
+/**
+ * Dock — нижня панель macOS (tech stack). Персистентна між сторінками.
+ */
+const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
+---
+
+<footer class="dock" transition:persist="dock">
+  {dock.map((d) => <div class="dock-app" title={d}>{d[0]}</div>)}
+</footer>
+
+<style>
+  .dock {
+    position: fixed;
+    bottom: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 40;
+    display: flex;
+    gap: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    background: var(--panel);
+    border: 1px solid var(--panel-border);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    backdrop-filter: blur(20px);
+  }
+  .dock-app {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(160deg, #6f88ae, #47597c);
+    box-shadow: 0 4px 12px rgba(23, 37, 66, 0.25);
+    transition: transform 0.16s ease;
+  }
+  .dock-app:hover {
+    transform: translateY(-8px) scale(1.08);
+  }
+  @media (max-width: 760px) {
+    .dock {
+      bottom: 8px;
+    }
+  }
+</style>

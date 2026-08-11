@@ -1,6 +1,7 @@
 ---
 import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
+import OSLayout from "../../layouts/OSLayout.astro";
+import WindowFrame from "../../components/os/WindowFrame.astro";
 import Container from "../../components/Container.astro";
 import MonoLabel from "../../components/MonoLabel.astro";
 import ProjectCard from "../../components/ProjectCard.astro";
@@ -13,11 +14,12 @@ const projects = (
 ).sort((a, b) => a.data.order - b.data.order);
 ---
 
-<BaseLayout
+<OSLayout
   title={`Projects — ${SITE.name}`}
   description="Selected UX/UI case studies by Anton Lukovyi — mobile apps, SaaS platforms and product design."
 >
-  <Container class="py-16 sm:py-24">
+  <WindowFrame title="Case Studies" wide>
+    <Container class="py-16 sm:py-24">
     <MonoLabel>Projects</MonoLabel>
     <h1 class="mt-4 max-w-2xl text-5xl font-medium text-paper sm:text-6xl">
       Case studies that delight clients and engage users.
@@ -37,5 +39,6 @@ const projects = (
         ))
       }
     </div>
-  </Container>
-</BaseLayout>
+    </Container>
+  </WindowFrame>
+</OSLayout>

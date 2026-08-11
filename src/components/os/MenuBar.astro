@@ -1,0 +1,65 @@
+---
+/**
+ * MenuBar — верхня панель macOS. Присутня на всіх сторінках і «переживає»
+ * переходи (transition:persist), тому не блимає при відкритті вікон-кейсів.
+ */
+import { SITE, SOCIALS } from "../../consts";
+const social = (label: string) =>
+  SOCIALS.find((s) => s.label === label)?.href ?? "#";
+---
+
+<header class="menubar" transition:persist="menubar">
+  <div class="menu-left">
+    <a href="/" class="menu-name" aria-label="Desktop">
+      <span aria-hidden="true">✳</span> {SITE.name}
+    </a>
+    <a class="menu-item" href="/about-me">About</a>
+    <a class="menu-item" href="/projects">Work</a>
+    <a class="menu-item" href="/contact">Contact</a>
+  </div>
+  <div class="menu-right">
+    <a href={social("Instagram")} target="_blank" rel="noopener" aria-label="Instagram">◎</a>
+    <a href={social("LinkedIn")} target="_blank" rel="noopener" aria-label="LinkedIn">in</a>
+    <span id="barDate">—</span>
+    <span id="barClock">00:00</span>
+  </div>
+</header>
+
+<style>
+  .menubar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 14px;
+    background: var(--panel);
+    backdrop-filter: blur(18px);
+    border-bottom: 1px solid var(--panel-border);
+    font-size: 0.8rem;
+    color: var(--ink);
+  }
+  .menu-left,
+  .menu-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .menu-name {
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .menu-item,
+  .menu-right a {
+    opacity: 0.75;
+    color: var(--ink);
+  }
+  .menu-item:hover,
+  .menu-right a:hover {
+    opacity: 1;
+  }
+</style>

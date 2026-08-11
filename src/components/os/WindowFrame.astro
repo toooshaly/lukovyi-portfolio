@@ -1,0 +1,120 @@
+---
+/**
+ * WindowFrame — macOS-вікно, у якому рендериться сторінка (кейс/about/contact)
+ * поверх шпалери робочого столу. Червоний «світлофор» закриває вікно → на стіл.
+ */
+interface Props {
+  title: string;
+  /** Ширина вікна */
+  wide?: boolean;
+}
+const { title, wide = false } = Astro.props;
+---
+
+<main class="win" data-wide={wide} aria-label={title}>
+  <div class="win-bar">
+    <div class="lights">
+      <a class="l-close" href="/" aria-label="Close window (back to desktop)"></a>
+      <span class="l-min" aria-hidden="true"></span>
+      <span class="l-max" aria-hidden="true"></span>
+    </div>
+    <span class="win-title">{title}</span>
+    <span class="win-spacer"></span>
+  </div>
+  <div class="win-content">
+    <slot />
+  </div>
+</main>
+
+<style>
+  .win {
+    position: fixed;
+    top: 44px;
+    bottom: 78px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(1100px, calc(100vw - 40px));
+    display: flex;
+    flex-direction: column;
+    background: color-mix(in srgb, var(--panel-strong) 100%, transparent);
+    border: 1px solid var(--panel-border);
+    border-radius: 16px;
+    box-shadow: 0 30px 90px rgba(23, 37, 66, 0.34);
+    backdrop-filter: blur(24px);
+    overflow: hidden;
+    animation: winIn 0.32s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .win[data-wide="true"] {
+    width: min(1280px, calc(100vw - 32px));
+  }
+  @keyframes winIn {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(10px) scale(0.985);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0) scale(1);
+    }
+  }
+
+  .win-bar {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+    padding: 0 14px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--panel-border);
+  }
+  .lights {
+    display: flex;
+    gap: 8px;
+    width: 60px;
+  }
+  .lights .l-close,
+  .lights .l-min,
+  .lights .l-max {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+  }
+  .l-close {
+    background: #ff5f57;
+  }
+  .l-close:hover {
+    filter: brightness(0.9);
+  }
+  .l-min {
+    background: #febc2e;
+  }
+  .l-max {
+    background: #28c840;
+  }
+  .win-title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: var(--ink-soft);
+  }
+  .win-spacer {
+    width: 60px;
+  }
+  .win-content {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    background: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  @media (max-width: 760px) {
+    .win {
+      top: 38px;
+      bottom: 64px;
+      width: calc(100vw - 16px);
+      border-radius: 12px;
+    }
+  }
+</style>

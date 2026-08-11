@@ -4,7 +4,8 @@
  * Шапка (категорія, назва, summary, метрики, мета) + обкладинка + контент MDX.
  */
 import { Image } from "astro:assets";
-import BaseLayout from "./BaseLayout.astro";
+import OSLayout from "./OSLayout.astro";
+import WindowFrame from "../components/os/WindowFrame.astro";
 import Container from "../components/Container.astro";
 import MonoLabel from "../components/MonoLabel.astro";
 import Button from "../components/Button.astro";
@@ -41,13 +42,14 @@ const meta = [
 ].filter((m) => m.value && !m.value.startsWith("TODO"));
 ---
 
-<BaseLayout
+<OSLayout
   title={title}
   description={description}
   ogType="article"
   jsonLd={caseSchema}
 >
-  <article>
+  <WindowFrame title={d.title} wide>
+    <article>
     <!-- Шапка -->
     <Container class="pt-16 pb-10 sm:pt-24">
       <a
@@ -142,8 +144,9 @@ const meta = [
         <Button href="/contact" variant="primary">Get in touch</Button>
       </div>
     </Container>
-  </article>
-</BaseLayout>
+    </article>
+  </WindowFrame>
+</OSLayout>
 
 <style is:global>
   .case-content > * + * {
