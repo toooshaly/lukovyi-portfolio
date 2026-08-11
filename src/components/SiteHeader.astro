@@ -20,7 +20,11 @@ const isActive = (href: string) => {
   class="sticky top-0 z-50 border-b border-line bg-ink/80 backdrop-blur-md"
 >
   <Container class="flex items-center justify-between py-4">
-    <a href="/" class="group flex items-baseline gap-2" aria-label="Home">
+    <a
+      href="/"
+      class="group flex items-baseline gap-2"
+      aria-label={`${SITE.name} — home`}
+    >
       <span class="text-lg font-semibold tracking-tight text-paper"
         >{SITE.name}</span
       >
