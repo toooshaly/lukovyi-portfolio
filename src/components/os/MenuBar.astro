@@ -11,7 +11,7 @@ const social = (label: string) =>
 
 <header class="menubar" transition:persist="menubar">
   <div class="menu-left">
-    <a href="/" class="menu-name" aria-label="Desktop">
+    <a href="/" class="menu-name">
       <Spiral size={15} stroke="var(--ink)" width={2} /> {SITE.name}
     </a>
     <a class="menu-item" href="/about-me">About</a>
@@ -61,6 +61,13 @@ const social = (label: string) =>
   .menu-right a {
     opacity: 0.75;
     color: var(--ink);
+  }
+  .menu-right a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 26px;
+    min-height: 26px;
   }
   .menu-item:hover,
   .menu-right a:hover {
