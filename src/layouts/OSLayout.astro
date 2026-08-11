@@ -216,6 +216,109 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       navigate(target);
     });
     pw?.addEventListener("click", (e) => { if (e.target === pw && pw) pw.hidden = true; });
+
+    // Now Playing плеєр
+    const audio = document.getElementById("npAudio") as HTMLAudioElement | null;
+    const npPlay = document.getElementById("npPlay");
+    const npIco = document.getElementById("npIco");
+    const npFill = document.getElementById("npFill");
+    const npBar = document.getElementById("npBar");
+    if (audio && npPlay) {
+      npPlay.addEventListener("click", () => {
+        if (audio.paused) audio.play().then(() => { if (npIco) npIco.textContent = "❚❚"; }).catch(() => {});
+        else { audio.pause(); if (npIco) npIco.textContent = "▶"; }
+      });
+      audio.addEventListener("timeupdate", () => {
+        if (npFill && audio.duration) npFill.style.width = (audio.currentTime / audio.duration) * 100 + "%";
+      });
+      audio.addEventListener("ended", () => { if (npIco) npIco.textContent = "▶"; if (npFill) npFill.style.width = "0%"; });
+      npBar?.addEventListener("click", (e) => {
+        const r = npBar.getBoundingClientRect();
+        if (audio.duration) audio.currentTime = ((e as MouseEvent).clientX - r.left) / r.width * audio.duration;
+      });
+    }
+
+    // Перетягувані іконки (позиції в localStorage)
+    const iconsWrap = document.querySelector(".icons") as HTMLElement | null;
+    if (iconsWrap) {
+      const saved = JSON.parse(localStorage.getItem("os-icons") || "{}");
+      iconsWrap.querySelectorAll<HTMLElement>(".icon").forEach((el) => {
+        const key = el.dataset.key!;
+        el.draggable = false;
+        if (saved[key]) { el.style.left = saved[key].x + "px"; el.style.top = saved[key].y + "px"; }
+        let sx = 0, sy = 0, ox = 0, oy = 0, drag = false, moved = false;
+        el.addEventListener("pointerdown", (e) => {
+          drag = true; moved = false;
+          sx = e.clientX; sy = e.clientY;
+          ox = parseFloat(el.style.left) || 0; oy = parseFloat(el.style.top) || 0;
+          el.setPointerCapture(e.pointerId);
+        });
+        el.addEventListener("pointermove", (e) => {
+          if (!drag) return;
+          const dx = e.clientX - sx, dy = e.clientY - sy;
+          if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+          if (moved) { el.style.left = ox + dx + "px"; el.style.top = Math.max(0, oy + dy) + "px"; el.style.zIndex = "5"; }
+        });
+        el.addEventListener("pointerup", () => {
+          drag = false;
+          if (moved) {
+            saved[key] = { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
+            localStorage.setItem("os-icons", JSON.stringify(saved));
+            (window as any).__iconDragged = true;
+          }
+        });
+        el.addEventListener("click", (e) => {
+          if ((window as any).__iconDragged) { e.preventDefault(); e.stopImmediatePropagation(); (window as any).__iconDragged = false; }
+        }, true);
+      });
+    }
+
+    // Контекстне меню (права кнопка на столі) + About This Mac
+    const ctx = document.getElementById("ctx");
+    const about = document.getElementById("about-mac");
+    const hideCtx = () => { if (ctx) ctx.hidden = true; };
+    document.addEventListener("contextmenu", (e) => {
+      const t = e.target as HTMLElement;
+      if (t.closest(".win") || t.closest("input") || t.closest("textarea") || t.closest(".menubar") || t.closest(".dock")) return;
+      if (!ctx) return;
+      e.preventDefault();
+      ctx.hidden = false;
+      ctx.style.left = Math.min(e.clientX, window.innerWidth - 200) + "px";
+      ctx.style.top = Math.min(e.clientY, window.innerHeight - 140) + "px";
+    });
+    document.addEventListener("click", () => hideCtx());
+    const themeOrder = ["", "sand", "green", "dark"];
+    ctx?.querySelectorAll<HTMLButtonElement>(".ctx-item").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        hideCtx();
+        const act = btn.dataset.action;
+        if (act === "about" && about) about.hidden = false;
+        else if (act === "theme") {
+          const cur = document.documentElement.dataset.theme || "";
+          const next = themeOrder[(themeOrder.indexOf(cur) + 1) % themeOrder.length];
+          if (next) document.documentElement.dataset.theme = next;
+          else document.documentElement.removeAttribute("data-theme");
+          localStorage.setItem("os-theme", next);
+        } else if (act === "cleanup") {
+          localStorage.removeItem("os-icons");
+          iconsWrap?.querySelectorAll<HTMLElement>(".icon").forEach((el, i) => {
+            el.style.left = (i % 4) * 112 + "px"; el.style.top = Math.floor(i / 4) * 132 + "px"; el.style.zIndex = "";
+          });
+        }
+      });
+    });
+    document.getElementById("amClose")?.addEventListener("click", () => { if (about) about.hidden = true; });
+    about?.addEventListener("click", (e) => { if (e.target === about) about.hidden = true; });
+
+    // Esc закриває відкрите вікно-сторінку (повернення на стіл)
+    document.addEventListener("keydown", (e) => {
+      if (e.key !== "Escape") return;
+      const anyOverlay = [document.getElementById("spotlight"), document.getElementById("pw"), about, ctx]
+        .some((el) => el && !(el as HTMLElement).hidden);
+      if (anyOverlay) return;
+      if (document.querySelector(".win")) { e.preventDefault(); navigate("/"); }
+    });
   }
 
   applyTheme();

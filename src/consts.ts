@@ -30,6 +30,13 @@ export const SOCIALS = [
   { label: "Telegram", href: "https://t.me/tooshaly" },
 ] as const;
 
+/** Трек для віджета Now Playing. Кинь mp3 у public/music/ і онови поля. */
+export const NOWPLAYING = {
+  title: "Focus Mix",
+  artist: "while designing",
+  src: "/music/track.mp3",
+} as const;
+
 /** Послуги (з футера поточного сайту). */
 export const SERVICES = [
   "Webflow Development",
