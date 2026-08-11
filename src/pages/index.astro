@@ -1,5 +1,6 @@
 ---
 import OSLayout from "../layouts/OSLayout.astro";
+import Spiral from "../components/os/Spiral.astro";
 import { SITE } from "../consts";
 ---
 
@@ -11,7 +12,7 @@ import { SITE } from "../consts";
       <div class="lock-clock" id="lockClock">00:00</div>
     </div>
     <div class="lock-user">
-      <div class="avatar" aria-hidden="true">✳</div>
+      <div class="avatar" aria-hidden="true"><Spiral size={38} stroke="#fff" width={2} /></div>
       <div class="lock-name">{SITE.name}</div>
       <div class="lock-role">{SITE.role}</div>
       <button class="unlock-btn" id="unlockBtn">🔓 Click to unlock</button>

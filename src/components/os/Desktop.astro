@@ -5,27 +5,31 @@
  * тому при відкритті кейсу стіл із папками лишається на місці (як у macOS).
  */
 import { SITE, SOCIALS } from "../../consts";
+import AppIcon from "./AppIcon.astro";
+import Spiral from "./Spiral.astro";
 
 const social = (label: string) =>
   SOCIALS.find((s) => s.label === label)?.href ?? "#";
 
 const icons = [
-  { label: "Case Studies", emoji: "📁", href: "/projects", pw: true },
-  { label: "About Me", emoji: "📖", href: "/about-me" },
-  { label: "Contact", emoji: "✉️", href: "/contact" },
-  { label: "Resume", emoji: "📄", href: `mailto:${SITE.email}`, ext: true },
-  { label: "Photos", emoji: "📷", href: social("Instagram"), ext: true },
-  { label: "Dribbble", emoji: "🏀", href: social("Dribbble"), ext: true },
-  { label: "Behance", emoji: "🎨", href: social("Behance"), ext: true },
-  { label: "LinkedIn", emoji: "💼", href: social("LinkedIn"), ext: true },
-];
+  { label: "Case Studies", type: "folder", href: "/projects", pw: true },
+  { label: "About Me", type: "book", href: "/about-me" },
+  { label: "Contact", type: "mail", href: "/contact" },
+  { label: "Resume", type: "doc", href: `mailto:${SITE.email}`, ext: true },
+  { label: "Photos", type: "camera", href: social("Instagram"), ext: true },
+  { label: "Dribbble", type: "dribbble", href: social("Dribbble"), ext: true },
+  { label: "Behance", type: "behance", href: social("Behance"), ext: true },
+  { label: "LinkedIn", type: "linkedin", href: social("LinkedIn"), ext: true },
+] as const;
 ---
 
 <div class="desktop" transition:persist="desktop">
   <div class="workspace">
     <div class="stage">
       <section class="intro">
-        <div class="intro-avatar" aria-hidden="true">✳</div>
+        <div class="intro-avatar" aria-hidden="true">
+          <Spiral size={34} stroke="var(--ink)" />
+        </div>
         <div>
           <p class="intro-kicker">{SITE.role}</p>
           <p class="intro-text">
@@ -46,7 +50,7 @@ const icons = [
               data-pw={i.pw ? "1" : undefined}
               {...(i.ext ? { target: "_blank", rel: "noopener noreferrer" } : {})}
             >
-              <span class="icon-glyph" aria-hidden="true">{i.emoji}</span>
+              <AppIcon type={i.type} />
               <span class="icon-label">{i.label}</span>
             </a>
           ))
@@ -71,7 +75,7 @@ const icons = [
       <div class="widget">
         <div class="widget-title">Now building</div>
         <div class="np">
-          <div class="np-art" aria-hidden="true">✳</div>
+          <div class="np-art" aria-hidden="true"><Spiral size={26} stroke="#fff" /></div>
           <div>
             <div class="np-line">desluko.com</div>
             <div class="np-sub">Portfolio · v1</div>
@@ -110,8 +114,8 @@ const icons = [
 
   .icons { display: grid; grid-template-columns: repeat(4, 96px); gap: 1.6rem 1.2rem; }
   .icon { display: flex; flex-direction: column; align-items: center; gap: .5rem; text-align: center; color: var(--ink); background: none; border: 0; cursor: pointer; font: inherit; }
-  .icon-glyph { width: 72px; height: 72px; display: grid; place-items: center; font-size: 2.4rem; border-radius: 18px; background: var(--panel); border: 1px solid var(--panel-border); box-shadow: var(--shadow); transition: transform .18s ease, box-shadow .18s ease; }
-  .icon:hover .icon-glyph { transform: translateY(-4px) scale(1.04); box-shadow: 0 18px 44px rgba(23,37,66,.26); }
+  .icon:hover :global(.app-tile) { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 46px rgba(23,37,66,.3), inset 0 1px 0 rgba(255,255,255,.4); }
+  .icon:active :global(.app-tile) { transform: translateY(-1px) scale(.99); }
   .icon-label { font-size: .78rem; font-weight: 500; padding: 1px 8px; border-radius: 6px; background: var(--label-bg); color: var(--ink); }
 
   .widgets { width: 260px; flex: none; display: flex; flex-direction: column; gap: 1rem; }

@@ -1,12 +1,26 @@
 ---
 /**
  * Dock — нижня панель macOS (tech stack). Персистентна між сторінками.
+ * Кольорові плитки з магніфікацією при наведенні.
  */
-const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
+const dock = [
+  { label: "Figma", letter: "F", g: ["#f24e1e", "#a259ff"] },
+  { label: "Webflow", letter: "W", g: ["#4a6bff", "#2b3aff"] },
+  { label: "Framer", letter: "F", g: ["#00aaff", "#0055ff"] },
+  { label: "Notion", letter: "N", g: ["#3a3a3a", "#111111"] },
+  { label: "Claude", letter: "C", g: ["#e08a63", "#c15f3c"] },
+  { label: "Photoshop", letter: "Ps", g: ["#31a8ff", "#001e36"] },
+];
 ---
 
 <footer class="dock" transition:persist="dock">
-  {dock.map((d) => <div class="dock-app" title={d}>{d[0]}</div>)}
+  {
+    dock.map((d) => (
+      <div class="dock-app" title={d.label} style={`--g1:${d.g[0]};--g2:${d.g[1]}`}>
+        <span>{d.letter}</span>
+      </div>
+    ))
+  }
 </footer>
 
 <style>
@@ -17,12 +31,12 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
     transform: translateX(-50%);
     z-index: 40;
     display: flex;
-    gap: 0.6rem;
+    gap: 0.55rem;
     padding: 0.5rem 0.7rem;
     background: var(--panel);
     border: 1px solid var(--panel-border);
-    border-radius: 20px;
-    box-shadow: var(--shadow);
+    border-radius: 22px;
+    box-shadow: var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.5);
     backdrop-filter: blur(20px);
   }
   .dock-app {
@@ -31,18 +45,30 @@ const dock = ["Figma", "Webflow", "Framer", "Notion", "Claude", "Photoshop"];
     border-radius: 12px;
     display: grid;
     place-items: center;
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 1.05rem;
     color: #fff;
-    background: linear-gradient(160deg, #6f88ae, #47597c);
-    box-shadow: 0 4px 12px rgba(23, 37, 66, 0.25);
-    transition: transform 0.16s ease;
+    background: linear-gradient(160deg, var(--g1), var(--g2));
+    box-shadow:
+      0 4px 12px rgba(23, 37, 66, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    transition: transform 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transform-origin: bottom center;
+  }
+  .dock-app span {
+    filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.25));
   }
   .dock-app:hover {
-    transform: translateY(-8px) scale(1.08);
+    transform: translateY(-10px) scale(1.14);
   }
   @media (max-width: 760px) {
     .dock {
       bottom: 8px;
+      gap: 0.4rem;
+    }
+    .dock-app {
+      width: 40px;
+      height: 40px;
     }
   }
 </style>

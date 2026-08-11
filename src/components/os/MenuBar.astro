@@ -4,6 +4,7 @@
  * переходи (transition:persist), тому не блимає при відкритті вікон-кейсів.
  */
 import { SITE, SOCIALS } from "../../consts";
+import Spiral from "./Spiral.astro";
 const social = (label: string) =>
   SOCIALS.find((s) => s.label === label)?.href ?? "#";
 ---
@@ -11,7 +12,7 @@ const social = (label: string) =>
 <header class="menubar" transition:persist="menubar">
   <div class="menu-left">
     <a href="/" class="menu-name" aria-label="Desktop">
-      <span aria-hidden="true">✳</span> {SITE.name}
+      <Spiral size={15} stroke="var(--ink)" width={2} /> {SITE.name}
     </a>
     <a class="menu-item" href="/about-me">About</a>
     <a class="menu-item" href="/projects">Work</a>
@@ -50,6 +51,9 @@ const social = (label: string) =>
     gap: 16px;
   }
   .menu-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     font-weight: 700;
     color: var(--ink);
   }
