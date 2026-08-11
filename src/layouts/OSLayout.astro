@@ -11,6 +11,7 @@ import { SITE, SOCIALS } from "../consts";
 import MenuBar from "../components/os/MenuBar.astro";
 import Dock from "../components/os/Dock.astro";
 import Desktop from "../components/os/Desktop.astro";
+import Spotlight from "../components/os/Spotlight.astro";
 
 interface Props {
   title?: string;
@@ -100,6 +101,7 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     {showChrome && <Desktop />}
     <slot />
     {showChrome && <Dock />}
+    {showChrome && <Spotlight />}
   </body>
 </html>
 
