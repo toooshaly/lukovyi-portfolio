@@ -79,6 +79,38 @@ const personSchema = {
     --ink: #1c2530;
     --ink-soft: #55627a;
     --shadow: 0 12px 40px rgba(23, 37, 66, 0.18);
+    --label-bg: rgba(255, 255, 255, 0.4);
+  }
+  /* Теми (перемикач у віджеті). Значення міняють шпалеру + панелі. */
+  :root[data-theme="sand"] {
+    --wall: radial-gradient(140% 120% at 50% 0%, #c9a888 0%, #ddc3ab 45%, #efe0d1 100%);
+    --panel: rgba(255, 255, 255, 0.5);
+    --panel-strong: rgba(255, 253, 250, 0.85);
+    --panel-border: rgba(255, 255, 255, 0.6);
+    --ink: #3a2c22;
+    --ink-soft: #7a6656;
+    --shadow: 0 12px 40px rgba(74, 52, 34, 0.18);
+    --label-bg: rgba(255, 255, 255, 0.45);
+  }
+  :root[data-theme="green"] {
+    --wall: radial-gradient(140% 120% at 50% 0%, #7fa07f 0%, #a6c0a2 45%, #cfe0cd 100%);
+    --panel: rgba(255, 255, 255, 0.52);
+    --panel-strong: rgba(252, 255, 251, 0.85);
+    --panel-border: rgba(255, 255, 255, 0.6);
+    --ink: #223026;
+    --ink-soft: #566a5b;
+    --shadow: 0 12px 40px rgba(30, 55, 38, 0.18);
+    --label-bg: rgba(255, 255, 255, 0.45);
+  }
+  :root[data-theme="dark"] {
+    --wall: radial-gradient(140% 120% at 50% 0%, #2a2f38 0%, #20242c 45%, #14171d 100%);
+    --panel: rgba(40, 46, 58, 0.55);
+    --panel-strong: rgba(38, 44, 56, 0.8);
+    --panel-border: rgba(255, 255, 255, 0.12);
+    --ink: #e9edf5;
+    --ink-soft: #9aa6bd;
+    --shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    --label-bg: rgba(255, 255, 255, 0.1);
   }
 
   /* Скидаємо темну тему сайту для головної: тут світлий macOS-look */
