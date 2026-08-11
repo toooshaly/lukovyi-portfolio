@@ -1,43 +1,86 @@
-# Astro Starter Kit: Minimal
+# Anton Lukovyi — Portfolio
 
-```sh
-npm create astro@latest -- --template minimal
+Статичне портфоліо на **Astro + Tailwind CSS + TypeScript**.
+Швидке, без підписок, розгортається на Netlify (безкоштовний тариф).
+
+## Запуск локально
+
+Потрібен Node.js 22+.
+
+```bash
+npm install      # встановити залежності (один раз)
+npm run dev      # локальний сервер: http://localhost:4321
+npm run build    # зібрати продакшн-версію в /dist
+npm run preview  # переглянути зібрану версію локально
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+## Як додати новий кейс
 
-## 🚀 Project Structure
+Один кейс = **один файл**. Створи `src/content/projects/<slug>.mdx`:
 
-Inside of your Astro project, you'll see the following folders and files:
+```mdx
+---
+title: "НАЗВА КЕЙСУ"
+category: "Mobile App"          # тип проєкту
+summary: "Один рядок опису для списку та SEO."
+order: 6                         # порядок у списку (менше = вище)
+featured: false                  # true — показати першим на головній
+year: "2025"                     # опційно
+role: "UX/UI Design"             # опційно
+timeline: "6 weeks"              # опційно
+client: "Client name"            # опційно
+metrics:                         # опційно — великі цифри в шапці
+  - value: "+38%"
+    label: "Conversion rate"
+# cover: ./cover.png             # опційно — обкладинка поряд із цим файлом
+---
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+## Overview
+Текст кейсу у форматі Markdown…
+
+## The problem
+…
+
+## Solution
+…
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Сторінка `/projects/<slug>`, картка на головній і в списку проєктів
+з'являться автоматично. Нічого більше правити не треба.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **Приховати кейс** з продакшну: додай `draft: true` у метадані.
+- **Статус «SOON»**: додай `status: "SOON"` (картка стане неактивною).
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Де що лежить
 
-## 🧞 Commands
+```
+src/
+  components/        перевикористовувані блоки (Header, Footer, Button, ProjectCard…)
+  layouts/           BaseLayout (усі сторінки) + CaseStudyLayout (кейси)
+  pages/             index, about-me, contact, projects/ (+ [slug].astro)
+  content/projects/  кейси (.mdx) — редагуй тут
+  styles/global.css  дизайн-токени (кольори, шрифти)
+  consts.ts          навігація, соцмережі, контакти — єдине джерело правди
+public/
+  fonts/             самохостовані шрифти
+  og-default.png     прев'ю для соцмереж (заміни на власне за бажанням)
+  robots.txt
+```
 
-All commands are run from the root of the project, from a terminal:
+## Змінити кольори / шрифти / контакти
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+- **Кольори і шрифти** — `src/styles/global.css` (блок `@theme`).
+- **Ім'я, роль, пошта, навігація, соцмережі** — `src/consts.ts`.
 
-## 👀 Want to learn more?
+## Деплой на Netlify
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+1. Заливаєш репозиторій на GitHub.
+2. На Netlify: **Add new site → Import from Git** → обираєш репозиторій.
+   Команда збірки й папка публікації вже прописані в `netlify.toml`.
+3. Після деплою заміни домен у двох місцях на реальний:
+   - `site` у `astro.config.mjs`
+   - `SITE.url` у `src/consts.ts`
+   - адресу sitemap у `public/robots.txt`
+
+**Форма контакту** працює на Netlify Forms автоматично (без коду) —
+повідомлення з'являтимуться у вкладці *Forms* панелі Netlify.
