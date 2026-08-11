@@ -1,0 +1,98 @@
+---
+/**
+ * SiteFooter — велике CTA "Let's chat" + колонки навігації/соцмереж/послуг
+ * і нижній рядок з копірайтом. Дані беруться з consts.ts.
+ */
+import Container from "./Container.astro";
+import Button from "./Button.astro";
+import MonoLabel from "./MonoLabel.astro";
+import { SITE, NAV, SOCIALS, SERVICES } from "../consts";
+
+const year = new Date().getFullYear();
+---
+
+<footer class="mt-24 border-t border-line bg-ink">
+  <Container class="py-16">
+    <!-- CTA -->
+    <div
+      class="flex flex-col gap-6 border-b border-line pb-12 md:flex-row md:items-end md:justify-between"
+    >
+      <div>
+        <MonoLabel>Let's chat!</MonoLabel>
+        <h2 class="mt-3 max-w-xl text-4xl font-medium text-paper sm:text-5xl">
+          Have a project in mind?
+        </h2>
+      </div>
+      <Button href={`mailto:${SITE.email}`} variant="primary">Send mail</Button>
+    </div>
+
+    <!-- Колонки -->
+    <div class="grid grid-cols-2 gap-8 py-12 md:grid-cols-4">
+      <div class="col-span-2 md:col-span-1">
+        <span class="text-lg font-semibold text-paper">{SITE.name}</span>
+        <p class="mt-2 max-w-xs text-sm text-muted">{SITE.role}</p>
+        <p class="mt-1 text-sm text-muted">{SITE.location}</p>
+      </div>
+
+      <nav aria-label="Footer">
+        <MonoLabel>Navigation</MonoLabel>
+        <ul class="mt-4 space-y-2">
+          {
+            NAV.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="text-sm text-paper transition-colors hover:text-accent"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div>
+        <MonoLabel>Social</MonoLabel>
+        <ul class="mt-4 space-y-2">
+          {
+            SOCIALS.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-sm text-paper transition-colors hover:text-accent"
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <MonoLabel>Services</MonoLabel>
+        <ul class="mt-4 space-y-2">
+          {SERVICES.map((s) => <li class="text-sm text-muted">{s}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <!-- Нижній рядок -->
+    <div
+      class="flex flex-col gap-2 border-t border-line pt-8 sm:flex-row sm:items-center sm:justify-between"
+    >
+      <p class="font-mono text-xs text-muted">
+        © {year} {SITE.name}. All rights reserved.
+      </p>
+      <a
+        href={`mailto:${SITE.email}`}
+        class="font-mono text-xs text-muted transition-colors hover:text-accent"
+      >
+        {SITE.email}
+      </a>
+    </div>
+  </Container>
+</footer>

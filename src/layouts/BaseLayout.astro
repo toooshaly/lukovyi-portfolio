@@ -6,6 +6,8 @@
  */
 import "../styles/global.css";
 import { SITE } from "../consts";
+import SiteHeader from "../components/SiteHeader.astro";
+import SiteFooter from "../components/SiteFooter.astro";
 
 interface Props {
   /** Заголовок вкладки браузера + <title> (унікальний на кожній сторінці) */
@@ -43,7 +45,17 @@ const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
     <meta name="generator" content={Astro.generator} />
   </head>
 
-  <body>
-    <slot />
+  <body class="flex min-h-screen flex-col">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-accent-ink"
+    >
+      Skip to content
+    </a>
+    <SiteHeader />
+    <main id="main" class="flex-1">
+      <slot />
+    </main>
+    <SiteFooter />
   </body>
 </html>
