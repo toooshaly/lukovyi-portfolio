@@ -1,22 +1,96 @@
 ---
+import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Container from "../components/Container.astro";
+import MonoLabel from "../components/MonoLabel.astro";
+import Button from "../components/Button.astro";
+import ProjectCard from "../components/ProjectCard.astro";
 import { SITE } from "../consts";
+
+const projects = (
+  await getCollection("projects", ({ data }) =>
+    import.meta.env.PROD ? !data.draft : true,
+  )
+).sort((a, b) => {
+  // Виділений кейс — першим, далі за order
+  if (a.data.featured !== b.data.featured) return a.data.featured ? -1 : 1;
+  return a.data.order - b.data.order;
+});
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.role}`}>
-  <main class="mx-auto max-w-5xl px-6 py-24">
-    <p class="font-mono text-sm uppercase tracking-widest text-accent">
-      Design tokens smoke test
-    </p>
-    <h1 class="mt-4 text-5xl font-medium text-paper">
-      Hello, my name is {SITE.name}
+  <!-- Hero -->
+  <Container class="py-20 sm:py-28">
+    <div class="flex items-center gap-3">
+      <span class="h-2 w-2 rounded-full bg-accent"></span>
+      <MonoLabel>Available for new project</MonoLabel>
+    </div>
+
+    <h1 class="mt-6 max-w-4xl text-5xl font-medium leading-[1.05] text-paper sm:text-7xl">
+      Hello, my name is <span class="text-accent">{SITE.name}</span>
     </h1>
-    <p class="mt-4 max-w-xl text-lg text-muted">{SITE.role}</p>
-    <a
-      href="/contact"
-      class="mt-8 inline-block rounded-full bg-accent px-6 py-3 font-mono text-sm font-medium text-accent-ink"
-    >
-      Contact with me
-    </a>
-  </main>
+    <p class="mt-6 font-mono text-sm uppercase tracking-widest text-muted">
+      {SITE.role}
+    </p>
+
+    <p class="mt-8 max-w-2xl text-xl leading-relaxed text-muted">
+      Every Pixel Has a Reason. Every Reason Has a Person. I help startups and
+      businesses create intuitive, user-centered interfaces — from research and
+      wireframes to pixel-perfect designs ready for development.
+    </p>
+
+    <div class="mt-10 flex flex-wrap gap-4">
+      <Button href="/contact" variant="primary">Contact with me</Button>
+      <Button href="/projects" variant="secondary">View projects</Button>
+    </div>
+  </Container>
+
+  <!-- Projects -->
+  <Container class="py-16">
+    <div class="flex items-end justify-between gap-6 border-t border-line pt-12">
+      <div>
+        <MonoLabel>Projects</MonoLabel>
+        <h2 class="mt-4 max-w-2xl text-4xl font-medium text-paper sm:text-5xl">
+          Discover projects that delight clients and engage users.
+        </h2>
+      </div>
+      <a
+        href="/projects"
+        class="hidden shrink-0 font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent sm:block"
+        >All projects →</a
+      >
+    </div>
+
+    <div class="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2">
+      {
+        projects.map((p, i) => (
+          <ProjectCard
+            title={p.data.title}
+            category={p.data.category}
+            href={`/projects/${p.id}`}
+            num={String(i + 1).padStart(2, "0")}
+            status={p.data.status}
+            cover={p.data.cover}
+          />
+        ))
+      }
+    </div>
+  </Container>
+
+  <!-- About teaser -->
+  <Container class="py-16">
+    <div class="border-t border-line pt-12">
+      <MonoLabel>About me</MonoLabel>
+      <p class="mt-6 max-w-3xl text-2xl font-medium leading-snug text-paper">
+        I'm a freelance UX/UI designer from {SITE.location}, helping businesses
+        grow through design that creates meaningful connections with their
+        audience.
+      </p>
+      <a
+        href="/about-me"
+        class="mt-8 inline-block font-mono text-xs uppercase tracking-widest text-accent hover:underline"
+        >More about me →</a
+      >
+    </div>
+  </Container>
 </BaseLayout>

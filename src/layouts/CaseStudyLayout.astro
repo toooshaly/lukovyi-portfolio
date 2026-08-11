@@ -1,0 +1,164 @@
+---
+/**
+ * CaseStudyLayout — шаблон сторінки кейсу.
+ * Шапка (категорія, назва, summary, метрики, мета) + обкладинка + контент MDX.
+ */
+import { Image } from "astro:assets";
+import BaseLayout from "./BaseLayout.astro";
+import Container from "../components/Container.astro";
+import MonoLabel from "../components/MonoLabel.astro";
+import Button from "../components/Button.astro";
+import { SITE } from "../consts";
+import type { CollectionEntry } from "astro:content";
+
+interface Props {
+  entry: CollectionEntry<"projects">;
+}
+const { entry } = Astro.props;
+const d = entry.data;
+
+const title = d.seoTitle ?? `${d.title} — ${d.category} | ${SITE.name}`;
+const description = d.seoDescription ?? d.summary;
+
+const meta = [
+  { label: "Role", value: d.role },
+  { label: "Timeline", value: d.timeline },
+  { label: "Year", value: d.year },
+  { label: "Client", value: d.client },
+].filter((m) => m.value && !m.value.startsWith("TODO"));
+---
+
+<BaseLayout title={title} description={description}>
+  <article>
+    <!-- Шапка -->
+    <Container class="pt-16 pb-10 sm:pt-24">
+      <a
+        href="/projects"
+        class="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent"
+        >← All projects</a
+      >
+
+      <div class="mt-8 flex items-center gap-3">
+        <MonoLabel>{d.category}</MonoLabel>
+        {
+          d.status && (
+            <span class="rounded-full bg-accent px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-widest text-accent-ink">
+              {d.status}
+            </span>
+          )
+        }
+      </div>
+
+      <h1 class="mt-4 text-5xl font-medium text-paper sm:text-7xl">
+        {d.title}
+      </h1>
+      <p class="mt-6 max-w-2xl text-lg text-muted">{d.summary}</p>
+
+      <!-- Мета -->
+      {
+        meta.length > 0 && (
+          <dl class="mt-10 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:grid-cols-4">
+            {meta.map((m) => (
+              <div>
+                <dt>
+                  <MonoLabel>{m.label}</MonoLabel>
+                </dt>
+                <dd class="mt-1 text-paper">{m.value}</dd>
+              </div>
+            ))}
+          </dl>
+        )
+      }
+    </Container>
+
+    <!-- Обкладинка -->
+    {
+      d.cover && (
+        <Container>
+          <Image
+            src={d.cover}
+            alt={`${d.title} — cover`}
+            widths={[640, 1024, 1600]}
+            sizes="(max-width: 1152px) 100vw, 1152px"
+            class="w-full rounded-3xl border border-line"
+          />
+        </Container>
+      )
+    }
+
+    <!-- Метрики -->
+    {
+      d.metrics && d.metrics.length > 0 && (
+        <Container class="py-16">
+          <div class="grid grid-cols-1 gap-8 border-y border-line py-12 sm:grid-cols-3">
+            {d.metrics.map((m) => (
+              <div>
+                <div class="text-5xl font-medium text-accent sm:text-6xl">
+                  {m.value}
+                </div>
+                <div class="mt-2 font-mono text-xs uppercase tracking-widest text-muted">
+                  {m.label}
+                </div>
+              </div>
+            ))}
+          </div>
+        </Container>
+      )
+    }
+
+    <!-- Контент кейсу (з MDX) -->
+    <Container class="pb-8">
+      <div class="case-content mx-auto max-w-3xl">
+        <slot />
+      </div>
+    </Container>
+
+    <!-- CTA -->
+    <Container class="py-16">
+      <div
+        class="flex flex-col items-start gap-6 rounded-3xl border border-line bg-ink-soft p-10 sm:flex-row sm:items-center sm:justify-between"
+      >
+        <p class="max-w-md text-2xl font-medium text-paper">
+          Like what you see? Let's build something together.
+        </p>
+        <Button href="/contact" variant="primary">Get in touch</Button>
+      </div>
+    </Container>
+  </article>
+</BaseLayout>
+
+<style is:global>
+  .case-content > * + * {
+    margin-top: 1.25rem;
+  }
+  .case-content h2 {
+    margin-top: 3rem;
+    font-size: 1.75rem;
+    font-weight: 500;
+    color: var(--color-paper);
+  }
+  .case-content h3 {
+    margin-top: 2rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: var(--color-paper);
+  }
+  .case-content p,
+  .case-content li {
+    color: var(--color-muted);
+    line-height: 1.75;
+  }
+  .case-content ul {
+    list-style: disc;
+    padding-left: 1.25rem;
+  }
+  .case-content a {
+    color: var(--color-accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+  .case-content img {
+    border-radius: 1rem;
+    border: 1px solid var(--color-line);
+  }
+</style>

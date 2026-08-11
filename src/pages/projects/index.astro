@@ -1,0 +1,41 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Container from "../../components/Container.astro";
+import MonoLabel from "../../components/MonoLabel.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import { SITE } from "../../consts";
+
+const projects = (
+  await getCollection("projects", ({ data }) =>
+    import.meta.env.PROD ? !data.draft : true,
+  )
+).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title={`Projects — ${SITE.name}`}
+  description="Selected UX/UI case studies by Anton Lukovyi — mobile apps, SaaS platforms and product design."
+>
+  <Container class="py-16 sm:py-24">
+    <MonoLabel>Projects</MonoLabel>
+    <h1 class="mt-4 max-w-2xl text-5xl font-medium text-paper sm:text-6xl">
+      Case studies that delight clients and engage users.
+    </h1>
+
+    <div class="mt-16 grid gap-x-8 gap-y-16 sm:grid-cols-2">
+      {
+        projects.map((p, i) => (
+          <ProjectCard
+            title={p.data.title}
+            category={p.data.category}
+            href={`/projects/${p.id}`}
+            num={String(i + 1).padStart(2, "0")}
+            status={p.data.status}
+            cover={p.data.cover}
+          />
+        ))
+      }
+    </div>
+  </Container>
+</BaseLayout>
