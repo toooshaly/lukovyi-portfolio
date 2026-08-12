@@ -92,6 +92,9 @@ const icons = [
   </div>
 </div>
 
+<!-- Рамка виділення (rubber-band) -->
+<div id="marquee" class="marquee" hidden transition:persist="marquee"></div>
+
 <!-- Контекстне меню (права кнопка на столі) -->
 <div id="ctx" class="ctx" hidden transition:persist="ctx">
   <button class="ctx-item" data-action="about">About This Mac</button>
@@ -144,6 +147,10 @@ const icons = [
   .icons { position: relative; width: 448px; max-width: 100%; height: 264px; }
   .icon { position: absolute; width: 96px; display: flex; flex-direction: column; align-items: center; gap: .5rem; text-align: center; color: var(--ink); background: none; border: 0; cursor: grab; font: inherit; touch-action: none; user-select: none; }
   .icon:active { cursor: grabbing; }
+  .icon.selected .icon-label { background: #4a90e2; color: #fff; }
+  .icon.selected :global(.app-tile) { box-shadow: 0 0 0 3px rgba(74,144,226,.55), var(--shadow); }
+
+  .marquee { position: fixed; z-index: 15; border: 1px solid rgba(74,144,226,.9); background: rgba(74,144,226,.16); border-radius: 2px; pointer-events: none; }
   .icon:hover :global(.app-tile) { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 46px rgba(23,37,66,.3), inset 0 1px 0 rgba(255,255,255,.4); }
   .icon:active :global(.app-tile) { transform: translateY(-1px) scale(.99); }
   .icon-label { font-size: .78rem; font-weight: 500; padding: 1px 8px; border-radius: 6px; background: var(--label-bg); color: var(--ink); }
