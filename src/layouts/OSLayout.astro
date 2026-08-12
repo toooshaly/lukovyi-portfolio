@@ -238,60 +238,109 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       });
     }
 
-    // Перетягувані іконки (позиції в localStorage)
+    // Іконки: перетягування (одиночне + групове) + індикатор виділення
     const iconsWrap = document.querySelector(".icons") as HTMLElement | null;
+    const iconEls = () => (iconsWrap ? Array.from(iconsWrap.querySelectorAll<HTMLElement>(".icon")) : []);
+    const selpill = document.getElementById("selpill");
+    const selcount = document.getElementById("selcount");
+    const updateSelUI = () => {
+      const n = iconEls().filter((el) => el.classList.contains("selected")).length;
+      if (selpill) selpill.hidden = n < 2;
+      if (selcount) selcount.textContent = String(n);
+    };
+    const clearSel = () => { iconEls().forEach((el) => el.classList.remove("selected")); updateSelUI(); };
+
     if (iconsWrap) {
       const saved = JSON.parse(localStorage.getItem("os-icons") || "{}");
-      iconsWrap.querySelectorAll<HTMLElement>(".icon").forEach((el) => {
-        const key = el.dataset.key!;
+      iconEls().forEach((el) => {
         el.draggable = false;
-        if (saved[key]) { el.style.left = saved[key].x + "px"; el.style.top = saved[key].y + "px"; }
-        let sx = 0, sy = 0, ox = 0, oy = 0, drag = false, moved = false;
-        el.addEventListener("pointerdown", (e) => {
-          drag = true; moved = false;
-          sx = e.clientX; sy = e.clientY;
-          ox = parseFloat(el.style.left) || 0; oy = parseFloat(el.style.top) || 0;
-          el.setPointerCapture(e.pointerId);
-        });
-        el.addEventListener("pointermove", (e) => {
-          if (!drag) return;
-          const dx = e.clientX - sx, dy = e.clientY - sy;
-          if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
-          if (moved) { el.style.left = ox + dx + "px"; el.style.top = Math.max(0, oy + dy) + "px"; el.style.zIndex = "5"; }
-        });
-        el.addEventListener("pointerup", () => {
-          drag = false;
-          if (moved) {
-            saved[key] = { x: parseFloat(el.style.left), y: parseFloat(el.style.top) };
-            localStorage.setItem("os-icons", JSON.stringify(saved));
-            (window as any).__iconDragged = true;
-          }
-        });
-        el.addEventListener("click", (e) => {
-          if ((window as any).__iconDragged) { e.preventDefault(); e.stopImmediatePropagation(); (window as any).__iconDragged = false; }
-        }, true);
+        const k = el.dataset.key!;
+        if (saved[k]) { el.style.left = saved[k].x + "px"; el.style.top = saved[k].y + "px"; }
       });
+
+      let set: { el: HTMLElement; x: number; y: number }[] = [];
+      let sx = 0, sy = 0, dragging = false, moved = false, capEl: HTMLElement | null = null, pid = 0;
+
+      iconsWrap.addEventListener("pointerdown", (e) => {
+        const el = (e.target as HTMLElement).closest?.(".icon") as HTMLElement | null;
+        if (!el || e.button !== 0) return;
+        const selected = iconEls().filter((i) => i.classList.contains("selected"));
+        if (el.classList.contains("selected") && selected.length > 1) {
+          // групове перетягування виділених
+          set = selected.map((i) => ({ el: i, x: parseFloat(i.style.left) || 0, y: parseFloat(i.style.top) || 0 }));
+        } else {
+          clearSel();
+          set = [{ el, x: parseFloat(el.style.left) || 0, y: parseFloat(el.style.top) || 0 }];
+        }
+        sx = e.clientX; sy = e.clientY; dragging = true; moved = false;
+        capEl = el; pid = e.pointerId; el.setPointerCapture(e.pointerId);
+      });
+      iconsWrap.addEventListener("pointermove", (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - sx, dy = e.clientY - sy;
+        if (Math.abs(dx) + Math.abs(dy) > 4) moved = true;
+        if (moved) set.forEach((p) => { p.el.style.left = p.x + dx + "px"; p.el.style.top = Math.max(0, p.y + dy) + "px"; p.el.style.zIndex = "5"; });
+      });
+      iconsWrap.addEventListener("pointerup", () => {
+        if (!dragging) return;
+        dragging = false;
+        if (moved) {
+          set.forEach((p) => { saved[p.el.dataset.key!] = { x: parseFloat(p.el.style.left), y: parseFloat(p.el.style.top) }; });
+          localStorage.setItem("os-icons", JSON.stringify(saved));
+          (window as any).__iconDragged = true;
+        }
+        if (capEl) { try { capEl.releasePointerCapture(pid); } catch {} }
+      });
+      iconsWrap.addEventListener("click", (e) => {
+        if ((window as any).__iconDragged) { e.preventDefault(); e.stopImmediatePropagation(); (window as any).__iconDragged = false; }
+      }, true);
     }
 
     // Контекстне меню (права кнопка на столі) + About This Mac
     const ctx = document.getElementById("ctx");
+    const selctx = document.getElementById("selctx");
     const about = document.getElementById("about-mac");
-    const hideCtx = () => { if (ctx) ctx.hidden = true; };
+    const hideMenus = () => { if (ctx) ctx.hidden = true; if (selctx) selctx.hidden = true; };
     document.addEventListener("contextmenu", (e) => {
       const t = e.target as HTMLElement;
       if (t.closest(".win") || t.closest("input") || t.closest("textarea") || t.closest(".menubar") || t.closest(".dock")) return;
-      if (!ctx) return;
+      const onIcon = t.closest?.(".icon") as HTMLElement | null;
+      // на виділеній іконці — меню дій із виділенням; інакше — меню столу
+      const menu = onIcon && onIcon.classList.contains("selected") ? selctx : ctx;
+      if (!menu) return;
       e.preventDefault();
-      ctx.hidden = false;
-      ctx.style.left = Math.min(e.clientX, window.innerWidth - 200) + "px";
-      ctx.style.top = Math.min(e.clientY, window.innerHeight - 140) + "px";
+      hideMenus();
+      menu.hidden = false;
+      menu.style.left = Math.min(e.clientX, window.innerWidth - 200) + "px";
+      menu.style.top = Math.min(e.clientY, window.innerHeight - 140) + "px";
     });
-    document.addEventListener("click", () => hideCtx());
+    document.addEventListener("click", () => hideMenus());
+
+    // дії меню виділення
+    selctx?.querySelectorAll<HTMLButtonElement>(".ctx-item").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        hideMenus();
+        const sel = iconEls().filter((i) => i.classList.contains("selected"));
+        if (btn.dataset.action === "deselect") { clearSel(); return; }
+        // tidy up: вирівняти виділені у сітку від їх лівого-верхнього кута
+        const ax = Math.min(...sel.map((i) => parseFloat(i.style.left) || 0));
+        const ay = Math.min(...sel.map((i) => parseFloat(i.style.top) || 0));
+        sel.sort((a, b) => (parseFloat(a.style.top) - parseFloat(b.style.top)) || (parseFloat(a.style.left) - parseFloat(b.style.left)));
+        const saved = JSON.parse(localStorage.getItem("os-icons") || "{}");
+        sel.forEach((i, idx) => {
+          const x = ax + (idx % 4) * 112, y = ay + Math.floor(idx / 4) * 132;
+          i.style.left = x + "px"; i.style.top = y + "px";
+          saved[i.dataset.key!] = { x, y };
+        });
+        localStorage.setItem("os-icons", JSON.stringify(saved));
+      });
+    });
     const themeOrder = ["", "sand", "green", "dark"];
     ctx?.querySelectorAll<HTMLButtonElement>(".ctx-item").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.stopPropagation();
-        hideCtx();
+        hideMenus();
         const act = btn.dataset.action;
         if (act === "about" && about) about.hidden = false;
         else if (act === "theme") {
@@ -311,19 +360,18 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     document.getElementById("amClose")?.addEventListener("click", () => { if (about) about.hidden = true; });
     about?.addEventListener("click", (e) => { if (e.target === about) about.hidden = true; });
 
-    // Esc закриває відкрите вікно-сторінку (повернення на стіл)
+    // Esc: закрити overlay → зняти виділення → закрити вікно-сторінку
     document.addEventListener("keydown", (e) => {
       if (e.key !== "Escape") return;
-      const anyOverlay = [document.getElementById("spotlight"), document.getElementById("pw"), about, ctx]
+      const anyOverlay = [document.getElementById("spotlight"), document.getElementById("pw"), about, ctx, selctx]
         .some((el) => el && !(el as HTMLElement).hidden);
       if (anyOverlay) return;
+      if (iconEls().some((i) => i.classList.contains("selected"))) { e.preventDefault(); clearSel(); return; }
       if (document.querySelector(".win")) { e.preventDefault(); navigate("/"); }
     });
 
     // Виділення рамкою (rubber-band), як на ПК
     const marquee = document.getElementById("marquee");
-    const allIcons = () => Array.from(document.querySelectorAll<HTMLElement>(".icon"));
-    const clearSel = () => allIcons().forEach((el) => el.classList.remove("selected"));
     const isEmpty = (t: HTMLElement) =>
       ["desktop", "workspace", "stage", "icons"].some((c) => t.classList.contains(c));
     let mDrag = false, mMoved = false, mx0 = 0, my0 = 0;
@@ -343,10 +391,11 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
       marquee.style.left = x + "px"; marquee.style.top = y + "px";
       marquee.style.width = w + "px"; marquee.style.height = h + "px";
       const r = { l: x, t: y, r: x + w, b: y + h };
-      allIcons().forEach((el) => {
+      iconEls().forEach((el) => {
         const b = el.getBoundingClientRect();
         el.classList.toggle("selected", b.left < r.r && b.right > r.l && b.top < r.b && b.bottom > r.t);
       });
+      updateSelUI();
     });
     document.addEventListener("pointerup", () => {
       if (mDrag && marquee) { mDrag = false; marquee.hidden = true; }

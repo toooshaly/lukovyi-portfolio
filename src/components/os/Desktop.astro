@@ -95,6 +95,17 @@ const icons = [
 <!-- Рамка виділення (rubber-band) -->
 <div id="marquee" class="marquee" hidden transition:persist="marquee"></div>
 
+<!-- Підказка-лічильник виділення -->
+<div id="selpill" class="selpill" hidden transition:persist="selpill">
+  <span id="selcount">0</span> selected · drag to move
+</div>
+
+<!-- Контекстне меню виділення -->
+<div id="selctx" class="ctx" hidden transition:persist="selctx">
+  <button class="ctx-item" data-action="tidy">Tidy up selection</button>
+  <button class="ctx-item" data-action="deselect">Deselect all</button>
+</div>
+
 <!-- Контекстне меню (права кнопка на столі) -->
 <div id="ctx" class="ctx" hidden transition:persist="ctx">
   <button class="ctx-item" data-action="about">About This Mac</button>
@@ -151,6 +162,8 @@ const icons = [
   .icon.selected :global(.app-tile) { box-shadow: 0 0 0 3px rgba(74,144,226,.55), var(--shadow); }
 
   .marquee { position: fixed; z-index: 15; border: 1px solid rgba(74,144,226,.9); background: rgba(74,144,226,.16); border-radius: 2px; pointer-events: none; }
+  .selpill { position: fixed; z-index: 30; left: 50%; bottom: 76px; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(74,144,226,.92); color: #fff; font-size: .78rem; font-weight: 500; box-shadow: 0 6px 20px rgba(23,37,66,.3); pointer-events: none; }
+  .selpill span { font-weight: 700; }
   .icon:hover :global(.app-tile) { transform: translateY(-5px) scale(1.05); box-shadow: 0 20px 46px rgba(23,37,66,.3), inset 0 1px 0 rgba(255,255,255,.4); }
   .icon:active :global(.app-tile) { transform: translateY(-1px) scale(.99); }
   .icon-label { font-size: .78rem; font-weight: 500; padding: 1px 8px; border-radius: 6px; background: var(--label-bg); color: var(--ink); }
