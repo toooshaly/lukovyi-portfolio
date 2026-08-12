@@ -147,8 +147,8 @@ const icons = [
 
 <style>
   .desktop { position: fixed; inset: 0; z-index: 1; padding-top: 30px; padding-bottom: 84px; }
-  .workspace { height: 100%; display: flex; justify-content: space-between; gap: 2rem; padding: 2.2rem 1.6rem 0; overflow: hidden; }
-  .stage { max-width: 820px; width: 100%; }
+  .workspace { height: 100%; display: flex; align-items: center; justify-content: center; padding: 0 1.6rem; overflow: hidden; }
+  .stage { max-width: 680px; }
   .intro { display: flex; gap: 1.1rem; max-width: 680px; margin: 1rem 0 2.5rem; }
   .intro-avatar { flex: none; width: 64px; height: 64px; border-radius: 14px; display: grid; place-items: center; background: var(--panel-strong); box-shadow: var(--shadow); font-size: 1.5rem; }
   .intro-kicker { font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
@@ -169,7 +169,7 @@ const icons = [
   .icon:active :global(.app-tile) { transform: translateY(-1px) scale(.99); }
   .icon-label { font-size: .78rem; font-weight: 500; padding: 1px 8px; border-radius: 6px; background: var(--label-bg); color: var(--ink); }
 
-  .widgets { width: 260px; flex: none; display: flex; flex-direction: column; gap: 1rem; }
+  .widgets { position: absolute; top: 44px; right: 1.6rem; width: 260px; display: flex; flex-direction: column; gap: 1rem; }
   .widget { background: var(--panel-strong); border: 1px solid var(--panel-border); border-radius: 18px; padding: 1rem; box-shadow: var(--shadow); backdrop-filter: blur(20px); color: var(--ink); }
   .widget-title { font-size: .68rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-soft); font-weight: 700; }
   .swatches { display: flex; gap: .6rem; margin-top: .7rem; }
