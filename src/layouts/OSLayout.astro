@@ -160,6 +160,16 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
       "Segoe UI", Roboto, sans-serif;
+    /* Стіл/меню/dock — як в ОС: без нативного виділення тексту */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  /* Але всередині вікон текст можна виділяти й копіювати */
+  .win-content,
+  input,
+  textarea {
+    -webkit-user-select: text;
+    user-select: text;
   }
 </style>
 
