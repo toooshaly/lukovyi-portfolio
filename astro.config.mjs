@@ -10,6 +10,9 @@ export default defineConfig({
   // Фінальний домен сайту. Потрібен для sitemap.xml і canonical URL.
   site: "https://desluko.com",
 
+  // Прибирає панель розробника Astro знизу екрана (вона й так лише локальна)
+  devToolbar: { enabled: false },
+
   vite: {
     plugins: [tailwindcss()]
   },
