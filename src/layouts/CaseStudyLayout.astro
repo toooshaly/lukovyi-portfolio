@@ -1,14 +1,9 @@
 ---
 /**
- * CaseStudyLayout — шаблон сторінки кейсу.
- * Шапка (категорія, назва, summary, метрики, мета) + обкладинка + контент MDX.
+ * CaseStudyLayout — сторінка кейсу у брутально-мінімалістичному стилі.
  */
 import { Image } from "astro:assets";
-import OSLayout from "./OSLayout.astro";
-import WindowFrame from "../components/os/WindowFrame.astro";
-import Container from "../components/Container.astro";
-import MonoLabel from "../components/MonoLabel.astro";
-import Button from "../components/Button.astro";
+import BaseLayout from "./BaseLayout.astro";
 import { SITE } from "../consts";
 import type { CollectionEntry } from "astro:content";
 
@@ -22,7 +17,6 @@ const title = d.seoTitle ?? `${d.title} — ${d.category} | ${SITE.name}`;
 const description = d.seoDescription ?? d.summary;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site).href;
 
-// Схема кейсу для пошуковиків (пов'язана з Person із BaseLayout)
 const caseSchema = {
   "@context": "https://schema.org",
   "@type": "CreativeWork",
@@ -35,202 +29,109 @@ const caseSchema = {
 };
 
 const meta = [
-  { label: "Role", value: d.role },
-  { label: "Timeline", value: d.timeline },
-  { label: "Year", value: d.year },
-  { label: "Client", value: d.client },
-].filter((m) => m.value && !m.value.startsWith("TODO"));
+  { k: "Role", v: d.role },
+  { k: "Timeline", v: d.timeline },
+  { k: "Year", v: d.year },
+  { k: "Client", v: d.client },
+].filter((m) => m.v && !String(m.v).startsWith("TODO"));
 ---
 
-<OSLayout
-  title={title}
-  description={description}
-  ogType="article"
-  jsonLd={caseSchema}
->
-  <WindowFrame title={d.title} wide>
-    <article>
+<BaseLayout title={title} description={description} ogType="article" jsonLd={caseSchema}>
+  <article>
     <!-- Шапка -->
-    <Container class="pt-16 pb-10 sm:pt-24">
-      <a
-        href="/projects"
-        class="font-mono text-xs uppercase tracking-widest text-muted transition-colors hover:text-accent"
-        >← All projects</a
-      >
-
-      <div class="mt-8 flex items-center gap-3">
-        <MonoLabel>{d.category}</MonoLabel>
-        {
-          d.status && (
-            <span class="rounded-full bg-accent px-3 py-1 font-mono text-[10px] font-medium uppercase tracking-widest text-accent-ink">
-              {d.status}
-            </span>
-          )
-        }
-      </div>
-
-      <h1 class="mt-4 text-5xl font-medium text-paper sm:text-7xl">
-        {d.title}
-      </h1>
-      <p class="mt-6 max-w-2xl text-lg text-muted">{d.summary}</p>
-
-      <!-- Мета -->
-      {
-        meta.length > 0 && (
-          <dl class="mt-10 grid grid-cols-2 gap-6 border-t border-line pt-8 sm:grid-cols-4">
-            {meta.map((m) => (
-              <div>
-                <dt>
-                  <MonoLabel>{m.label}</MonoLabel>
-                </dt>
-                <dd class="mt-1 text-paper">{m.value}</dd>
-              </div>
-            ))}
-          </dl>
-        )
-      }
-    </Container>
+    <section class="wrap">
+      <a href="/projects" class="mono back">[ &lt; Work ]</a>
+      <div class="mono cat">{d.category}{d.status ? <span class="tag"> · {d.status}</span> : null}</div>
+      <h1 class="case-h">{d.title}</h1>
+      <p class="summary">{d.summary}</p>
+      {meta.length > 0 && (
+        <dl class="meta mono">
+          {meta.map((m) => (
+            <div><dt>{m.k}</dt><dd>{m.v}</dd></div>
+          ))}
+        </dl>
+      )}
+    </section>
 
     <!-- Обкладинка -->
-    {
-      d.cover && (
-        <Container>
-          <Image
-            src={d.cover}
-            alt={`${d.title} — cover`}
-            widths={[640, 1024, 1600]}
-            sizes="(max-width: 1152px) 100vw, 1152px"
-            class="w-full rounded-3xl border border-line"
-          />
-        </Container>
-      )
-    }
+    {d.cover && (
+      <section class="wrap">
+        <Image src={d.cover} alt={`${d.title} — cover`} widths={[640, 1024, 1600]} sizes="(max-width: 1200px) 100vw, 1200px" class="cover" />
+      </section>
+    )}
 
     <!-- Метрики -->
-    {
-      d.metrics && d.metrics.length > 0 && (
-        <Container class="py-16">
-          <div class="grid grid-cols-1 gap-8 border-y border-line py-12 sm:grid-cols-3">
-            {d.metrics.map((m) => (
-              <div>
-                <div class="text-5xl font-medium text-accent sm:text-6xl">
-                  {m.value}
-                </div>
-                <div class="mt-2 font-mono text-xs uppercase tracking-widest text-muted">
-                  {m.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Container>
-      )
-    }
+    {d.metrics && d.metrics.length > 0 && (
+      <section class="wrap">
+        <div class="metrics">
+          {d.metrics.map((m) => (
+            <div class="metric">
+              <div class="metric-v">{m.value}</div>
+              <div class="mono metric-l">{m.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
 
-    <!-- Контент кейсу (з MDX) -->
-    <Container class="pb-8">
-      <div class="case-content mx-auto max-w-3xl">
-        <slot />
-      </div>
-    </Container>
+    <!-- Контент -->
+    <section class="wrap">
+      <div class="case-content"><slot /></div>
+    </section>
 
     <!-- CTA -->
-    <Container class="py-16">
-      <div
-        class="flex flex-col items-start gap-6 rounded-3xl border border-line bg-ink-soft p-10 sm:flex-row sm:items-center sm:justify-between"
-      >
-        <p class="max-w-md text-2xl font-medium text-paper">
-          Like what you see? Let's build something together.
-        </p>
-        <Button href="/contact" variant="primary">Get in touch</Button>
+    <section class="wrap">
+      <div class="cta">
+        <span class="mono idx">[ Next ]</span>
+        <a href="/contact" class="cta-h">Like what you see?<br />Let's build something. <span class="sl">&gt;</span></a>
       </div>
-    </Container>
-    </article>
-  </WindowFrame>
-</OSLayout>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .sl { color: var(--color-accent); }
+  .back { color: var(--color-accent); display: inline-block; margin-bottom: 2rem; }
+  .cat { color: var(--color-faint); }
+  .tag { color: var(--color-accent); }
+  .case-h { margin-top: 0.75rem; font-size: clamp(2.5rem, 9vw, 6rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }
+  .summary { margin-top: 1.5rem; max-width: 40ch; font-size: clamp(1.25rem, 2.6vw, 1.9rem); line-height: 1.25; letter-spacing: -0.02em; color: var(--color-mute); }
+  .meta { margin-top: 2.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; border-top: 1px solid var(--color-line); padding-top: 1.5rem; }
+  .meta dt { color: var(--color-faint); }
+  .meta dd { color: var(--color-ink); margin-top: 0.2rem; }
+  @media (min-width: 720px) { .meta { grid-template-columns: repeat(4, 1fr); } }
+
+  .cover { width: 100%; border: 1px solid var(--color-line); }
+  .metrics { display: grid; grid-template-columns: 1fr; gap: 2rem; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 2.5rem 0; }
+  .metric-v { font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--color-accent); }
+  .metric-l { color: var(--color-mute); margin-top: 0.5rem; }
+  @media (min-width: 720px) { .metrics { grid-template-columns: repeat(3, 1fr); } }
+
+  .cta { border-top: 1px solid var(--color-line); padding-top: 2rem; }
+  .idx { color: var(--color-faint); display: block; margin-bottom: 1rem; }
+  .cta-h { font-size: clamp(1.75rem, 5vw, 3.5rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; text-transform: uppercase; }
+  .cta-h:hover { color: var(--color-accent); }
+</style>
 
 <style is:global>
-  .case-content > * + * {
-    margin-top: 1.25rem;
-  }
-  .case-content h2 {
-    margin-top: 3rem;
-    font-size: 1.75rem;
-    font-weight: 500;
-    color: var(--color-paper);
-  }
-  .case-content h3 {
-    margin-top: 2rem;
-    font-size: 1.25rem;
-    font-weight: 500;
-    color: var(--color-paper);
-  }
-  .case-content p,
-  .case-content li {
-    color: var(--color-muted);
-    line-height: 1.75;
-  }
-  .case-content ul {
-    list-style: disc;
-    padding-left: 1.25rem;
-  }
-  .case-content a {
-    color: var(--color-accent);
-    text-decoration: underline;
-    text-underline-offset: 2px;
-  }
-  .case-content h4 {
-    margin-top: 2.25rem;
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--color-paper);
-  }
-  .case-content strong {
-    color: var(--color-paper);
-    font-weight: 600;
-  }
-  .case-content img {
-    display: block;
-    width: 100%;
-    margin: 1.75rem 0;
-    border-radius: 1rem;
-    border: 1px solid var(--color-line);
-  }
-  .case-content blockquote {
-    margin: 1.75rem 0;
-    padding: 1rem 1.25rem;
-    border-left: 3px solid var(--color-accent);
-    background: var(--color-ink-soft);
-    border-radius: 0 0.75rem 0.75rem 0;
-  }
-  .case-content blockquote p {
-    color: var(--color-paper);
-    font-size: 1.1rem;
-    margin: 0;
-  }
-  .case-content table {
-    width: 100%;
-    border-collapse: collapse;
-    margin: 1.75rem 0;
-    font-size: 0.95rem;
-  }
-  .case-content th,
-  .case-content td {
-    padding: 0.6rem 0.8rem;
-    border-bottom: 1px solid var(--color-line);
-    text-align: right;
-  }
-  .case-content th:first-child,
-  .case-content td:first-child {
-    text-align: left;
-  }
-  .case-content th {
-    color: var(--color-muted);
-    font-weight: 600;
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .case-content thead th {
-    border-bottom-color: var(--color-muted-dark);
-  }
+  .case-content { max-width: 720px; }
+  .case-content > * + * { margin-top: 1.25rem; }
+  .case-content h2 { margin-top: 3rem; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; color: var(--color-ink); }
+  .case-content h3 { margin-top: 2rem; font-size: 1.3rem; font-weight: 500; color: var(--color-ink); }
+  .case-content h4 { margin-top: 2rem; font-size: 1.05rem; font-weight: 700; color: var(--color-ink); }
+  .case-content p, .case-content li { color: var(--color-mute); line-height: 1.7; font-size: 1.05rem; }
+  .case-content strong { color: var(--color-ink); font-weight: 700; }
+  .case-content ul { list-style: none; padding-left: 0; }
+  .case-content ul li { padding-left: 1.25rem; position: relative; }
+  .case-content ul li::before { content: "/"; position: absolute; left: 0; color: var(--color-accent); }
+  .case-content a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
+  .case-content img { display: block; width: 100%; margin: 2rem 0; border: 1px solid var(--color-line); }
+  .case-content blockquote { margin: 2rem 0; padding: 1.25rem 1.5rem; border-left: 3px solid var(--color-accent); background: #ececec; }
+  .case-content blockquote p { color: var(--color-ink); font-size: 1.2rem; }
+  .case-content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-family: var(--font-mono); font-size: 0.85rem; }
+  .case-content th, .case-content td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--color-line); text-align: right; }
+  .case-content th:first-child, .case-content td:first-child { text-align: left; }
+  .case-content th { color: var(--color-faint); text-transform: uppercase; font-weight: 400; }
+  .case-content thead th { border-bottom-color: var(--color-ink); }
 </style>

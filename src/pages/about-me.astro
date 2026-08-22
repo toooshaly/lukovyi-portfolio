@@ -1,80 +1,56 @@
 ---
-import OSLayout from "../layouts/OSLayout.astro";
-import WindowFrame from "../components/os/WindowFrame.astro";
-import Container from "../components/Container.astro";
-import MonoLabel from "../components/MonoLabel.astro";
-import Button from "../components/Button.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE, SOCIALS } from "../consts";
-
-const interests = ["#VideoEnthusiast", "#PhotographyLover"];
 ---
 
-<OSLayout
+<BaseLayout
   title={`About — ${SITE.name}`}
-  description="Anton Lukovyi — freelance UX/UI designer and Webflow developer helping businesses grow through design."
+  description="Anton Lukovyi — freelance UX/UI designer helping businesses grow through design."
 >
-  <WindowFrame title="About Me">
-    <Container class="py-16 sm:py-24">
-    <MonoLabel>About me</MonoLabel>
-    <h1 class="mt-4 max-w-4xl text-5xl font-medium leading-tight text-paper sm:text-6xl">
-      Hello, my name is {SITE.name}
-    </h1>
+  <section class="wrap">
+    <span class="mono idx">[ About ]</span>
+    <h1 class="page-h">Anton<br />Lukovyi</h1>
+    <p class="role mono">{SITE.role} <span class="sl">/</span> {SITE.location}</p>
+  </section>
 
-    <div class="mt-12 grid gap-12 md:grid-cols-3">
-      <div class="space-y-6 text-lg leading-relaxed text-muted md:col-span-2">
-        <p>
-          I'm a freelance UX/UI designer and Webflow developer passionate about
-          helping businesses grow through exceptional design. My journey began
-          over two years ago, focused on creating standout digital experiences.
-        </p>
-        <p>
-          I specialize in bespoke website design and development — serving
-          government institutions, startups, and established businesses. My work
-          spans SaaS dashboards and e-commerce platforms.
-        </p>
-        <p class="text-paper">
-          Design is about more than aesthetics — it's about creating meaningful
-          connections between businesses and their audiences.
-        </p>
-      </div>
-
-      <aside class="space-y-8">
-        <div>
-          <MonoLabel>Based in</MonoLabel>
-          <p class="mt-2 text-paper">{SITE.location}</p>
-        </div>
-        <div>
-          <MonoLabel>Interests</MonoLabel>
-          <ul class="mt-2 space-y-1">
-            {interests.map((t) => <li class="text-paper">{t}</li>)}
-          </ul>
-        </div>
-        <div>
-          <MonoLabel>Find me on</MonoLabel>
-          <ul class="mt-2 space-y-1">
-            {
-              SOCIALS.map((s) => (
-                <li>
-                  <a
-                    href={s.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="text-paper transition-colors hover:text-accent"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
-      </aside>
+  <section class="wrap grid">
+    <div class="bio">
+      <p>
+        I'm at my best when I stay close to the craft — combining a strategic
+        view with hands-on execution. I help startups and businesses turn
+        complex ideas into intuitive, user-centered interfaces.
+      </p>
+      <p>
+        My work spans mobile apps, SaaS dashboards and e-commerce — from
+        research and wireframes to pixel-perfect designs ready for development.
+        Design, to me, is less about decoration and more about creating trust
+        between a product and the people who use it.
+      </p>
     </div>
+    <aside class="meta mono">
+      <div class="row"><span class="k">Based in</span><span class="v">{SITE.location}</span></div>
+      <div class="row"><span class="k">Focus</span><span class="v">UX/UI · Web · Product · App</span></div>
+      <div class="row"><span class="k">Interests</span><span class="v">#Video · #Photography</span></div>
+      <div class="row"><span class="k">Email</span><a class="v link" href={`mailto:${SITE.email}`}>{SITE.email}</a></div>
+      {SOCIALS.map((s) => (
+        <div class="row"><span class="k">{s.label}</span><a class="v link" href={s.href} target="_blank" rel="noopener noreferrer">[ Visit &gt; ]</a></div>
+      ))}
+    </aside>
+  </section>
+</BaseLayout>
 
-    <div class="mt-16 flex flex-wrap gap-4">
-      <Button href="/projects" variant="primary">My work</Button>
-      <Button href="/contact" variant="secondary">Get in touch</Button>
-    </div>
-    </Container>
-  </WindowFrame>
-</OSLayout>
+<style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+  .idx { color: var(--color-faint); display: block; margin-bottom: 1rem; }
+  .sl { color: var(--color-accent); }
+  .page-h { font-size: clamp(2.5rem, 9vw, 6rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }
+  .role { margin-top: 1.25rem; color: var(--color-mute); }
+
+  .grid { display: grid; gap: 3rem; grid-template-columns: 1fr; border-top: 1px solid var(--color-line); }
+  .bio p { font-size: clamp(1.25rem, 2.6vw, 1.9rem); line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 1.5rem; max-width: 30ch; }
+  .meta .row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--color-line); }
+  .meta .k { color: var(--color-faint); }
+  .meta .v { color: var(--color-ink); text-align: right; }
+  .meta .link:hover { color: var(--color-accent); }
+  @media (min-width: 820px) { .grid { grid-template-columns: 1.4fr 1fr; } }
+</style>

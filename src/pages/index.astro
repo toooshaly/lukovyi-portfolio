@@ -1,59 +1,156 @@
 ---
-import OSLayout from "../layouts/OSLayout.astro";
-import Spiral from "../components/os/Spiral.astro";
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../consts";
+
+const projects = (
+  await getCollection("projects", ({ data }) =>
+    import.meta.env.PROD ? !data.draft : true,
+  )
+).sort((a, b) => a.data.order - b.data.order);
+
+// TODO(Anton): звір/онови цифри під себе
+const stats = [
+  { n: "2+", label: "years — UX/UI & product design" },
+  { n: "+304%", label: "revenue lift · Sports AI-Pro" },
+  { n: "05", label: "selected case studies" },
+];
 ---
 
-<OSLayout>
-  <!-- Екран блокування (лише на головній; стіл рендерить OSLayout позаду) -->
-  <div id="lock" class="lock">
-    <div class="lock-top">
-      <div class="lock-date" id="lockDate">—</div>
-      <div class="lock-clock" id="lockClock">00:00</div>
+<BaseLayout title={`${SITE.name} — ${SITE.role}`}>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-top mono">
+      <span>Portfolio © {new Date().getFullYear()}</span>
+      <span>{SITE.location}</span>
     </div>
-    <div class="lock-user">
-      <div class="avatar" aria-hidden="true"><Spiral size={38} stroke="#fff" width={2} /></div>
-      <div class="lock-name">{SITE.name}</div>
-      <div class="lock-role">{SITE.role}</div>
-      <button class="unlock-btn" id="unlockBtn">🔓 Click to unlock</button>
+    <h1 class="wordmark">
+      LU<span class="sl">/</span>KO<span class="sl">/</span>VYI
+    </h1>
+    <p class="role">
+      UX<span class="sl">/</span>UI designer with decent taste, working across
+      <span class="hl">PRODUCT</span> <span class="sl">/</span>
+      <span class="hl">WEB</span> <span class="sl">/</span>
+      <span class="hl">APP</span>
+    </p>
+  </section>
+
+  <!-- INTRO -->
+  <section class="wrap intro rule">
+    <span class="mono idx">[ 01 ] Intro</span>
+    <p class="lede">
+      I'm at my best when I stay close to the craft — combining a strategic
+      view with hands-on execution, from research and wireframes to
+      pixel-perfect UI ready for development.
+    </p>
+    <a href="/about-me" class="more mono">[ Read more &gt; ]</a>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section class="wrap exp rule">
+    <span class="mono idx">[ 02 ] Snapshot</span>
+    <div class="exp-grid">
+      {stats.map((s) => (
+        <div class="exp-item">
+          <div class="exp-n">{s.n}</div>
+          <div class="mono exp-l">{s.label}</div>
+        </div>
+      ))}
     </div>
-    <div class="lock-hint">Click anywhere to unlock</div>
-  </div>
-</OSLayout>
+  </section>
+
+  <!-- SELECT WORK -->
+  <section class="wrap work rule">
+    <div class="work-head">
+      <span class="mono idx">[ 03 ] Select work</span>
+      <a href="/projects" class="more mono">[ Show all &gt; ]</a>
+    </div>
+    <ul class="work-list">
+      {projects.map((p, i) => (
+        <li class="work-row">
+          <a href={`/projects/${p.id}`} class="work-link">
+            <span class="mono work-num">{String(i + 1).padStart(2, "0")}</span>
+            <span class="work-title">{p.data.title}</span>
+            <span class="mono work-meta">
+              {p.data.year ?? "—"} <span class="sl">/</span> {p.data.category}
+              {p.data.status ? <span class="tag"> · {p.data.status}</span> : null}
+            </span>
+            <span class="mono work-cta">[ Show case &gt; ]</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+</BaseLayout>
 
 <style>
-  .lock { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 3.5rem 0 2rem; background: var(--wall); cursor: pointer; transition: opacity .6s ease, transform .6s ease, filter .6s ease; }
-  .lock.is-open { opacity: 0; transform: scale(1.04); filter: blur(6px); pointer-events: none; }
-  .lock-top { text-align: center; color: #eef3fb; }
-  .lock-date { font-size: .95rem; font-weight: 600; opacity: .9; }
-  .lock-clock { font-size: clamp(5rem, 16vw, 12rem); font-weight: 300; line-height: .9; letter-spacing: -.03em; transform: scaleY(1.35); transform-origin: top center; margin-top: .6rem; text-shadow: 0 2px 30px rgba(23,37,66,.25); }
-  .lock-user { text-align: center; color: #f3f6fb; }
-  .avatar { width: 68px; height: 68px; margin: 0 auto .75rem; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.25); backdrop-filter: blur(8px); font-size: 1.6rem; }
-  .lock-name { font-size: 1.15rem; font-weight: 700; }
-  .lock-role { font-size: .7rem; letter-spacing: .22em; text-transform: uppercase; opacity: .85; margin-top: .2rem; }
-  .unlock-btn { margin-top: 1rem; padding: .5rem 1.1rem; border: 0; border-radius: 999px; background: rgba(255,255,255,.28); color: #fff; font: inherit; font-size: .85rem; cursor: pointer; backdrop-filter: blur(8px); }
-  .unlock-btn:hover { background: rgba(255,255,255,.42); }
-  .lock-hint { color: rgba(255,255,255,.75); font-size: .7rem; letter-spacing: .24em; text-transform: uppercase; }
-  @media (max-width: 760px) { .lock-clock { transform: scaleY(1.2); } }
-</style>
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem; }
+  .rule { border-top: 1px solid var(--color-line); }
+  .sl { color: var(--color-accent); padding: 0 0.1em; }
+  .hl { color: var(--color-ink); }
+  .idx { color: var(--color-faint); display: block; margin-bottom: 1.5rem; }
+  .more { color: var(--color-accent); }
+  .more:hover { text-decoration: underline; }
 
-<script>
-  function initLock() {
-    const lock = document.getElementById("lock");
-    if (!lock) return;
-    function unlock() {
-      lock!.classList.add("is-open");
-      sessionStorage.setItem("unlocked", "1");
-      window.setTimeout(() => { lock!.style.display = "none"; }, 650);
-    }
-    if (sessionStorage.getItem("unlocked") === "1") {
-      lock.style.display = "none";
-    } else {
-      lock.style.display = "";
-      lock.classList.remove("is-open");
-      lock.addEventListener("click", unlock, { once: true });
-    }
+  /* Hero */
+  .hero { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
+  .hero-top { display: flex; justify-content: space-between; color: var(--color-faint); }
+  .wordmark {
+    font-weight: 700;
+    font-size: clamp(4rem, 20vw, 15rem);
+    line-height: 0.86;
+    letter-spacing: -0.04em;
+    margin: 1.5rem 0 0;
+    text-transform: uppercase;
   }
-  initLock();
-  document.addEventListener("astro:page-load", initLock);
-</script>
+  .role {
+    margin-top: 1.5rem;
+    max-width: 40ch;
+    font-size: clamp(1.1rem, 2.4vw, 1.75rem);
+    line-height: 1.25;
+    color: var(--color-mute);
+    text-transform: uppercase;
+    letter-spacing: -0.01em;
+  }
+
+  /* Intro */
+  .lede { max-width: 52ch; font-size: clamp(1.4rem, 3vw, 2.25rem); line-height: 1.2; letter-spacing: -0.02em; }
+  .intro .more { display: inline-block; margin-top: 1.5rem; }
+
+  /* Experience */
+  .exp-grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
+  .exp-n { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+  .exp-l { color: var(--color-mute); margin-top: 0.5rem; }
+  @media (min-width: 720px) { .exp-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  /* Select work */
+  .work-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .work-list { margin-top: 1rem; }
+  .work-row { border-top: 1px solid var(--color-line); }
+  .work-row:last-child { border-bottom: 1px solid var(--color-line); }
+  .work-link {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: baseline;
+    gap: 0.5rem 1.5rem;
+    padding: 1.5rem 0;
+    transition: padding-left 0.2s ease;
+  }
+  .work-link:hover { padding-left: 0.75rem; }
+  .work-num { color: var(--color-faint); align-self: start; }
+  .work-title {
+    grid-column: 2;
+    font-size: clamp(1.75rem, 5vw, 3.25rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .work-link:hover .work-title { color: var(--color-accent); }
+  .work-meta { grid-column: 2; color: var(--color-mute); }
+  .work-cta { grid-column: 3; grid-row: 1; color: var(--color-accent); align-self: start; white-space: nowrap; }
+  .tag { color: var(--color-accent); }
+  @media (max-width: 640px) {
+    .work-cta { display: none; }
+  }
+</style>

@@ -1,106 +1,58 @@
 @import "tailwindcss";
 
 /* ==========================================================================
-   Шрифти (самохостяться з /public/fonts — жодних зовнішніх запитів)
-   General Sans  -> заміна PP Neue Montreal (заголовки, текст)
-   Geist Mono    -> заміна Suisse Int'l Mono (лейбли, нумерація)
-   font-display: swap — текст видно одразу, шрифт підмінюється без «стрибка».
+   Шрифти (self-host з /public/fonts). Space Grotesk + Space Mono —
+   як на референсі gustaffurusten.se. font-display: swap.
    ========================================================================== */
-@font-face {
-  font-family: "General Sans";
-  src: url("/fonts/GeneralSans-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "General Sans";
-  src: url("/fonts/GeneralSans-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "General Sans";
-  src: url("/fonts/GeneralSans-Semibold.woff2") format("woff2");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("/fonts/GeistMono-Regular.woff2") format("woff2");
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Geist Mono";
-  src: url("/fonts/GeistMono-Medium.woff2") format("woff2");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
+@font-face { font-family: "Space Grotesk"; src: url("/fonts/SpaceGrotesk-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Grotesk"; src: url("/fonts/SpaceGrotesk-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Grotesk"; src: url("/fonts/SpaceGrotesk-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("/fonts/SpaceMono-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
+@font-face { font-family: "Space Mono"; src: url("/fonts/SpaceMono-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 
 /* ==========================================================================
-   Design tokens — джерело правди для кольорів, шрифтів і типографіки.
-   Значення взяті з поточного Webflow-сайту (lukovyi.webflow.io).
-   Tailwind v4 автоматично генерує утиліти з цих змінних:
-   --color-accent -> bg-accent / text-accent / border-accent, і т.д.
+   Дизайн-токени — брутально-мінімалістична палітра з референсу.
    ========================================================================== */
 @theme {
-  /* --- Кольори (СВІТЛА тема, macOS-стиль) ---
-     Імена токенів історичні; ролі в цій темі описані праворуч. */
-  --color-ink: #f4f6fa;        /* фон сторінки (світлий) */
-  --color-ink-soft: #ffffff;   /* піднята поверхня: картки, блоки (біла) */
-  --color-line: #e4e8ef;       /* тонкі розділові лінії (світло-сірі) */
-  --color-paper: #1b2430;      /* основний текст (темний) */
-  --color-muted: #5f6b7c;      /* приглушений текст */
-  --color-muted-dark: #9aa4b2; /* найсвітліший сірий: плейсхолдери/бордери */
-  --color-accent: #3f6fb0;     /* синій акцент: кнопки, лінки, active */
-  --color-accent-ink: #ffffff; /* текст поверх акцентної заливки */
+  --color-paper: #f4f4f4;   /* фон сторінки (off-white) */
+  --color-ink: #161819;     /* основний текст (near-black) */
+  --color-mute: #6b6f72;    /* приглушений текст */
+  --color-faint: #b3b3b3;   /* найсвітліший сірий / мета */
+  --color-line: #dcdcdc;    /* лінії/бордери */
+  --color-accent: #055dff;  /* синій акцент */
 
-  /* --- Шрифти ---
-     Реальні гарнітури сайту (PP Neue Montreal + Suisse Int'l Mono) —
-     ліцензійні. Поки що працює системний запасний стек; коли додамо
-     файли шрифтів, вони підхопляться першими автоматично. */
-  --font-sans: "General Sans", ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, Arial, sans-serif;
-  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas,
-    monospace;
+  --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;
+  --font-mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
 }
 
 /* ==========================================================================
-   Базові стилі документа
+   Базові стилі
    ========================================================================== */
 @layer base {
-  html {
-    scroll-behavior: smooth;
-    -webkit-text-size-adjust: 100%;
-  }
-
+  html { -webkit-text-size-adjust: 100%; }
   body {
-    background-color: var(--color-ink);
-    color: var(--color-paper);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
   }
+  ::selection { background: var(--color-accent); color: #fff; }
+  a { color: inherit; text-decoration: none; }
+  :focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; }
+}
 
-  /* Мono-лейбли (нумерація навігації, підписи секцій) */
-  ::selection {
-    background-color: var(--color-accent);
-    color: var(--color-accent-ink);
+/* ==========================================================================
+   Брутал-утиліти
+   ========================================================================== */
+@layer components {
+  /* Моно-лейбл: маленький, розріджений, uppercase */
+  .mono {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
-
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  :focus-visible {
-    outline: 2px solid var(--color-accent);
-    outline-offset: 2px;
-  }
+  /* Тонка розділова лінія */
+  .rule { border-top: 1px solid var(--color-line); }
 }

@@ -1,69 +1,49 @@
 ---
 /**
- * BaseLayout — спільний каркас для всіх сторінок.
- * Задає <head> (SEO-мета, OG, Twitter, JSON-LD, canonical, favicon)
- * і обгортку сторінки (header + main + footer).
+ * BaseLayout — брутально-мінімалістичний каркас (референс: gustaffurusten.se).
+ * Тонкий верхній бар + контент + футер із живим таймстемпом. SEO у head.
  */
 import "../styles/global.css";
 import { SITE, SOCIALS } from "../consts";
-import SiteHeader from "../components/SiteHeader.astro";
-import SiteFooter from "../components/SiteFooter.astro";
 
 interface Props {
-  /** <title> + заголовок вкладки (унікальний на кожній сторінці) */
   title: string;
-  /** Meta description (унікальний на кожній сторінці) */
   description?: string;
-  /** Перевизначити canonical URL */
   canonical?: string;
-  /** Прибрати сторінку з індексації */
-  noindex?: boolean;
-  /** OG-зображення (шлях від кореня). За замовчуванням — брендоване. */
-  ogImage?: string;
-  /** Тип OG: "website" (сторінки) або "article" (кейси) */
   ogType?: "website" | "article";
-  /** Додаткова JSON-LD схема сторінки (напр. CreativeWork для кейсу) */
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
 }
-
 const {
   title,
   description = SITE.description,
   canonical,
-  noindex = false,
-  ogImage = "/og-default.png",
   ogType = "website",
   jsonLd,
 } = Astro.props;
 
 const canonicalURL = canonical ?? new URL(Astro.url.pathname, Astro.site).href;
-const ogImageURL = new URL(ogImage, Astro.site).href;
+const ogImageURL = new URL("/og-default.png", Astro.site).href;
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
-// Site-wide identity — присутня на кожній сторінці
-const baseSchema = {
+const nav = [
+  { label: "Work", href: "/projects" },
+  { label: "About", href: "/about-me" },
+  { label: "Contact", href: "/contact" },
+];
+const isActive = (href: string) => path === href || path.startsWith(href + "/");
+
+const personSchema = {
   "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Person",
-      "@id": `${SITE.url}/#person`,
-      name: SITE.name,
-      jobTitle: SITE.role,
-      url: SITE.url,
-      email: `mailto:${SITE.email}`,
-      address: { "@type": "PostalAddress", addressLocality: SITE.location },
-      sameAs: SOCIALS.map((s) => s.href),
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${SITE.url}/#website`,
-      name: SITE.name,
-      url: SITE.url,
-      publisher: { "@id": `${SITE.url}/#person` },
-    },
-  ],
+  "@type": "Person",
+  name: SITE.name,
+  jobTitle: SITE.role,
+  url: SITE.url,
+  email: `mailto:${SITE.email}`,
+  address: { "@type": "PostalAddress", addressLocality: SITE.location },
+  sameAs: SOCIALS.map((s) => s.href),
 };
-
-const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+const schemas = [personSchema, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+const year = new Date().getFullYear();
 ---
 
 <!doctype html>
@@ -71,75 +51,114 @@ const pageSchemas = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <!-- Primary -->
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalURL} />
-    {noindex && <meta name="robots" content="noindex, nofollow" />}
-
-    <!-- Open Graph -->
     <meta property="og:type" content={ogType} />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:site_name" content={SITE.name} />
-    <meta property="og:locale" content="en_US" />
     <meta property="og:image" content={ogImageURL} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={`${SITE.name} — ${SITE.role}`} />
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageURL} />
-
-    <!-- Preload ключових шрифтів (кращий LCP: заголовок + основний текст) -->
-    <link
-      rel="preload"
-      href="/fonts/GeneralSans-Medium.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
-      href="/fonts/GeneralSans-Regular.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-
-    <!-- Icons / misc -->
+    <link rel="preload" href="/fonts/SpaceGrotesk-Bold.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/SpaceGrotesk-Regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/SpaceMono-Regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#040008" />
+    <meta name="theme-color" content="#f4f4f4" />
     <meta name="generator" content={Astro.generator} />
-
-    <!-- JSON-LD -->
-    <script
-      type="application/ld+json"
-      set:html={JSON.stringify(baseSchema)}
-    />
-    {
-      pageSchemas.map((s) => (
-        <script type="application/ld+json" set:html={JSON.stringify(s)} />
-      ))
-    }
+    {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
   </head>
 
-  <body class="flex min-h-screen flex-col">
-    <a
-      href="#main"
-      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:font-mono focus:text-sm focus:text-accent-ink"
-    >
-      Skip to content
-    </a>
-    <SiteHeader />
-    <main id="main" class="flex-1">
+  <body class="min-h-screen flex flex-col">
+    <!-- Верхній бар -->
+    <header class="topbar mono">
+      <a href="/" class="flex items-center gap-2">
+        <span class="dot"></span>{SITE.name}
+      </a>
+      <nav class="flex items-center gap-5">
+        {nav.map((n) => (
+          <a href={n.href} class:list={["nav-link", isActive(n.href) && "is-active"]}>{n.label}</a>
+        ))}
+      </nav>
+    </header>
+
+    <main class="flex-1">
       <slot />
     </main>
-    <SiteFooter />
+
+    <!-- Футер -->
+    <footer class="footer mono">
+      <div class="foot-grid">
+        <div>
+          <div class="foot-h">Menu</div>
+          <a href="/" class="foot-a">Home</a>
+          <a href="/projects" class="foot-a">Work</a>
+          <a href="/about-me" class="foot-a">About</a>
+          <a href="/contact" class="foot-a">Contact</a>
+        </div>
+        <div>
+          <div class="foot-h">Elsewhere</div>
+          {SOCIALS.map((s) => (
+            <a href={s.href} target="_blank" rel="noopener noreferrer" class="foot-a">{s.label}</a>
+          ))}
+        </div>
+        <div>
+          <div class="foot-h">Contact</div>
+          <a href={`mailto:${SITE.email}`} class="foot-a">{SITE.email}</a>
+          <div class="foot-a">{SITE.location}</div>
+        </div>
+        <div class="foot-clock">
+          <div class="foot-h">Local time</div>
+          <div id="footTime" class="foot-time">--:--:--</div>
+          <div id="footDate" class="foot-a">—</div>
+        </div>
+      </div>
+      <div class="foot-bottom">
+        <span>© {year} {SITE.name}</span>
+        <span>[ {SITE.role} ]</span>
+      </div>
+    </footer>
+
+    <style>
+      .topbar {
+        position: sticky; top: 0; z-index: 40;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.75rem 1.5rem;
+        background: color-mix(in srgb, var(--color-paper) 88%, transparent);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid var(--color-line);
+      }
+      .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); display: inline-block; }
+      .nav-link { color: var(--color-mute); transition: color .15s; }
+      .nav-link:hover, .nav-link.is-active { color: var(--color-ink); }
+
+      .footer { margin-top: 6rem; border-top: 1px solid var(--color-line); padding: 2.5rem 1.5rem 1.5rem; }
+      .foot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+      .foot-h { color: var(--color-faint); margin-bottom: 0.75rem; }
+      .foot-a { display: block; color: var(--color-ink); padding: 2px 0; }
+      .foot-a:hover { color: var(--color-accent); }
+      .foot-time { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; color: var(--color-ink); }
+      .foot-bottom { max-width: 1200px; margin: 2.5rem auto 0; padding-top: 1.25rem; border-top: 1px solid var(--color-line); display: flex; justify-content: space-between; color: var(--color-mute); }
+      @media (min-width: 720px) { .foot-grid { grid-template-columns: repeat(4, 1fr); } }
+    </style>
+
+    <script>
+      function tickFoot() {
+        const now = new Date();
+        const p = (n: number) => String(n).padStart(2, "0");
+        const t = document.getElementById("footTime");
+        const d = document.getElementById("footDate");
+        if (t) t.textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+        if (d) d.textContent = now.toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" });
+      }
+      tickFoot();
+      const w = window as any;
+      if (!w.__footClock) w.__footClock = setInterval(tickFoot, 1000);
+      document.addEventListener("astro:page-load", tickFoot);
+    </script>
   </body>
 </html>
