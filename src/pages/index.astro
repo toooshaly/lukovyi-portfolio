@@ -11,69 +11,74 @@ const projects = (
 
 // TODO(Anton): звір/онови цифри під себе
 const stats = [
-  { n: "2+", label: "years — UX/UI & product design" },
-  { n: "+304%", label: "revenue lift · Sports AI-Pro" },
-  { n: "05", label: "selected case studies" },
+  { n: "02+", cap: "Years — UX/UI" },
+  { n: "05", cap: "Case studies" },
+  { n: "+304%", cap: "Best result · Sports AI-Pro" },
 ];
+const tags = ["UX/UI", "Product", "Web", "App", "2026"];
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.role}`}>
-  <!-- HERO -->
+  <!-- HERO (dark) -->
   <section class="hero">
-    <div class="hero-top mono">
-      <span>Portfolio © {new Date().getFullYear()}</span>
-      <span>{SITE.location}</span>
-    </div>
-    <h1 class="wordmark">
-      LU<span class="sl">/</span>KO<span class="sl">/</span>VYI
-    </h1>
-    <p class="role">
-      UX<span class="sl">/</span>UI designer with decent taste, working across
-      <span class="hl">PRODUCT</span> <span class="sl">/</span>
-      <span class="hl">WEB</span> <span class="sl">/</span>
+    <div class="hero-mark">LU<span class="sl">/</span>KO</div>
+    <div class="hero-role mono">
+      UX/UI designer with decent taste, working across
+      <span class="hl">PRODUCT</span> / <span class="hl">WEB</span> /
       <span class="hl">APP</span>
-    </p>
-  </section>
-
-  <!-- INTRO -->
-  <section class="wrap intro rule">
-    <span class="mono idx">[ 01 ] Intro</span>
-    <p class="lede">
-      I'm at my best when I stay close to the craft — combining a strategic
-      view with hands-on execution, from research and wireframes to
-      pixel-perfect UI ready for development.
-    </p>
-    <a href="/about-me" class="more mono">[ Read more &gt; ]</a>
-  </section>
-
-  <!-- EXPERIENCE -->
-  <section class="wrap exp rule">
-    <span class="mono idx">[ 02 ] Snapshot</span>
-    <div class="exp-grid">
-      {stats.map((s) => (
-        <div class="exp-item">
-          <div class="exp-n">{s.n}</div>
-          <div class="mono exp-l">{s.label}</div>
-        </div>
-      ))}
     </div>
+    <div class="hero-label mono">
+      {SITE.name} — Portfolio 2026 ©
+    </div>
+    {/* TODO(Anton): сюди можна вставити hero-візуал (3D/зображення) */}
+  </section>
+
+  <!-- INTRO + SNAPSHOT (light) -->
+  <section class="wrap intro">
+    <div class="intro-grid">
+      <span class="mono lbl"><span class="dot"></span> Intro</span>
+      <div class="word">DES<span class="sl">/</span>LUKO</div>
+      <div class="bio">
+        <p>
+          I'm at my best when I stay close to the craft — combining a strategic
+          view with hands-on execution.
+        </p>
+        <div class="tags mono">
+          {tags.map((t) => <span class="tag">[ {t} ]</span>)}
+        </div>
+      </div>
+    </div>
+
+    <div class="numbers">
+      <span class="mono num-lbl">▸ Experience</span>
+      <div class="num-cells">
+        {stats.map((s) => (
+          <div class="cell">
+            <div class="num">{s.n}</div>
+            <div class="mono cap">{s.cap}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <a href="/about-me" class="mono more">Read more ◁</a>
   </section>
 
   <!-- SELECT WORK -->
-  <section class="wrap work rule">
-    <div class="work-head">
-      <span class="mono idx">[ 03 ] Select work</span>
-      <a href="/projects" class="more mono">[ Show all &gt; ]</a>
+  <section class="wrap work">
+    <div class="work-head mono">
+      <span class="lbl2">▸ Select work</span>
+      <a href="/projects" class="more">Show all ►</a>
     </div>
     <ul class="work-list">
       {projects.map((p, i) => (
         <li class="work-row">
           <a href={`/projects/${p.id}`} class="work-link">
-            <span class="mono work-num">{String(i + 1).padStart(2, "0")}</span>
+            <span class="mono work-num">{String(i + 1).padStart(3, "0")}</span>
             <span class="work-title">{p.data.title}</span>
             <span class="mono work-meta">
               {p.data.year ?? "—"} <span class="sl">/</span> {p.data.category}
-              {p.data.status ? <span class="tag"> · {p.data.status}</span> : null}
+              {p.data.status ? <span class="sl"> · {p.data.status}</span> : null}
             </span>
             <span class="mono work-cta">[ Show case &gt; ]</span>
           </a>
@@ -85,72 +90,69 @@ const stats = [
 
 <style>
   .wrap { max-width: 1200px; margin: 0 auto; padding: 3.5rem 1.5rem; }
-  .rule { border-top: 1px solid var(--color-line); }
-  .sl { color: var(--color-accent); padding: 0 0.1em; }
-  .hl { color: var(--color-ink); }
-  .idx { color: var(--color-faint); display: block; margin-bottom: 1.5rem; }
-  .more { color: var(--color-accent); }
+  .sl { color: var(--color-accent); }
+  .hl { color: #fff; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); display: inline-block; }
+
+  /* HERO */
+  .hero {
+    position: relative;
+    background: #161819; color: #f4f4f4;
+    min-height: 78vh;
+    margin-top: -3.75rem; /* під нав-пігулку */
+    padding: 7rem 1.5rem 2rem;
+    display: grid;
+  }
+  .hero-mark {
+    font-weight: 700; text-transform: uppercase;
+    font-size: clamp(4.5rem, 22vw, 18rem);
+    line-height: 0.8; letter-spacing: -0.05em;
+    align-self: start;
+  }
+  .hero-role {
+    position: absolute; top: 7rem; right: 1.5rem;
+    max-width: 22ch; text-align: left;
+    color: #b3b3b3; text-transform: uppercase;
+    font-size: 0.8rem; line-height: 1.5;
+  }
+  .hero-role .hl { color: #f4f4f4; }
+  .hero-label { align-self: end; color: #8a8f92; }
+
+  /* INTRO */
+  .intro-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; align-items: start; }
+  .lbl { color: var(--color-faint); display: inline-flex; align-items: center; gap: 0.5rem; }
+  .word {
+    font-weight: 700; text-transform: uppercase;
+    font-size: clamp(3.5rem, 12vw, 9rem);
+    line-height: 0.82; letter-spacing: -0.05em;
+    text-align: center;
+  }
+  .bio p { font-size: clamp(1.05rem, 2vw, 1.35rem); line-height: 1.3; letter-spacing: -0.01em; max-width: 32ch; }
+  .tags { margin-top: 1.25rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .tag { color: var(--color-mute); border: 1px solid var(--color-line); padding: 2px 8px; border-radius: 999px; }
+  @media (min-width: 900px) { .intro-grid { grid-template-columns: auto 1fr auto; gap: 3rem; } }
+
+  .numbers { margin-top: 3.5rem; border-top: 1px solid var(--color-line); padding-top: 1.5rem; }
+  .num-lbl { color: var(--color-faint); display: block; margin-bottom: 1.5rem; }
+  .num-cells { display: grid; grid-template-columns: 1fr; gap: 2rem; }
+  .num { font-size: clamp(2.75rem, 7vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
+  .cap { color: var(--color-mute); margin-top: 0.5rem; }
+  @media (min-width: 720px) { .num-cells { grid-template-columns: repeat(3, 1fr); } }
+  .more { display: inline-block; margin-top: 2.5rem; color: var(--color-accent); }
   .more:hover { text-decoration: underline; }
 
-  /* Hero */
-  .hero { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 3rem; }
-  .hero-top { display: flex; justify-content: space-between; color: var(--color-faint); }
-  .wordmark {
-    font-weight: 700;
-    font-size: clamp(4rem, 20vw, 15rem);
-    line-height: 0.86;
-    letter-spacing: -0.04em;
-    margin: 1.5rem 0 0;
-    text-transform: uppercase;
-  }
-  .role {
-    margin-top: 1.5rem;
-    max-width: 40ch;
-    font-size: clamp(1.1rem, 2.4vw, 1.75rem);
-    line-height: 1.25;
-    color: var(--color-mute);
-    text-transform: uppercase;
-    letter-spacing: -0.01em;
-  }
-
-  /* Intro */
-  .lede { max-width: 52ch; font-size: clamp(1.4rem, 3vw, 2.25rem); line-height: 1.2; letter-spacing: -0.02em; }
-  .intro .more { display: inline-block; margin-top: 1.5rem; }
-
-  /* Experience */
-  .exp-grid { display: grid; gap: 2rem; grid-template-columns: 1fr; }
-  .exp-n { font-size: clamp(2.5rem, 6vw, 4.5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; }
-  .exp-l { color: var(--color-mute); margin-top: 0.5rem; }
-  @media (min-width: 720px) { .exp-grid { grid-template-columns: repeat(3, 1fr); } }
-
-  /* Select work */
-  .work-head { display: flex; align-items: baseline; justify-content: space-between; }
+  /* SELECT WORK */
+  .work-head { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--color-line); padding-top: 1.5rem; }
+  .lbl2 { color: var(--color-faint); }
   .work-list { margin-top: 1rem; }
   .work-row { border-top: 1px solid var(--color-line); }
   .work-row:last-child { border-bottom: 1px solid var(--color-line); }
-  .work-link {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: baseline;
-    gap: 0.5rem 1.5rem;
-    padding: 1.5rem 0;
-    transition: padding-left 0.2s ease;
-  }
+  .work-link { display: grid; grid-template-columns: auto 1fr auto; align-items: baseline; gap: 0.5rem 1.5rem; padding: 1.75rem 0; transition: padding-left 0.2s ease; }
   .work-link:hover { padding-left: 0.75rem; }
   .work-num { color: var(--color-faint); align-self: start; }
-  .work-title {
-    grid-column: 2;
-    font-size: clamp(1.75rem, 5vw, 3.25rem);
-    font-weight: 500;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    text-transform: uppercase;
-  }
+  .work-title { grid-column: 2; font-size: clamp(1.75rem, 5vw, 3.5rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; text-transform: uppercase; }
   .work-link:hover .work-title { color: var(--color-accent); }
   .work-meta { grid-column: 2; color: var(--color-mute); }
   .work-cta { grid-column: 3; grid-row: 1; color: var(--color-accent); align-self: start; white-space: nowrap; }
-  .tag { color: var(--color-accent); }
-  @media (max-width: 640px) {
-    .work-cta { display: none; }
-  }
+  @media (max-width: 640px) { .work-cta { display: none; } }
 </style>

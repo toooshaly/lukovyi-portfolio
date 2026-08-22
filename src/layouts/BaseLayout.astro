@@ -26,11 +26,13 @@ const ogImageURL = new URL("/og-default.png", Astro.site).href;
 const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
 const nav = [
+  { label: "Home", href: "/" },
   { label: "Work", href: "/projects" },
+  { label: "Lab", href: "/projects" },
   { label: "About", href: "/about-me" },
-  { label: "Contact", href: "/contact" },
 ];
-const isActive = (href: string) => path === href || path.startsWith(href + "/");
+const isActive = (href: string) =>
+  href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
 
 const personSchema = {
   "@context": "https://schema.org",
@@ -74,12 +76,9 @@ const year = new Date().getFullYear();
   </head>
 
   <body class="min-h-screen flex flex-col">
-    <!-- Верхній бар -->
-    <header class="topbar mono">
-      <a href="/" class="flex items-center gap-2">
-        <span class="dot"></span>{SITE.name}
-      </a>
-      <nav class="flex items-center gap-5">
+    <!-- Центроване нав-меню (пігулка) -->
+    <header class="topbar">
+      <nav class="pill mono">
         {nav.map((n) => (
           <a href={n.href} class:list={["nav-link", isActive(n.href) && "is-active"]}>{n.label}</a>
         ))}
@@ -92,58 +91,46 @@ const year = new Date().getFullYear();
 
     <!-- Футер -->
     <footer class="footer mono">
-      <div class="foot-grid">
-        <div>
-          <div class="foot-h">Menu</div>
-          <a href="/" class="foot-a">Home</a>
+      <div class="foot-mark" aria-hidden="true">S<span class="sl">]</span> P</div>
+      <div class="foot-cols">
+        <div class="foot-c">
+          <div class="foot-h">▸ Contact</div>
+          <a href={`mailto:${SITE.email}`} class="foot-a">{SITE.email}</a>
+          {SOCIALS.slice(0, 2).map((s) => (
+            <a href={s.href} target="_blank" rel="noopener noreferrer" class="foot-a">{s.label} ↗</a>
+          ))}
+        </div>
+        <div class="foot-c">
+          <div class="foot-h">▸ Menu</div>
           <a href="/projects" class="foot-a">Work</a>
           <a href="/about-me" class="foot-a">About</a>
           <a href="/contact" class="foot-a">Contact</a>
         </div>
-        <div>
-          <div class="foot-h">Elsewhere</div>
-          {SOCIALS.map((s) => (
-            <a href={s.href} target="_blank" rel="noopener noreferrer" class="foot-a">{s.label}</a>
-          ))}
-        </div>
-        <div>
-          <div class="foot-h">Contact</div>
-          <a href={`mailto:${SITE.email}`} class="foot-a">{SITE.email}</a>
+        <div class="foot-c foot-clock">
+          <div class="foot-a">TIME: <span id="footTime">--:--:--</span></div>
+          <div class="foot-a">DATE: <span id="footDate">—</span></div>
           <div class="foot-a">{SITE.location}</div>
         </div>
-        <div class="foot-clock">
-          <div class="foot-h">Local time</div>
-          <div id="footTime" class="foot-time">--:--:--</div>
-          <div id="footDate" class="foot-a">—</div>
-        </div>
       </div>
-      <div class="foot-bottom">
-        <span>© {year} {SITE.name}</span>
-        <span>[ {SITE.role} ]</span>
-      </div>
+      <div class="foot-bottom">© {year} {SITE.name} — all rights reserved</div>
     </footer>
 
     <style>
-      .topbar {
-        position: sticky; top: 0; z-index: 40;
-        display: flex; align-items: center; justify-content: space-between;
-        padding: 0.75rem 1.5rem;
-        background: color-mix(in srgb, var(--color-paper) 88%, transparent);
-        backdrop-filter: blur(8px);
-        border-bottom: 1px solid var(--color-line);
-      }
-      .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--color-accent); display: inline-block; }
-      .nav-link { color: var(--color-mute); transition: color .15s; }
-      .nav-link:hover, .nav-link.is-active { color: var(--color-ink); }
+      .topbar { position: sticky; top: 0; z-index: 40; display: flex; justify-content: center; padding: 0.75rem 1rem; pointer-events: none; }
+      .pill { pointer-events: auto; display: flex; gap: 0.35rem; padding: 0.35rem; border-radius: 999px; background: color-mix(in srgb, var(--color-paper) 78%, transparent); backdrop-filter: blur(10px); border: 1px solid var(--color-line); }
+      .nav-link { padding: 0.35rem 0.9rem; border-radius: 999px; color: var(--color-mute); transition: color .15s, background .15s; }
+      .nav-link:hover { color: var(--color-ink); }
+      .nav-link.is-active { color: var(--color-ink); background: color-mix(in srgb, var(--color-ink) 8%, transparent); }
 
-      .footer { margin-top: 6rem; border-top: 1px solid var(--color-line); padding: 2.5rem 1.5rem 1.5rem; }
-      .foot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; max-width: 1200px; margin: 0 auto; }
+      .footer { margin-top: 7rem; border-top: 1px solid var(--color-line); padding: 3rem 1.5rem 1.5rem; }
+      .foot-mark { font-family: var(--font-sans); font-weight: 700; font-size: clamp(4rem, 14vw, 10rem); line-height: 0.8; letter-spacing: -0.05em; color: var(--color-ink); text-transform: uppercase; }
+      .sl { color: var(--color-accent); }
+      .foot-cols { display: grid; grid-template-columns: 1fr; gap: 1.5rem; max-width: 1200px; margin: 2.5rem auto 0; }
       .foot-h { color: var(--color-faint); margin-bottom: 0.75rem; }
       .foot-a { display: block; color: var(--color-ink); padding: 2px 0; }
-      .foot-a:hover { color: var(--color-accent); }
-      .foot-time { font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em; color: var(--color-ink); }
-      .foot-bottom { max-width: 1200px; margin: 2.5rem auto 0; padding-top: 1.25rem; border-top: 1px solid var(--color-line); display: flex; justify-content: space-between; color: var(--color-mute); }
-      @media (min-width: 720px) { .foot-grid { grid-template-columns: repeat(4, 1fr); } }
+      a.foot-a:hover { color: var(--color-accent); }
+      .foot-bottom { max-width: 1200px; margin: 2.5rem auto 0; padding-top: 1.25rem; border-top: 1px solid var(--color-line); color: var(--color-mute); }
+      @media (min-width: 720px) { .foot-cols { grid-template-columns: repeat(3, 1fr); } .foot-clock { text-align: right; } }
     </style>
 
     <script>
