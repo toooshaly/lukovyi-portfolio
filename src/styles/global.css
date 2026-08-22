@@ -9,6 +9,10 @@
 @font-face { font-family: "Space Grotesk"; src: url("/fonts/SpaceGrotesk-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 @font-face { font-family: "Space Mono"; src: url("/fonts/SpaceMono-Regular.woff2") format("woff2"); font-weight: 400; font-style: normal; font-display: swap; }
 @font-face { font-family: "Space Mono"; src: url("/fonts/SpaceMono-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
+/* Clash Display — виразний брутал-дисплей для великих wordmark-ів */
+@font-face { font-family: "Clash Display"; src: url("/fonts/ClashDisplay-Medium.woff2") format("woff2"); font-weight: 500; font-style: normal; font-display: swap; }
+@font-face { font-family: "Clash Display"; src: url("/fonts/ClashDisplay-Semibold.woff2") format("woff2"); font-weight: 600; font-style: normal; font-display: swap; }
+@font-face { font-family: "Clash Display"; src: url("/fonts/ClashDisplay-Bold.woff2") format("woff2"); font-weight: 700; font-style: normal; font-display: swap; }
 
 /* ==========================================================================
    Дизайн-токени — брутально-мінімалістична палітра з референсу.
@@ -23,6 +27,13 @@
 
   --font-sans: "Space Grotesk", ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;
   --font-mono: "Space Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: "Clash Display", "Space Grotesk", sans-serif;
+}
+
+/* Дисплей-шрифт на всі великі wordmark-заголовки (класи з .astro-сторінок) */
+.hero-mark, .word, .work-title, .page-h, .case-h, .cta-h, .foot-mark,
+.num, .metric-v, .exp-n {
+  font-family: var(--font-display);
 }
 
 /* ==========================================================================
