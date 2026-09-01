@@ -102,8 +102,6 @@ const year = new Date().getFullYear();
 
     <!-- НАВБАР -->
     <header class="nav">
-      <a href="/" class="nav-logo" aria-label={`${SITE.name} — home`} set:html={logoSvg} />
-
       <div class="nav-center">
         <nav class="nav-pill glass" aria-label="Primary">
           {nav.map((n) => (
@@ -119,11 +117,6 @@ const year = new Date().getFullYear();
             <path d="M21 12.8A8.5 8.5 0 1 1 11.2 3a6.6 6.6 0 0 0 9.8 9.8z" />
           </svg>
         </button>
-      </div>
-
-      <div class="nav-id label">
-        <span>{SITE.name}</span>
-        <span class="nav-role">UX/UI/Product Designer</span>
       </div>
     </header>
 
@@ -168,6 +161,14 @@ const year = new Date().getFullYear();
       </div>
     </footer>
 
+    <!-- Логотип і бічний підпис — окремі fixed-елементи поверх контенту,
+         щоб інвертувались (mix-blend) проти фону сторінки, не чіпаючи центр. -->
+    <a href="/" class="nav-logo" aria-label={`${SITE.name} — home`} set:html={logoSvg} />
+    <div class="nav-id label">
+      <span>{SITE.name}</span>
+      <span class="nav-role">UX/UI/Product Designer</span>
+    </div>
+
     <style>
       /* ---------- Прогресивний BLUR по краях (на скролі) ---------- */
       .edge-blur {
@@ -210,6 +211,10 @@ const year = new Date().getFullYear();
       /* Приємний плавний скрол для якорів (напр. Work → секція робіт) */
       @media (prefers-reduced-motion: no-preference) { :global(html) { scroll-behavior: smooth; } }
 
+      /* Ховаємо системний скролбар сторінки (скрол лишається робочим) */
+      :global(html) { scrollbar-width: none; -ms-overflow-style: none; }
+      :global(html::-webkit-scrollbar) { width: 0; height: 0; display: none; }
+
       /* Sticky-footer: на коротких сторінках футер притискається донизу,
          тож нижній відступ (24px у .footer) однаковий на всіх сторінках. */
       :global(body) { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
@@ -218,28 +223,41 @@ const year = new Date().getFullYear();
       /* ---------- НАВБАР ---------- */
       .nav {
         position: sticky; top: 0; z-index: 50;
-        display: grid; grid-template-columns: 1fr auto 1fr; align-items: center;
+        display: flex; justify-content: center; align-items: center;
         gap: 1rem; padding: var(--nav-pad-y) var(--pad-side);
+        /* Контрастний чип під центральні кнопки (видимість + акцент активного).
+           Лого й бічний текст — окремі fixed-елементи з інверсією (нижче). */
+        --nav-chip: rgba(255, 255, 255, 0.72);
       }
-      .nav-logo { color: var(--icon-primary); width: 46px; height: 48px; }
+      :root[data-theme="dark"] .nav { --nav-chip: rgba(0, 0, 0, 0.55); }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .nav { --nav-chip: rgba(0, 0, 0, 0.55); }
+      }
+      /* Лого — fixed поверх контенту, інвертується проти фону сторінки */
+      .nav-logo {
+        position: fixed; top: var(--nav-pad-y); left: var(--pad-side); z-index: 60;
+        color: #fff; width: 46px; height: 48px; mix-blend-mode: difference;
+      }
       .nav-logo :global(svg) { width: 100%; height: 100%; }
 
       .nav-center { display: flex; justify-content: center; align-items: center; gap: 10px; }
-      .nav-pill { display: flex; gap: 2px; padding: 4px; border-radius: 999px; }
+      .nav-pill { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--nav-chip); }
       .nav-link {
         font-family: var(--font-display); font-size: var(--size-sm); text-transform: uppercase;
-        color: var(--text-muted); padding: 8px 16px; border-radius: 999px;
-        transition: color .15s, background .15s;
+        color: #fff; opacity: .9; padding: 8px 16px; border-radius: 999px;
+        mix-blend-mode: difference; transition: opacity .15s;
       }
-      .nav-link:hover { color: var(--text-primary); }
-      .nav-link.is-active { color: var(--text-accent); }
+      .nav-link:hover { opacity: 1; }
+      /* Активний — акцентним кольором (без інверсії, щоб колір був правдивий) */
+      .nav-link.is-active { opacity: 1; color: var(--text-accent); mix-blend-mode: normal; text-decoration: underline; text-underline-offset: 4px; }
 
       .theme-toggle {
         display: inline-flex; align-items: center; justify-content: center;
         width: 44px; height: 44px; border-radius: 999px; cursor: pointer;
-        color: var(--icon-primary); padding: 0;
+        color: #fff; padding: 0; background: var(--nav-chip);
       }
-      .theme-toggle:hover { color: var(--text-accent); }
+      .theme-toggle :global(svg) { mix-blend-mode: difference; }
+      .theme-toggle:hover { opacity: .7; }
       /* показуємо іконку відповідно до активної теми */
       .ico-sun { display: none; }
       .ico-moon { display: block; }
@@ -250,14 +268,17 @@ const year = new Date().getFullYear();
         :root:not([data-theme="light"]) .ico-moon { display: none; }
       }
 
+      /* Бічний підпис — fixed поверх контенту, інвертується проти фону */
       .nav-id {
-        justify-self: end; text-align: right; color: var(--text-primary);
+        position: fixed; top: var(--nav-pad-y); right: var(--pad-side); z-index: 60;
+        text-align: right; color: #fff; mix-blend-mode: difference;
         display: flex; flex-direction: column; line-height: 1.35;
       }
-      .nav-role { color: var(--text-muted); }
+      .nav-role { opacity: .7; }
 
       @media (max-width: 720px) {
-        .nav { grid-template-columns: auto 1fr auto; gap: 8px; padding: 12px 16px; }
+        .nav { gap: 8px; padding: 12px 16px; }
+        .nav-logo { top: 12px; left: 16px; }
         .nav-id { display: none; }
         .nav-center { justify-content: flex-end; }
         .nav-link { padding: 7px 11px; }
