@@ -1,56 +1,138 @@
 ---
+/**
+ * About — 1:1 з Figma "Portfolio 2.0" (frame About me, 87:10176).
+ * Hero-scatter «ABOUT ME» → інтро-стейтмент → 2×2 фото-галерея → футер.
+ */
+import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { SITE, SOCIALS } from "../consts";
+import { SITE } from "../consts";
+import ArrowUp from "../components/icons/ArrowUp.astro";
+import SectionMarker from "../components/SectionMarker.astro";
+import headshot from "../assets/about/headshot.png";
+import gym from "../assets/about/gym.jpg";
+import mountains from "../assets/about/mountains.jpg";
+import harbor from "../assets/about/harbor.jpg";
+
+const gallery = [
+  { img: gym, alt: "Boxing training", tag: "GYM ENTHUSIAST", pos: "center 30%" },
+  { img: mountains, alt: "Hiking in the mountains", tag: "NATURE LOVER", pos: "center" },
+  { img: harbor, alt: "Sunset by the harbor", tag: "BIKE LOVER", pos: "center" },
+  { img: gym, alt: "At the gym", tag: "BOXING", pos: "center 70%" },
+];
 ---
 
 <BaseLayout
   title={`About — ${SITE.name}`}
-  description="Anton Lukovyi — freelance UX/UI designer helping businesses grow through design."
+  description="Anton Lukovyi — UX/UI/Product designer based in Celle, Germany. I design products and take them all the way to release."
 >
-  <section class="wrap">
-    <span class="mono idx">[ About ]</span>
-    <h1 class="page-h">Anton<br />Lukovyi</h1>
-    <p class="role mono">{SITE.role} <span class="sl">/</span> {SITE.location}</p>
+  <!-- ================= HERO «ABOUT ME» ================= -->
+  <section class="ab-hero">
+    <h1 class="ab-word display" aria-label="About me">
+      <span class="aw-row r1">
+        <span>A</span>
+        <span class="aw-arrow" aria-hidden="true"><ArrowUp /></span>
+        <span>OUT</span>
+      </span>
+      <span class="aw-row r2"><span>B</span><span>ME</span></span>
+    </h1>
+    <span class="aw-copy label" aria-hidden="true">A.<br />Lukovyi</span>
   </section>
 
-  <section class="wrap grid">
-    <div class="bio">
-      <p>
-        I'm at my best when I stay close to the craft — combining a strategic
-        view with hands-on execution. I help startups and businesses turn
-        complex ideas into intuitive, user-centered interfaces.
-      </p>
-      <p>
-        My work spans mobile apps, SaaS dashboards and e-commerce — from
-        research and wireframes to pixel-perfect designs ready for development.
-        Design, to me, is less about decoration and more about creating trust
-        between a product and the people who use it.
-      </p>
+  <!-- ================= ІНТРО-СТЕЙТМЕНТ ================= -->
+  <section class="ab-intro">
+    <div class="ab-lead">
+      <span class="ab-name">I'm Anton.</span>
+      <Image src={headshot} alt={SITE.name} width={38} height={38} class="ab-mini" />
     </div>
-    <aside class="meta mono">
-      <div class="row"><span class="k">Based in</span><span class="v">{SITE.location}</span></div>
-      <div class="row"><span class="k">Focus</span><span class="v">UX/UI · Web · Product · App</span></div>
-      <div class="row"><span class="k">Interests</span><span class="v">#Video · #Photography</span></div>
-      <div class="row"><span class="k">Email</span><a class="v link" href={`mailto:${SITE.email}`}>{SITE.email}</a></div>
-      {SOCIALS.map((s) => (
-        <div class="row"><span class="k">{s.label}</span><a class="v link" href={s.href} target="_blank" rel="noopener noreferrer">[ Visit &gt; ]</a></div>
-      ))}
-    </aside>
+    <p class="ab-statement">
+      I design products and take them all the way to release. I don't stop at a good-looking
+      screen — an interface that doesn't solve the problem doesn't count.
+    </p>
+
+    <div class="ab-cols">
+      <SectionMarker label="About me" style="align-self:start" />
+      <div class="ab-body">
+        <p>
+          I break the problem down to its root, work through the flows and edge cases, and build
+          on a system rather than isolated mockups — so the product stays coherent as it scales.
+          For two years I've built websites, dashboards, SaaS, and e-commerce for government
+          institutions, startups, and companies already on their feet.
+        </p>
+        <p>
+          Next: my own products. Design isn't the finish line for me — it's how I think: dig in,
+          cut the excess, carry it to a working result.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= ФОТО-ГАЛЕРЕЯ 2×2 ================= -->
+  <section class="ab-gallery">
+    {gallery.map((g) => (
+      <figure class="ab-cell">
+        <Image src={g.img} alt={g.alt} widths={[480, 720, 960]} sizes="(max-width: 780px) 100vw, 50vw" style={`object-position:${g.pos}`} />
+        <figcaption class="label ab-cap">#{g.tag}</figcaption>
+      </figure>
+    ))}
   </section>
 </BaseLayout>
 
 <style>
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-  .idx { color: var(--color-faint); display: block; margin-bottom: 1rem; }
-  .sl { color: var(--color-accent); }
-  .page-h { font-size: clamp(2.5rem, 9vw, 6rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }
-  .role { margin-top: 1.25rem; color: var(--color-mute); }
+  /* ---------------- HERO ---------------- */
+  .ab-hero { position: relative; padding: var(--about-hero-pad-top) var(--pad-side) 24px; }
+  .ab-word { position: relative; margin: 0; display: grid; gap: 0; color: var(--text-primary); }
+  .aw-row { display: flex; align-items: center; font-size: clamp(2.75rem, 14vw, 230px); line-height: 0.9; }
+  .aw-row.r1 { justify-content: flex-start; gap: 3vw; padding-left: 11%; }
+  .aw-row.r2 { justify-content: space-between; padding-left: 28%; }
+  .aw-arrow { width: 0.72em; height: 0.72em; color: var(--icon-accent); flex-shrink: 0; display: block; }
+  .aw-arrow :global(svg) { width: 100%; height: 100%; display: block; }
+  .aw-copy { position: absolute; left: 0; top: 46%; color: var(--text-muted); line-height: 1.35; }
 
-  .grid { display: grid; gap: 3rem; grid-template-columns: 1fr; border-top: 1px solid var(--color-line); }
-  .bio p { font-size: clamp(1.25rem, 2.6vw, 1.9rem); line-height: 1.25; letter-spacing: -0.02em; margin-bottom: 1.5rem; max-width: 30ch; }
-  .meta .row { display: flex; justify-content: space-between; gap: 1rem; padding: 0.75rem 0; border-bottom: 1px solid var(--color-line); }
-  .meta .k { color: var(--color-faint); }
-  .meta .v { color: var(--color-ink); text-align: right; }
-  .meta .link:hover { color: var(--color-accent); }
-  @media (min-width: 820px) { .grid { grid-template-columns: 1.4fr 1fr; } }
+  @media (max-width: 720px) {
+    .ab-hero { padding: 120px 16px 16px; }
+    .aw-row.r1 { padding-left: 8%; gap: 4vw; }
+    .aw-row.r2 { padding-left: 22%; }
+    .aw-copy { display: none; }
+  }
+
+  /* ---------------- ІНТРО ---------------- */
+  .ab-intro { padding: 40px var(--pad-side) 64px; }
+  .ab-lead { display: flex; align-items: center; gap: 14px; }
+  .ab-name { font-family: var(--font-display); font-size: clamp(1.5rem, 3vw, 32px); color: var(--text-primary); }
+  .ab-mini { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; }
+  .ab-statement {
+    margin: 28px 0 0; max-width: 60ch;
+    font-size: clamp(1.35rem, 3.4vw, 2.25rem); line-height: 1.25; letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+
+  .ab-cols { display: grid; grid-template-columns: auto 1fr; gap: 48px; margin-top: 64px; }
+  .ab-body { max-width: 680px; justify-self: end; display: grid; gap: 24px; }
+  .ab-body p { margin: 0; color: var(--text-muted); font-size: 15px; line-height: 1.5; }
+
+  @media (max-width: 900px) {
+    .ab-cols { grid-template-columns: 1fr; gap: 24px; }
+    .ab-body { justify-self: stretch; max-width: none; }
+  }
+
+  /* ---------------- ГАЛЕРЕЯ ---------------- */
+  .ab-gallery {
+    display: grid; grid-template-columns: 1fr 1fr; gap: var(--gallery-gap);
+    padding: 0 var(--pad-side) 40px;
+  }
+  .ab-cell {
+    position: relative; margin: 0; aspect-ratio: 684 / 600; overflow: hidden;
+    background: var(--surface-raised);
+  }
+  .ab-cell :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ab-cap {
+    position: absolute; top: 18px; right: 18px;
+    color: var(--icon-accent); border: 1px solid var(--border-glass);
+    background: var(--surface-glass); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    padding: 7px 14px; border-radius: 999px;
+  }
+
+  @media (max-width: 780px) {
+    .ab-gallery { grid-template-columns: 1fr; gap: 14px; padding: 0 16px 32px; }
+  }
 </style>

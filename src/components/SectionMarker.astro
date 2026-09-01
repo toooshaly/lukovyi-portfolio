@@ -1,0 +1,32 @@
+---
+/**
+ * SectionMarker — моно-лейбл секції з акцентною крапкою (1:1 з Figma "section-marker").
+ * Крапка бере колір із --surface-accent, тож автоматично тематична (gold/orange).
+ * Текст: через проп `label` або <slot>. Позиціонування — через `class`/`style` ззовні.
+ */
+interface Props {
+  label?: string;
+  class?: string;
+}
+const { label, class: className, ...rest } = Astro.props;
+---
+
+<span class:list={["section-marker", "label", className]} {...rest}>
+  <span class="dot" aria-hidden="true"></span>{label}<slot />
+</span>
+
+<style>
+  .section-marker {
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--surface-accent);
+    display: inline-block;
+  }
+</style>
