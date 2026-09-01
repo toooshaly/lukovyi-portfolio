@@ -76,7 +76,7 @@ const works = [
     <div class="at-grid">
       <SectionMarker label="Intro" style="flex-shrink:0;margin-top:6px" />
       <div class="at-head">
-        <div class="at-word display">ABT<span class="us">_</span>M<span class="us">_</span></div>
+        <div class="at-word display">ABTM<span class="us" data-typing="E">E</span></div>
         <a href="/about-me" class="at-more label">Read more <ArrowUpRight /></a>
       </div>
       <div class="at-side">
@@ -152,6 +152,52 @@ const works = [
       setInterval(() => { idx = (idx + 1) % words.length; scramble(words[idx], 650); }, 2800);
     })();
   </script>
+
+  <script>
+    // Typing-ефект літери «E» після «ABTM»: набір → пауза → стирання → пауза → знову.
+    (() => {
+      const el = document.querySelector(".at-word [data-typing]");
+      if (!el) return;
+      const word = el.getAttribute("data-typing") || "E";
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = word; return; }
+      let i = word.length, dir = -1; // почати з повного слова, тоді стирати
+      function step() {
+        el.textContent = word.slice(0, i);
+        if (dir === -1) {
+          if (i > 0) { i--; setTimeout(step, 150); }
+          else { dir = 1; setTimeout(step, 700); }
+        } else {
+          if (i < word.length) { i++; setTimeout(step, 230); }
+          else { dir = -1; setTimeout(step, 1700); }
+        }
+      }
+      setTimeout(step, 1700);
+    })();
+  </script>
+
+  <script>
+    // Проєкти: full-bleed → звуження в карточку (scale + скруглення) при доскролі ~до середини.
+    // JS-драйв (працює в усіх браузерах, синхронно з Lenis-скролом).
+    (() => {
+      const cards = Array.from(document.querySelectorAll(".work-card"));
+      if (!cards.length || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      let ticking = false;
+      function update() {
+        const vh = window.innerHeight;
+        for (const card of cards) {
+          const r = card.getBoundingClientRect();
+          const p = Math.max(0, Math.min(1, (vh - r.top) / (vh * 0.5)));
+          card.style.transform = "scale(" + (1 - 0.035 * p) + ")";
+          card.style.borderRadius = 16 * p + "px";
+        }
+        ticking = false;
+      }
+      const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
+      window.addEventListener("scroll", onScroll, { passive: true });
+      window.addEventListener("resize", onScroll);
+      update();
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -218,6 +264,12 @@ const works = [
   .at-head { margin-left: var(--at-word-indent); display: flex; flex-direction: column; gap: 24px; }
   .at-word { font-size: clamp(2.5rem, 8vw, 240px); line-height: 0.8; color: var(--text-primary); white-space: nowrap; }
   .at-word .us { color: var(--text-accent); }
+  /* Курсор для typing-ефекту літери E після M */
+  .at-word [data-typing] { border-right: 0.06em solid var(--text-accent); margin-left: 0.02em; }
+  @media (prefers-reduced-motion: no-preference) {
+    .at-word [data-typing] { animation: at-caret 1.05s step-end infinite; }
+  }
+  @keyframes at-caret { 0%, 100% { border-color: var(--text-accent); } 50% { border-color: transparent; } }
   .at-more { color: var(--text-accent); align-self: start; display: inline-flex; align-items: center; gap: 6px; }
   .at-more :global(svg) { width: 14px; height: 14px; }
   .at-more:hover { text-decoration: underline; }
@@ -241,6 +293,8 @@ const works = [
   .work-card {
     position: relative; display: block; width: 100%; aspect-ratio: 1440 / 900;
     overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
+    transform-origin: center center; will-change: transform, border-radius;
+    /* full-bleed за замовчуванням; звуження до карточки керується скриптом (JS) при доскролі */
   }
   .wc-media { position: absolute; inset: 0; z-index: 0; }
   .wc-media :global(img) { width: 100%; height: 100%; object-fit: cover; }

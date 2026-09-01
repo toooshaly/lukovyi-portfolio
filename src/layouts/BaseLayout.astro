@@ -169,6 +169,15 @@ const year = new Date().getFullYear();
       <span class="nav-role">UX/UI/Product Designer</span>
     </div>
 
+    <style is:global>
+      /* Перемикання теми «хвилею»: нова тема відкривається круговим clip-path
+         від кнопки (див. скрипт), стара лишається під нею. Вимикаємо дефолтний кросфейд. */
+      ::view-transition-old(root),
+      ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+      ::view-transition-new(root) { z-index: 9999; }
+      ::view-transition-old(root) { z-index: 1; }
+    </style>
+
     <style>
       /* ---------- Прогресивний BLUR по краях (на скролі) ---------- */
       .edge-blur {
@@ -393,17 +402,31 @@ const year = new Date().getFullYear();
       if (!w.__themeBound) {
         w.__themeBound = true;
         document.addEventListener("click", (e) => {
-          const t = e.target as HTMLElement;
-          if (!t.closest("#themeToggle")) return;
+          const btn = (e.target as HTMLElement).closest("#themeToggle") as HTMLElement | null;
+          if (!btn) return;
           const root = document.documentElement;
           const cur =
             root.getAttribute("data-theme") ||
             (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
           const next = cur === "dark" ? "light" : "dark";
-          root.setAttribute("data-theme", next);
-          try {
-            localStorage.setItem("theme", next);
-          } catch (err) {}
+          const apply = () => {
+            root.setAttribute("data-theme", next);
+            try { localStorage.setItem("theme", next); } catch (err) {}
+          };
+          const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+          if (!(document as any).startViewTransition || reduce) { apply(); return; }
+          // Хвиля-reveal нової теми колом від центру кнопки до країв екрана
+          const r = btn.getBoundingClientRect();
+          const x = r.left + r.width / 2;
+          const y = r.top + r.height / 2;
+          const end = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+          const vt = (document as any).startViewTransition(apply);
+          vt.ready.then(() => {
+            root.animate(
+              { clipPath: [`circle(0px at ${x}px ${y}px)`, `circle(${end}px at ${x}px ${y}px)`] },
+              { duration: 650, easing: "cubic-bezier(.4,0,.2,1)", pseudoElement: "::view-transition-new(root)" }
+            );
+          });
         });
       }
     </script>
@@ -443,7 +466,9 @@ const year = new Date().getFullYear();
         function scramble(el, dur) {
           if (animating.has(el)) return;
           animating.add(el);
-          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, {
+            acceptNode: (n) => (n.parentElement && n.parentElement.closest("[data-typing]") ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT),
+          });
           const nodes = [];
           let node;
           while ((node = walker.nextNode())) if (node.nodeValue && node.nodeValue.trim()) nodes.push({ n: node, t: node.nodeValue });
