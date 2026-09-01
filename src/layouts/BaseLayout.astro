@@ -34,7 +34,7 @@ const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
 const nav = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/projects" },
+  { label: "Work", href: "/#work" },
   { label: "Lab", href: "/lab" },
   { label: "About", href: "/about-me" },
 ];
@@ -206,6 +206,14 @@ const year = new Date().getFullYear();
 
       @media (max-width: 720px) { .edge-blur { height: 92px; } }
       @media (prefers-reduced-motion: reduce) { .edge-blur { display: none; } }
+
+      /* Приємний плавний скрол для якорів (напр. Work → секція робіт) */
+      @media (prefers-reduced-motion: no-preference) { :global(html) { scroll-behavior: smooth; } }
+
+      /* Sticky-footer: на коротких сторінках футер притискається донизу,
+         тож нижній відступ (24px у .footer) однаковий на всіх сторінках. */
+      :global(body) { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; }
+      :global(main) { flex: 1 0 auto; }
 
       /* ---------- НАВБАР ---------- */
       .nav {

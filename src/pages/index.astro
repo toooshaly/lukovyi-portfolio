@@ -12,6 +12,7 @@ import ArrowUpRight from "../components/icons/ArrowUpRight.astro";
 import Plus from "../components/icons/Plus.astro";
 import SectionMarker from "../components/SectionMarker.astro";
 import headshot from "../assets/about/headshot.png";
+import heroImg from "../assets/hero/hero.jpg";
 import sapImg from "../assets/work/sports-ai-pro.png";
 import bntImg from "../assets/work/bragmant.png";
 import labImg from "../assets/work/lab.png";
@@ -42,7 +43,7 @@ const works = [
   <section class="hero">
     <div class="hero-bg">
       {/* TODO(Anton): замінити на <video autoplay muted loop playsinline>; поки постер */}
-      <Image src={sapImg} alt="" widths={[768, 1200, 1800]} sizes="100vw" class="hero-media" loading="eager" fetchpriority="high" />
+      <Image src={heroImg} alt="" widths={[768, 1200, 1800, 2400]} sizes="100vw" class="hero-media" loading="eager" fetchpriority="high" />
       <div class="hero-scrim"></div>
     </div>
 
@@ -93,13 +94,10 @@ const works = [
   </section>
 
   <!-- ================= SELECT WORK ================= -->
-  <section class="select-work">
-    <SectionMarker label="Select work" />
-    <a href="/projects" class="label sw-all">View all <ArrowUpRight /></a>
-  </section>
+  <section class="select-work"></section>
 
   <!-- ================= РОБОТИ ================= -->
-  <div class="works">
+  <div class="works" id="work">
     {works.map((w) => (
       <a class:list={["work-card", w.blend && "is-blend"]} href={w.href} aria-label={w.sub}>
         <div class="wc-media">
@@ -207,12 +205,9 @@ const works = [
 
   /* ---------------- SELECT WORK (full-bleed) ---------------- */
   .select-work { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--border-subtle); margin: 0 var(--pad-side); padding-top: 24px; }
-  .sw-all { color: var(--text-accent); display: inline-flex; align-items: center; gap: 6px; }
-  .sw-all :global(svg) { width: 14px; height: 14px; }
-  .sw-all:hover { text-decoration: underline; }
 
   /* ---------------- РОБОТИ ---------------- */
-  .works { margin-top: 24px; }
+  .works { margin-top: 24px; scroll-margin-top: 0; }
   .work-card {
     position: relative; display: block; width: 100%; aspect-ratio: 1440 / 900;
     overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
