@@ -7,7 +7,6 @@ import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../consts";
 import ArrowDiag from "../components/icons/ArrowDiag.astro";
-import ArrowUp from "../components/icons/ArrowUp.astro";
 import ArrowUpRight from "../components/icons/ArrowUpRight.astro";
 import Plus from "../components/icons/Plus.astro";
 import SectionMarker from "../components/SectionMarker.astro";
@@ -48,21 +47,21 @@ const works = [
     </div>
 
     <div class="hero-inner">
-      <p class="hero-intro label">
-        UX/UI/Product Designer with decent taste, working across
-        <span class="hl">Product</span> / <span class="hl">Web</span> / <span class="hl">App</span>
-      </p>
-      <div class="hero-cr label">{SITE.name}<br />Portfolio {new Date().getFullYear()} ©</div>
-
-      <h1 class="hero-word display" aria-label="Lukovyi Portfolio">
+      <div class="hero-wordwrap">
+        <p class="hero-intro label">
+          UX/UI/Product Designer with decent taste working across
+          <span class="hl" data-rotator>Product</span>
+        </p>
+        <div class="hero-cr label">{SITE.name}<br />Portfolio {new Date().getFullYear()} ©</div>
+        <h1 class="hero-word display" aria-label="Lukovyi Portfolio">
         <span class="hw-row r1">
           <span>L</span>
-          <span class="hw-arrow" aria-hidden="true"><ArrowUp /></span>
           <span>KO</span>
         </span>
         <span class="hw-row r2"><span class="hw-u">U</span><span>VYI</span></span>
         <span class="hw-row r3"><span>P</span><span>O</span><span>R</span><span>T</span><span>F</span><span>O</span><span>L</span><span>I</span><span>O</span></span>
-      </h1>
+        </h1>
+      </div>
 
       <div class="hero-foot label">
         <span>52.62.10.00E — {SITE.location}</span>
@@ -92,9 +91,6 @@ const works = [
     </div>
     <span class="plus bl" aria-hidden="true"><Plus /></span><span class="plus br" aria-hidden="true"><Plus /></span>
   </section>
-
-  <!-- ================= SELECT WORK ================= -->
-  <section class="select-work"></section>
 
   <!-- ================= РОБОТИ ================= -->
   <div class="works" id="work">
@@ -126,6 +122,36 @@ const works = [
       </a>
     ))}
   </div>
+
+  <script>
+    // Одне слово, що циклічно змінюється (Product → Web → App → …) з ефектом
+    // «дешифрування»: літери прокручуються й фіксуються зліва направо.
+    (() => {
+      const el = document.querySelector(".hero-intro [data-rotator]");
+      if (!el) return;
+      const words = ["Product", "Web", "App"];
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) { el.textContent = words[0]; return; }
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#*<>";
+      const rnd = () => chars[(Math.random() * chars.length) | 0];
+      function scramble(text, dur) {
+        const start = performance.now();
+        const N = text.length;
+        function tick(now) {
+          const p = Math.min(1, (now - start) / dur);
+          const revealed = Math.floor(p * N);
+          let s = "";
+          for (let i = 0; i < N; i++) s += i < revealed ? text[i] : rnd();
+          el.textContent = s;
+          if (p < 1) requestAnimationFrame(tick);
+          else el.textContent = text;
+        }
+        requestAnimationFrame(tick);
+      }
+      let idx = 0;
+      scramble(words[0], 650);
+      setInterval(() => { idx = (idx + 1) % words.length; scramble(words[idx], 650); }, 2800);
+    })();
+  </script>
 </BaseLayout>
 
 <style>
@@ -133,7 +159,9 @@ const works = [
      Висота = пропорція Figma (1440×900 → 62.5vw), з підлогою 620px. Не
      залежить від висоти екрана; масштабується з шириною разом із wordmark. */
   .hero {
-    position: relative; height: max(62.5vw, 620px);
+    position: relative;
+    height: 100vh; height: 100dvh; /* герой займає всю висоту екрану на вході */
+    min-height: 620px;
     margin-top: -88px; /* під sticky-навбар */
     overflow: hidden;
     color: var(--text-on-media);
@@ -147,30 +175,34 @@ const works = [
     position: relative; z-index: 1; height: 100%;
     display: grid; align-content: center; padding: 0 var(--pad-side);
   }
-  .hero-intro { position: absolute; top: var(--hero-pad-top); right: var(--pad-side); max-width: 30ch; text-align: left; color: rgba(255,255,255,.72); }
+  /* Обгортка wordmark — точка відліку для інтро (1:1 з Figma: інтро зверху-праворуч,
+     верх на рівні верху wordmark-рядка, правий край до краю контенту). */
+  .hero-wordwrap { position: relative; }
+  .hero-intro { position: absolute; top: 0; right: 0; width: 250px; text-align: left; color: rgba(255,255,255,.72); }
   .hero-intro .hl { color: #fff; }
-  .hero-cr { position: absolute; top: 288px; left: var(--pad-side); color: rgba(255,255,255,.6); line-height: 1.5; }
+  /* Слово-ротатор — окремим останнім рядком, щоб зміна довжини не «стрибала» */
+  .hero-intro [data-rotator] { display: block; margin-top: 2px; }
+  /* «ANTON LUKOVYI / PORTFOLIO 2026 ©» — зліва, на рівні другого рядка wordmark */
+  .hero-cr { position: absolute; top: 33.33%; left: 0; color: rgba(255,255,255,.6); line-height: 1.5; }
   .hero-foot { position: absolute; left: var(--pad-side); right: var(--pad-side); bottom: var(--hero-pad-bottom); display: flex; justify-content: space-between; gap: 1rem; color: var(--gold-500); }
 
   .hero-word {
     position: relative; margin: 0; width: 100%;
-    display: grid; gap: 0; color: #fff;
+    display: grid; gap: 0.7vw; color: #fff; /* міжрядковий відступ ≈ Figma 12px */
     --ux: 42%; /* спільна вісь X: стрілка (r1) і U (r2) стоять точно одна під одною */
   }
   /* Розмір від доступної ширини та довжини "PORTFOLIO" (9×~0.7em) — рядок
      рівно заповнює ширину на будь-якому екрані. */
-  .hw-row { position: relative; display: flex; align-items: center; font-size: calc((100vw - var(--pad-side) * 2) / 6.5); line-height: 0.9; }
-  .hw-row.r1 { justify-content: space-between; padding: 0 34% 0 22%; }
+  .hw-row { position: relative; display: flex; align-items: center; font-size: calc((100vw - var(--pad-side) * 2) / 6.5); line-height: 0.8; }
+  .hw-row.r1 { justify-content: space-between; padding: 0 32% 0 22%; }
   .hw-row.r2 { justify-content: flex-end; padding-right: 2%; }
   .hw-row.r3 { justify-content: space-between; }
   /* стрілка й U — абсолютно на осі --ux (U точно під стрілкою) */
-  .hw-arrow { position: absolute; left: var(--ux); top: 50%; transform: translate(-50%, -50%); width: 0.66em; height: 0.66em; color: var(--icon-accent); display: block; }
-  .hw-arrow :global(svg) { width: 100%; height: 100%; display: block; }
   .hw-u { position: absolute; left: var(--ux); top: 50%; transform: translate(-50%, -50%); }
 
   @media (max-width: 900px) {
-    .hero { height: 88svh; min-height: 560px; }
-    .hero-intro { position: static; max-width: none; margin: 0 0 auto; }
+    .hero { height: 100svh; min-height: 560px; }
+    .hero-intro { position: static; width: auto; max-width: none; margin: 0 0 auto; }
     .hero-cr { display: none; }
     .hw-row { font-size: calc((100vw - var(--pad-side-mobile) * 2) / 6.8); }
     .hw-row.r1 { padding: 0 22% 0 14%; }
@@ -203,8 +235,6 @@ const works = [
     .at-side { margin-left: 0; width: 100%; max-width: 460px; }
   }
 
-  /* ---------------- SELECT WORK (full-bleed) ---------------- */
-  .select-work { display: flex; align-items: baseline; justify-content: space-between; border-top: 1px solid var(--border-subtle); margin: 0 var(--pad-side); padding-top: 24px; }
 
   /* ---------------- РОБОТИ ---------------- */
   .works { margin-top: 24px; scroll-margin-top: 0; }

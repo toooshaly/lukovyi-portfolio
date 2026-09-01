@@ -211,6 +211,12 @@ const year = new Date().getFullYear();
       /* Приємний плавний скрол для якорів (напр. Work → секція робіт) */
       @media (prefers-reduced-motion: no-preference) { :global(html) { scroll-behavior: smooth; } }
 
+      /* Lenis — плавний моментум-скрол сторінки */
+      :global(html.lenis), :global(html.lenis body) { height: auto; }
+      :global(.lenis.lenis-smooth) { scroll-behavior: auto !important; }
+      :global(.lenis.lenis-smooth [data-lenis-prevent]) { overscroll-behavior: contain; }
+      :global(.lenis.lenis-stopped) { overflow: hidden; }
+
       /* Ховаємо системний скролбар сторінки (скрол лишається робочим) */
       :global(html) { scrollbar-width: none; -ms-overflow-style: none; }
       :global(html::-webkit-scrollbar) { width: 0; height: 0; display: none; }
@@ -400,6 +406,86 @@ const year = new Date().getFullYear();
           } catch (err) {}
         });
       }
+    </script>
+
+    <script>
+      // Lenis — плавний (моментум) скрол сторінки. Вимикається при reduced-motion.
+      import Lenis from "lenis";
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        const lenis = new Lenis({ duration: 1.1, easing: (t: number) => 1 - Math.pow(1 - t, 3), smoothWheel: true });
+        const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
+        requestAnimationFrame(raf);
+        // Якорі на цій же сторінці (напр. Work → #work) — плавно через Lenis
+        document.addEventListener("click", (e) => {
+          const a = (e.target as HTMLElement).closest('a[href*="#"]') as HTMLAnchorElement | null;
+          if (!a) return;
+          const url = new URL(a.href, location.href);
+          if (url.pathname !== location.pathname || !url.hash) return;
+          const target = document.querySelector(url.hash);
+          if (target) { e.preventDefault(); lenis.scrollTo(target as HTMLElement); history.pushState(null, "", url.hash); }
+        });
+        // Прийшли з іншої сторінки з хешем (напр. /#work) — доскролити до секції
+        if (location.hash) {
+          const t = document.querySelector(location.hash);
+          if (t) requestAnimationFrame(() => lenis.scrollTo(t as HTMLElement, { immediate: true }));
+        }
+      }
+    </script>
+
+    <script>
+      // Scramble/дешифрування всіх заголовків, коли вони з'являються у полі зору.
+      // Спрацьовує щоразу при вході елемента у в'юпорт; зберігає структуру (spans, br).
+      (() => {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#*_—";
+        const rnd = () => chars[(Math.random() * chars.length) | 0];
+        const animating = new WeakSet();
+        function scramble(el, dur) {
+          if (animating.has(el)) return;
+          animating.add(el);
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          let node;
+          while ((node = walker.nextNode())) if (node.nodeValue && node.nodeValue.trim()) nodes.push({ n: node, t: node.nodeValue });
+          if (!nodes.length) { animating.delete(el); return; }
+          let total = 0;
+          for (const o of nodes) total += o.t.length;
+          // кожен символ мерехтить від старту до свого моменту фіксації (40–95% тривалості),
+          // тож навіть одиночна велика літера явно перебирається
+          const lockAt = new Array(total);
+          for (let i = 0; i < total; i++) lockAt[i] = dur * (0.4 + 0.55 * Math.random());
+          const roll = [];
+          const t0 = performance.now();
+          let lastRoll = -999;
+          function tick(now) {
+            const t = now - t0;
+            const reroll = now - lastRoll > 45; // темп перебору символів
+            if (reroll) lastRoll = now;
+            let gi = 0, done = true;
+            for (const o of nodes) {
+              let s = "";
+              for (let i = 0; i < o.t.length; i++, gi++) {
+                const c = o.t[i];
+                if (c === " " || c === "\n") { s += c; continue; }
+                if (t >= lockAt[gi]) s += c;
+                else { done = false; if (reroll || roll[gi] === undefined) roll[gi] = rnd(); s += roll[gi]; }
+              }
+              o.n.nodeValue = s;
+            }
+            if (!done) requestAnimationFrame(tick);
+            else { nodes.forEach((o) => (o.n.nodeValue = o.t)); animating.delete(el); }
+          }
+          requestAnimationFrame(tick);
+        }
+        const io = new IntersectionObserver(
+          (entries) => {
+            for (const e of entries)
+              if (e.isIntersecting) scramble(e.target, 850 + Math.min(1000, (e.target.textContent || "").replace(/\s/g, "").length * 40));
+          },
+          { threshold: 0.25 }
+        );
+        document.querySelectorAll(".display, .page-h, .case-h").forEach((el) => io.observe(el));
+      })();
     </script>
   </body>
 </html>
