@@ -17,16 +17,19 @@ const { label, class: className, ...rest } = Astro.props;
 
 <style>
   .section-marker {
-    color: var(--text-muted);
+    color: var(--text-accent);
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
+    font-size: 14px;
+    line-height: 1;
   }
   .dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: var(--surface-accent);
+    width: 4px;
+    height: 4px;
+    border-radius: 1px;
+    background: currentColor;
     display: inline-block;
+    flex-shrink: 0;
   }
 </style>

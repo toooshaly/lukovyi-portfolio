@@ -301,7 +301,7 @@ const year = new Date().getFullYear();
       }
 
       /* ---------- ФУТЕР (картка, 1:1 з Figma-компонентом) ---------- */
-      .footer { margin-top: var(--section-gap); padding: 0 0 24px; }
+      .footer { margin-top: 24px; padding: 0 0 24px; }
       /* картка: surface/raised + border/subtle + radius, з полями по краях;
          розтягується з в'юпортом. Кольори з токенів → однаково в чорній/білій темі.
          Розміри — з панелі керування (controls.css). */
@@ -510,6 +510,41 @@ const year = new Date().getFullYear();
           { threshold: 0.25 }
         );
         document.querySelectorAll(".display, .page-h, .case-h").forEach((el) => io.observe(el));
+      })();
+    </script>
+
+    <script>
+      // Стрілки: при появі у в'юпорті на місці стрілки мигтять випадкові символи,
+      // а в кінці з'являється сама стрілка — той самий підхід, що й scramble заголовків.
+      (() => {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const arrows = document.querySelectorAll(".wc-arrow, [data-arrow]");
+        if (!arrows.length) return;
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#*+=<>↗→↑↓";
+        const animating = new WeakSet();
+        function reveal(el, dur) {
+          if (animating.has(el)) return;
+          animating.add(el);
+          const svg = el.querySelector("svg");
+          const cy = el.querySelector(".wc-cy");
+          if (!cy) { animating.delete(el); return; }
+          if (svg) svg.style.opacity = "0";
+          cy.style.display = "flex";
+          const start = performance.now();
+          let last = -999;
+          function tick(now) {
+            const p = Math.min(1, (now - start) / dur);
+            if (now - last > 55) { last = now; cy.textContent = chars[(Math.random() * chars.length) | 0]; }
+            if (p < 1) requestAnimationFrame(tick);
+            else { cy.style.display = "none"; cy.textContent = ""; if (svg) svg.style.opacity = ""; animating.delete(el); }
+          }
+          requestAnimationFrame(tick);
+        }
+        const io = new IntersectionObserver(
+          (entries) => { for (const e of entries) if (e.isIntersecting) reveal(e.target, 650); },
+          { threshold: 0.6 }
+        );
+        arrows.forEach((a) => io.observe(a));
       })();
     </script>
   </body>
