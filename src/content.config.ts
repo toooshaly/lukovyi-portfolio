@@ -22,17 +22,28 @@ const projects = defineCollection({
       featured: z.boolean().default(false),
       /** Мітка статусу, напр. "SOON" (кейс ще готується) */
       status: z.string().optional(),
-      /** Рік, роль, тривалість, клієнт — метадані шапки кейсу */
+      /** Мета для sticky-сайдбара кейсу */
       year: z.string().optional(),
       role: z.string().optional(),
       timeline: z.string().optional(),
       client: z.string().optional(),
+      location: z.string().optional(),
+      team: z.string().optional(),
+      scope: z.string().optional(),
+      /** Короткий інтро-абзац під мета у сайдбарі */
+      intro: z.string().optional(),
+      /** TL;DR — рядки {label, body} у контент-колонці */
+      tldr: z
+        .array(z.object({ label: z.string(), body: z.string() }))
+        .optional(),
       /** Ключові метрики (виводяться великими цифрами) */
       metrics: z
         .array(z.object({ value: z.string(), label: z.string() }))
         .optional(),
       /** Обкладинка (кладеться поряд із .mdx або у src/assets) */
       cover: image().optional(),
+      /** Відео-обкладинка (шлях у /public, напр. "/video/x.mp4"); cover — poster */
+      coverVideo: z.string().optional(),
       /** SEO-перевизначення (необов'язкові) */
       seoTitle: z.string().optional(),
       seoDescription: z.string().optional(),

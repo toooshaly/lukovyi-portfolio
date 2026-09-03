@@ -6,42 +6,21 @@
 import { Image } from "astro:assets";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import { SITE } from "../consts";
-import ArrowDiag from "../components/icons/ArrowDiag.astro";
 import ArrowUpRight from "../components/icons/ArrowUpRight.astro";
 import Plus from "../components/icons/Plus.astro";
 import SectionMarker from "../components/SectionMarker.astro";
+import WorkCard from "../components/WorkCard.astro";
+import { clientWork } from "../data/work";
 import headshot from "../assets/about/headshot.png";
 import heroImg from "../assets/hero/hero.jpg";
-import sapImg from "../assets/work/sports-ai-pro.png";
-import bntImg from "../assets/work/bragmant.png";
-import labImg from "../assets/work/lab.png";
 
 const chips = ["UX/UI", "Product", "Design System", "AI Workflow"];
-
-const works = [
-  {
-    idx: "001", title: "S_AP", sub: "Sports AI-Pro", href: "/projects/sports-ai-pro",
-    year: "2026", role: "Product Designer", client: "North Brains Analytics",
-    img: sapImg, blend: true,
-  },
-  {
-    idx: "002", title: "B_NT", sub: "Bragmant", href: "/projects/bragmant",
-    year: "2026", role: "Product Designer", client: "Bragmant",
-    img: bntImg, blend: false,
-  },
-  {
-    idx: "003", title: "LAB", sub: "Lab Cases", href: "/lab",
-    year: null, role: null, client: null,
-    img: labImg, blend: false,
-  },
-];
 ---
 
 <BaseLayout title={`${SITE.name} — ${SITE.role}`}>
   <!-- ================= HERO ================= -->
   <section class="hero">
     <div class="hero-bg">
-      {/* TODO(Anton): замінити на <video autoplay muted loop playsinline>; поки постер */}
       <Image src={heroImg} alt="" widths={[768, 1200, 1800, 2400]} sizes="100vw" class="hero-media" loading="eager" fetchpriority="high" />
       <div class="hero-scrim"></div>
     </div>
@@ -77,7 +56,7 @@ const works = [
       <SectionMarker label="Intro" style="flex-shrink:0;margin-top:6px" />
       <div class="at-head">
         <div class="at-word display">ABTM<span class="us" data-typing="E">E</span></div>
-        <a href="/about-me" class="at-more label">Read more <ArrowUpRight /></a>
+        <a href="/about-me" class="at-more label link-fx">Read more <ArrowUpRight /></a>
       </div>
       <div class="at-side">
         <div class="at-bio">
@@ -92,36 +71,12 @@ const works = [
     <span class="plus bl" aria-hidden="true"><Plus /></span><span class="plus br" aria-hidden="true"><Plus /></span>
   </section>
 
-  <!-- ================= РОБОТИ ================= -->
-  <div class="works" id="work">
-    {works.map((w) => (
-      <a class:list={["work-card", w.blend && "is-blend"]} href={w.href} aria-label={w.sub}>
-        <div class="wc-media">
-          <Image src={w.img} alt={w.sub} widths={[768, 1200, 1600]} sizes="100vw" />
-        </div>
-        <span class="plus tl" aria-hidden="true"><Plus /></span><span class="plus tr" aria-hidden="true"><Plus /></span>
-        <span class="plus bl" aria-hidden="true"><Plus /></span><span class="plus br" aria-hidden="true"><Plus /></span>
-
-        {w.year && (
-          <dl class="wc-meta label">
-            <div><dt>Year</dt><dd>{w.year}</dd></div>
-            <div><dt>My role</dt><dd>{w.role}</dd></div>
-            <div><dt>Client</dt><dd>{w.client}</dd></div>
-          </dl>
-        )}
-
-        <div class="wc-title">
-          <span class="wc-idx label">/ {w.idx}</span>
-          <div class="wc-word">
-            <span class="wc-name display">{w.title}</span>
-            <span class="wc-sub label">&lt; {w.sub} &gt;</span>
-          </div>
-        </div>
-
-        <span class="wc-arrow" aria-hidden="true"><span class="wc-cy"></span><ArrowDiag /></span>
-      </a>
-    ))}
-  </div>
+  <!-- ================= РОБОТИ (Selected) ================= -->
+  <section class="works-sec" id="work">
+    <div class="works">
+      {clientWork.map((w) => <WorkCard {...w} />)}
+    </div>
+  </section>
 
   <script>
     // Одне слово, що циклічно змінюється (Product → Web → App → …) з ефектом
@@ -288,55 +243,10 @@ const works = [
   }
 
 
-  /* ---------------- РОБОТИ ---------------- */
-  .works { margin-top: 24px; scroll-margin-top: 0; }
-  .work-card {
-    position: relative; display: block; width: 100%; aspect-ratio: 1440 / 900;
-    overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
-    transform-origin: center center; will-change: transform, border-radius;
-    /* full-bleed за замовчуванням; звуження до карточки керується скриптом (JS) при доскролі */
-  }
-  .wc-media { position: absolute; inset: 0; z-index: 0; }
-  .wc-media :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .work-card.is-blend { background: #333333; }
-  .work-card.is-blend .wc-media :global(img) { mix-blend-mode: screen; }
-  /* скрим у лівий край — тримає читабельність мета (зверху) + тайтла (знизу) */
-  .work-card::after {
-    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    background: linear-gradient(100deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.18) 30%, transparent 55%);
-  }
+  /* ---------------- РОБОТИ (Selected) ---------------- */
+  .works-sec { scroll-margin-top: 0; }
+  .works { scroll-margin-top: 0; }
 
-  .wc-meta { position: absolute; top: 96px; left: 96px; z-index: 2; display: flex; gap: 48px; margin: 0; color: #fff; }
-  .wc-meta dt { color: rgba(255,255,255,.6); margin-bottom: 6px; }
-  .wc-meta dd { margin: 0; color: #fff; }
-
-  /* Розміри 1:1 з Figma (@1440): / 001 = 40, S_AP = 150, sub = 14; LH 80% / 80% / 115%.
-     Тримаємо пропорцію через vw (150/1440 ≈ 10.42vw), з кепом на Figma-розмірі. */
-  .wc-title { position: absolute; left: 88px; bottom: 80px; z-index: 2; display: grid; gap: 24px; }
-  .wc-idx { color: #fff; font-size: clamp(20px, 2.78vw, 40px); line-height: 0.8; letter-spacing: 0; }
-  .wc-word { display: flex; align-items: flex-end; flex-wrap: wrap; gap: clamp(24px, 3.33vw, 48px); }
-  .wc-name { font-size: clamp(4rem, 10.42vw, 150px); line-height: 0.8; letter-spacing: 0; color: #fff; }
-  .wc-sub { color: rgba(255,255,255,.85); font-size: 14px; line-height: 1.15; letter-spacing: 0; }
-
-  /* Стилізована ↗ картки — Figma-іконка (Arrows, повний компонент 115) */
-  .wc-arrow { position: absolute; right: 66px; bottom: 74px; z-index: 2; width: clamp(4rem, 8vw, 116px); height: clamp(4rem, 8vw, 116px); color: var(--icon-accent); display: block; transition: transform .2s ease; }
-  .wc-arrow :global(svg) { width: 100%; height: 100%; display: block; }
-  /* символьний шар для scramble → стрілка (керується скриптом) */
-  .wc-cy { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-family: var(--font-display); font-size: clamp(3rem, 6.4vw, 92px); line-height: 1; color: currentColor; }
-  .work-card:hover .wc-arrow { transform: translate(4px, -4px); }
-
-  @media (max-width: 720px) {
-    .wc-meta { top: 72px; left: 24px; gap: 20px; }
-    .wc-title { left: 24px; bottom: 48px; }
-    .wc-arrow { right: 4px; bottom: 38px; }
-  }
-
-  /* ---------------- Кутові плюси ---------------- */
-  /* Кутовий «+» — Figma-іконка (plus-icon) */
-  .plus { position: absolute; z-index: 3; width: 16px; height: 16px; pointer-events: none; display: block; }
-  .plus :global(svg) { width: 100%; height: 100%; display: block; }
-  .plus.tl { top: 16px; left: 16px; } .plus.tr { top: 16px; right: 16px; }
-  .plus.bl { bottom: 16px; left: 16px; } .plus.br { bottom: 16px; right: 16px; }
-  .work-card .plus { color: rgba(255,255,255,.55); }
+  /* Кутовий «+» у тизері About (базові стилі .plus — глобально) */
   .about-teaser .plus { color: var(--icon-muted); }
 </style>

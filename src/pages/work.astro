@@ -1,0 +1,163 @@
+---
+/**
+ * /work — єдина сторінка робіт. Дві групи:
+ *   Client work — комерційні кейси (повні деталки).
+ *   Lab         — концепт-роботи (showcase).
+ * Дані — з src/data/work.ts. Картки — компоненти WorkCard / LabCard.
+ */
+import BaseLayout from "../layouts/BaseLayout.astro";
+import WorkCard from "../components/WorkCard.astro";
+import LabCard from "../components/LabCard.astro";
+import { SITE } from "../consts";
+import { clientWork, labWork } from "../data/work";
+---
+
+<BaseLayout
+  title={`Work — ${SITE.name}`}
+  description="Selected work by Anton Lukovyi — commercial product design (Sports AI-Pro, Bragmant) and self-initiated concept work."
+>
+  <!-- ================= HERO (Figma 213:4758 — деконструйоване «SELECTED WORK») ================= -->
+  <section class="work-hero">
+    <h1 class="sr-only">Selected work</h1>
+    <div class="wh-word">
+      <div class="whw-row whw-r1" aria-hidden="true">
+        <span class="whw-left"><span class="whw-cell display">S</span><span class="whw-cell whw-ghost">E</span></span>
+        <span class="whw-cell display">LECTED</span>
+      </div>
+      <div class="whw-row whw-r2">
+        <span class="whw-left">
+          <p class="wh-sub">Commercial product design and self-initiated concepts — end to end.</p>
+          <span class="whw-cell display" aria-hidden="true">E</span>
+        </span>
+        <span class="whw-cell display" aria-hidden="true">WORK</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CLIENT WORK ================= -->
+  <section class="work-group" data-group="commercial" aria-label="Client work">
+    <div class="work-list">
+      {clientWork.map((w) => <WorkCard {...w} />)}
+    </div>
+  </section>
+
+  <!-- ================= LAB ================= -->
+  <section class="work-group" data-group="lab" id="lab" aria-label="Lab / Concepts">
+    <div class="work-list">
+      {labWork.map((c) => <LabCard {...c} />)}
+    </div>
+  </section>
+
+  <!-- ================= ПЛАВАЮЧИЙ ПЕРЕМИКАЧ (Figma 213:5547) ================= -->
+  <div class="work-switch" role="tablist" aria-label="Filter projects">
+    <button class="ws-seg is-active" data-group="commercial" role="tab" aria-selected="true" type="button">Commercial</button>
+    <button class="ws-seg" data-group="lab" role="tab" aria-selected="false" type="button">Lab</button>
+  </div>
+</BaseLayout>
+
+<script>
+  // Плаваючий сегментний перемикач: миттєво показує обрану групу, ховає іншу,
+  // і завжди прокручує до першого проєкту цієї групи.
+  (() => {
+    const sw = document.querySelector(".work-switch");
+    if (!sw) return;
+    const segs = Array.from(sw.querySelectorAll(".ws-seg"));
+    const groups = Array.from(document.querySelectorAll(".work-group"));
+    let current = "commercial";
+
+    const scrollToGroup = () => {
+      const g = groups.find((x) => x.dataset.group === current);
+      if (!g) return;
+      const y = g.getBoundingClientRect().top + window.scrollY - 100; // під фіксований навбар
+      const lenis = window.lenis;
+      if (lenis && lenis.scrollTo) lenis.scrollTo(y);
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    };
+
+    const activate = (name, animate) => {
+      current = name;
+      segs.forEach((s) => {
+        const on = s.dataset.group === name;
+        s.classList.toggle("is-active", on);
+        s.setAttribute("aria-selected", on ? "true" : "false");
+      });
+      groups.forEach((g) => {
+        const on = g.dataset.group === name;
+        g.hidden = !on;
+        if (on && animate) { g.classList.remove("wg-in"); void g.offsetWidth; g.classList.add("wg-in"); }
+      });
+      if (animate) scrollToGroup(); // завжди до першого проєкту обраної групи
+    };
+
+    segs.forEach((s) => s.addEventListener("click", () => { if (s.dataset.group !== current) activate(s.dataset.group, true); }));
+    activate("commercial", false);
+  })();
+</script>
+
+<style>
+  /* ---------------- HERO (деконструйоване «SELECTED WORK», Figma 213:4758) ----------------
+     На всю ширину через space-between: [S·E] ←край…край→ LECTED / [підзаголовок·E] …→ WORK.
+     Розмір шрифту ФІКСОВАНИЙ (не vw), степиться на менших екранах — літери лишаються
+     одного розміру, а ширину заповнюють проміжки (space-between). */
+  .work-hero { padding: 146px var(--pad-side) clamp(40px, 6vw, 72px); }
+  .wh-word {
+    width: 100%;
+    display: flex; flex-direction: column; gap: 12px;
+    font-family: var(--font-display); color: var(--text-primary);
+    font-size: 252px; line-height: 0.8; white-space: nowrap;
+  }
+  .whw-row { display: flex; align-items: center; justify-content: space-between; width: 100%; }
+  .whw-cell { display: block; }
+  .whw-left { display: flex; align-items: center; }
+  .whw-r1 .whw-ghost { opacity: 0; }                    /* невидима E — тримає проміжок після S */
+  .whw-r2 { align-items: flex-end; }
+  .whw-r2 .whw-left { align-items: flex-end; gap: 0.3087em; } /* підзаголовок → E (77.78px @252) */
+  .wh-sub {
+    flex-shrink: 0; width: 161px; margin: 0;
+    font-family: var(--font-display); font-size: 14px; line-height: 1;
+    color: var(--text-muted); white-space: normal;
+  }
+
+  @media (max-width: 1330px) { .wh-word { font-size: 180px; } }
+  @media (max-width: 1000px) { .wh-word { font-size: 128px; } }
+  @media (max-width: 720px) {
+    .work-hero { padding: 116px var(--pad-side-mobile) 40px; }
+    .wh-word { font-size: 90px; }
+    .wh-sub { width: 130px; }
+  }
+  @media (max-width: 500px) { .wh-word { font-size: 58px; } .wh-sub { width: 104px; } }
+
+  /* ---------------- ГРУПА ---------------- */
+  .work-group { margin-top: clamp(48px, 6vw, 96px); }
+  .work-list { display: grid; gap: 8px; }
+
+  /* поява групи при перемиканні */
+  .work-group.wg-in { animation: wg-in .42s cubic-bezier(.33,0,.15,1); }
+  @keyframes wg-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+  /* ---------------- ПЛАВАЮЧИЙ ПЕРЕМИКАЧ (Figma 213:5547) ---------------- */
+  .work-switch {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%);
+    z-index: 45; display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+    padding: 4px; border-radius: 16px;
+    background: var(--surface-glass); border: 1px solid var(--border-glass);
+    -webkit-backdrop-filter: blur(5px); backdrop-filter: blur(5px);
+  }
+  .ws-seg {
+    min-width: 129px; padding: 15px 14px; border-radius: 12px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    border: 1px solid transparent; background: transparent; cursor: pointer;
+    font-family: var(--font-display); font-size: 14px; line-height: 1.15; white-space: nowrap;
+    color: var(--text-primary); text-transform: uppercase;
+    transition: background .25s ease, color .25s ease, border-color .25s ease;
+  }
+  .ws-seg:hover:not(.is-active) { color: var(--text-primary); background: var(--surface-glass); }
+  .ws-seg.is-active {
+    background: var(--surface-accent); border-color: var(--border-accent); color: var(--text-on-accent);
+  }
+
+  @media (max-width: 560px) {
+    .work-switch { bottom: 16px; gap: 6px; }
+    .ws-seg { min-width: 0; flex: 1 1 0; padding: 14px 12px; }
+  }
+</style>

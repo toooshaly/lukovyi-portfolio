@@ -1,0 +1,84 @@
+---
+/**
+ * Повноширинна картка комерційної роботи (Sports, Bragmant).
+ * Використовується на головній і на /work. Відео (якщо є) автозапускається
+ * при появі у в'юпорті (спостерігач у BaseLayout). Стрілка-scramble — теж звідти.
+ */
+import { Image } from "astro:assets";
+import ArrowDiag from "./icons/ArrowDiag.astro";
+import Plus from "./icons/Plus.astro";
+import type { WorkItem } from "../data/work";
+
+const { idx, title, sub, href, year, role, client, img, video, blend } =
+  Astro.props as WorkItem;
+---
+
+<a class:list={["work-card", blend && "is-blend"]} href={href} aria-label={sub}>
+  <div class="wc-media">
+    {video ? (
+      <video src={video} poster={img.src} muted loop playsinline preload="none" data-autoplay></video>
+    ) : (
+      <Image src={img} alt={sub} widths={[768, 1200, 1600]} sizes="100vw" />
+    )}
+  </div>
+  <span class="plus tl" aria-hidden="true"><Plus /></span><span class="plus tr" aria-hidden="true"><Plus /></span>
+  <span class="plus bl" aria-hidden="true"><Plus /></span><span class="plus br" aria-hidden="true"><Plus /></span>
+
+  {year && (
+    <dl class="wc-meta label">
+      <div><dt>Year</dt><dd>{year}</dd></div>
+      {role && <div><dt>My role</dt><dd>{role}</dd></div>}
+      {client && <div><dt>Client</dt><dd>{client}</dd></div>}
+    </dl>
+  )}
+
+  <div class="wc-title">
+    <span class="wc-idx label">/ {idx}</span>
+    <div class="wc-word">
+      <span class="wc-name display">{title}</span>
+      <span class="wc-sub label">&lt; {sub} &gt;</span>
+    </div>
+  </div>
+
+  <span class="wc-arrow" aria-hidden="true"><span class="wc-cy"></span><ArrowDiag /></span>
+</a>
+
+<style>
+  .work-card {
+    position: relative; display: block; width: 100%; aspect-ratio: 1440 / 900;
+    overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
+    transform-origin: center center; will-change: transform, border-radius;
+  }
+  .wc-media { position: absolute; inset: 0; z-index: 0; }
+  .wc-media :global(img),
+  .wc-media :global(video) { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .work-card.is-blend { background: #333333; }
+  .work-card.is-blend .wc-media :global(img) { mix-blend-mode: screen; }
+  .work-card::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: linear-gradient(100deg, rgba(0,0,0,.5) 0%, rgba(0,0,0,.18) 30%, transparent 55%);
+  }
+
+  .wc-meta { position: absolute; top: 96px; left: 96px; z-index: 2; display: flex; gap: 48px; margin: 0; color: #fff; }
+  .wc-meta dt { color: rgba(255,255,255,.6); margin-bottom: 6px; }
+  .wc-meta dd { margin: 0; color: #fff; }
+
+  .wc-title { position: absolute; left: 88px; bottom: 80px; z-index: 2; display: grid; gap: 24px; }
+  .wc-idx { color: #fff; font-size: clamp(20px, 2.78vw, 40px); line-height: 0.8; letter-spacing: 0; }
+  .wc-word { display: flex; align-items: flex-end; flex-wrap: wrap; gap: clamp(24px, 3.33vw, 48px); }
+  .wc-name { font-size: clamp(4rem, 10.42vw, 150px); line-height: 0.8; letter-spacing: 0; color: #fff; }
+  .wc-sub { color: rgba(255,255,255,.85); font-size: 14px; line-height: 1.15; letter-spacing: 0; }
+
+  .wc-arrow { position: absolute; right: 66px; bottom: 74px; z-index: 2; width: clamp(4rem, 8vw, 116px); height: clamp(4rem, 8vw, 116px); color: var(--icon-accent); display: block; transition: transform .2s ease; }
+  .wc-arrow :global(svg) { width: 100%; height: 100%; display: block; }
+  .wc-cy { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; font-family: var(--font-display); font-size: clamp(3rem, 6.4vw, 92px); line-height: 1; color: currentColor; }
+  .work-card:hover .wc-arrow { transform: translate(4px, -4px); }
+
+  .work-card .plus { color: rgba(255,255,255,.55); }
+
+  @media (max-width: 720px) {
+    .wc-meta { top: 72px; left: 24px; gap: 20px; }
+    .wc-title { left: 24px; bottom: 48px; }
+    .wc-arrow { right: 4px; bottom: 38px; }
+  }
+</style>

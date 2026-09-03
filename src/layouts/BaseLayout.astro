@@ -34,12 +34,15 @@ const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
 
 const nav = [
   { label: "Home", href: "/" },
-  { label: "Work", href: "/#work" },
-  { label: "Lab", href: "/lab" },
+  { label: "Work", href: "/work" },
   { label: "About", href: "/about-me" },
 ];
 const isActive = (href: string) =>
-  href === "/" ? path === "/" : path === href || path.startsWith(href + "/");
+  href === "/"
+    ? path === "/"
+    : href === "/work"
+      ? path === "/work" || path.startsWith("/projects")
+      : path === href || path.startsWith(href + "/");
 
 const linkedin = SOCIALS.find((s) => s.label === "LinkedIn");
 
@@ -95,6 +98,11 @@ const year = new Date().getFullYear();
   </head>
 
   <body>
+    <!-- ПЕРЕХІД МІЖ СТОРІНКАМИ — «жалюзі» (8 слатів). Стартово закриті,
+         на завантаженні розкриваються з центру до боків; на кліку по
+         внутрішньому посиланні закриваються з боків до центру → навігація. -->
+    <div id="pageblinds" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
     <!-- Прогресивний blur по верхньому й нижньому краю (ефект при скролі).
          3 шари з наростаючим блюром + градієнтна маска = плавний перехід. -->
     <div class="edge-blur edge-blur--top" aria-hidden="true"><i></i><i></i><i></i></div>
@@ -105,7 +113,7 @@ const year = new Date().getFullYear();
       <div class="nav-center">
         <nav class="nav-pill glass" aria-label="Primary">
           {nav.map((n) => (
-            <a href={n.href} class:list={["nav-link", isActive(n.href) && "is-active"]}>{n.label}</a>
+            <a href={n.href} class:list={["nav-link", "link-fx", isActive(n.href) && "is-active"]}><span class="nl-t">{n.label}</span></a>
           ))}
         </nav>
         <button id="themeToggle" class="theme-toggle glass" type="button" aria-label="Toggle color theme">
@@ -131,9 +139,9 @@ const year = new Date().getFullYear();
           <div class="foot-contact">
             <SectionMarker label="Contact" style="margin-bottom:20px" />
             <dl class="foot-dl label">
-              <div class="foot-row"><dt>Mail</dt><dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd></div>
+              <div class="foot-row"><dt>Mail</dt><dd><a class="link-fx" href={`mailto:${SITE.email}`}>{SITE.email}</a></dd></div>
               {linkedin && (
-                <div class="foot-row"><dt>LinkedIn</dt><dd><a href={linkedin.href} target="_blank" rel="noopener noreferrer">Anton_Lukovyi ↗</a></dd></div>
+                <div class="foot-row"><dt>LinkedIn</dt><dd><a class="link-fx" href={linkedin.href} target="_blank" rel="noopener noreferrer">Anton_Lukovyi ↗</a></dd></div>
               )}
             </dl>
           </div>
@@ -153,8 +161,8 @@ const year = new Date().getFullYear();
           <div class="foot-legal label">
             <span>© {year} {SITE.name}. All rights reserved.</span>
             <span class="foot-legal-links">
-              <a href="/privacy">Privacy Policy</a>
-              <a href="/terms">Terms &amp; Conditions</a>
+              <a class="link-fx" href="/privacy">Privacy Policy</a>
+              <a class="link-fx" href="/terms">Terms &amp; Conditions</a>
             </span>
           </div>
         </div>
@@ -259,12 +267,16 @@ const year = new Date().getFullYear();
       .nav-pill { display: flex; gap: 2px; padding: 4px; border-radius: 999px; background: var(--nav-chip); }
       .nav-link {
         font-family: var(--font-display); font-size: var(--size-sm); text-transform: uppercase;
-        color: #fff; opacity: .9; padding: 8px 16px; border-radius: 999px;
-        mix-blend-mode: difference; transition: opacity .15s;
+        padding: 8px 16px; border-radius: 999px;
       }
-      .nav-link:hover { opacity: 1; }
+      /* текст авто-контрастить проти чипа (difference); opacity — НА ТОМУ Ж елементі,
+         що й блендінг, інакше батьківська прозорість ізолює блендінг від фону. */
+      .nl-t { color: #fff; mix-blend-mode: difference; display: inline-block; opacity: .9; transition: opacity .15s; }
+      .nav-link:hover .nl-t { opacity: 1; }
+      /* підкреслення — на лінку, без бленду */
+      .nav-link.link-fx::after { left: 16px; right: 16px; bottom: 5px; }
       /* Активний — акцентним кольором (без інверсії, щоб колір був правдивий) */
-      .nav-link.is-active { opacity: 1; color: var(--text-accent); mix-blend-mode: normal; text-decoration: underline; text-underline-offset: 4px; }
+      .nav-link.is-active .nl-t { opacity: 1; color: var(--text-accent); mix-blend-mode: normal; }
 
       .theme-toggle {
         display: inline-flex; align-items: center; justify-content: center;
@@ -436,6 +448,7 @@ const year = new Date().getFullYear();
       import Lenis from "lenis";
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
         const lenis = new Lenis({ duration: 1.1, easing: (t: number) => 1 - Math.pow(1 - t, 3), smoothWheel: true });
+        (window as any).lenis = lenis; // доступ для скролу з інших скриптів (напр. перемикач /work)
         const raf = (time: number) => { lenis.raf(time); requestAnimationFrame(raf); };
         requestAnimationFrame(raf);
         // Якорі на цій же сторінці (напр. Work → #work) — плавно через Lenis
@@ -545,6 +558,158 @@ const year = new Date().getFullYear();
           { threshold: 0.6 }
         );
         arrows.forEach((a) => io.observe(a));
+      })();
+    </script>
+
+    <script>
+      // Відео стартує саме. «Пояс + підтяжки»:
+      //  1) autoplay-атрибут + IntersectionObserver play() у полі зору;
+      //  2) фолбек: перша взаємодія (скрол/тач/клік) — це user-gesture, який
+      //     дозволяє play() навіть коли автозапуск заблоковано (Safari per-site
+      //     Auto-Play = Never для localhost). Паузу на виході НЕ ставимо.
+      (() => {
+        const vids = Array.from(document.querySelectorAll("video[data-autoplay]"));
+        if (!vids.length) return;
+        vids.forEach((v) => {
+          v.muted = true; v.defaultMuted = true; v.playsInline = true;
+          v.setAttribute("muted", ""); v.setAttribute("playsinline", ""); v.setAttribute("webkit-playsinline", "");
+        });
+        const tryPlay = (v) => {
+          v.muted = true;
+          const p = v.play();
+          if (p && p.catch) p.catch(() => {
+            const retry = () => { v.muted = true; const q = v.play(); if (q && q.catch) q.catch(() => {}); };
+            v.addEventListener("loadeddata", retry, { once: true });
+            v.addEventListener("canplay", retry, { once: true });
+            if (v.readyState < 2) { try { v.load(); } catch (e) {} }
+          });
+        };
+        const io = new IntersectionObserver(
+          (entries) => { for (const e of entries) if (e.isIntersecting) tryPlay(e.target); },
+          { threshold: 0.15 }
+        );
+        vids.forEach((v) => io.observe(v));
+        // фолбек: перший жест користувача розблоковує play() будь-де
+        const kick = () => vids.forEach((v) => { if (v.paused) tryPlay(v); });
+        ["pointerdown", "touchstart", "keydown", "wheel", "scroll"].forEach((ev) =>
+          window.addEventListener(ev, kick, { once: true, passive: true }));
+      })();
+    </script>
+
+    <script>
+      // ── ПЕРЕХІД «ХВИЛЯ» між сторінками ───────────────────────────────
+      // 8 горизонтальних слатів. scaleY(0)↔(1). Стагер по вертикалі:
+      //   закриття (при кліку) — зверху вниз;
+      //   розкриття (нова сторінка) — знизу вгору.
+      (() => {
+        const el = document.getElementById("pageblinds");
+        if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const slats = [...el.querySelectorAll("i")];
+        const n = slats.length;
+        const cs = getComputedStyle(document.documentElement);
+        const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 460;
+        const step = parseFloat(cs.getPropertyValue("--transition-step")) || 60;
+        const ease = "cubic-bezier(.33,0,.15,1)"; // м'який, без різкого старту/стопу
+        let navigating = false;
+
+        // open=true → розкрити (знизу вгору); open=false → закрити (зверху вниз)
+        function run(open) {
+          el.classList.add("is-busy");
+          return Promise.all(
+            slats.map((s, i) => {
+              const d = open ? n - 1 - i : i; // розкриття з низу, закриття зверху
+              const a = s.animate(
+                open
+                  ? [{ transform: "scaleY(1)" }, { transform: "scaleY(0)" }]
+                  : [{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }],
+                { duration: dur, delay: d * step, easing: ease, fill: "forwards" }
+              );
+              return a.finished
+                .then(() => { s.style.transform = open ? "scaleY(0)" : "scaleY(1)"; a.cancel(); })
+                .catch(() => {});
+            })
+          );
+        }
+
+        // Розкриваємо на завантаженні кожної сторінки.
+        run(true).then(() => el.classList.remove("is-busy"));
+
+        // Back/forward із bfcache — сторінка приходить «закритою», розкриваємо.
+        addEventListener("pageshow", (e) => {
+          if (!e.persisted) return;
+          slats.forEach((s) => (s.style.transform = "scaleX(1)"));
+          run(true).then(() => el.classList.remove("is-busy"));
+        });
+
+        // Перехоплюємо внутрішні переходи: закрити → перейти.
+        addEventListener("click", (e) => {
+          if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+          const a = e.target.closest("a");
+          if (!a) return;
+          const href = a.getAttribute("href");
+          if (!href || a.target === "_blank" || a.hasAttribute("download")) return;
+          if (href.startsWith("mailto:") || href.startsWith("tel:") || href.startsWith("#")) return;
+          let url;
+          try { url = new URL(a.href, location.href); } catch { return; }
+          if (url.origin !== location.origin) return;
+          if (url.pathname === location.pathname) return; // той самий шлях (якір) → плавний скрол
+          e.preventDefault();
+          if (navigating) return;
+          navigating = true;
+          run(false).then(() => { location.href = a.href; });
+        });
+      })();
+    </script>
+
+    <script>
+      // Scramble/перебір літер при наведенні на посилання (.link-fx).
+      // Той самий «дешифрувальний» ефект, що й на заголовках, але тригер — hover.
+      (() => {
+        if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#*_—";
+        const rnd = () => chars[(Math.random() * chars.length) | 0];
+        const busy = new WeakSet();
+        function scramble(el, dur) {
+          if (busy.has(el)) return;
+          busy.add(el);
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+          const nodes = [];
+          let node;
+          while ((node = walker.nextNode())) if (node.nodeValue && node.nodeValue.trim()) nodes.push({ n: node, t: node.nodeValue });
+          if (!nodes.length) { busy.delete(el); return; }
+          let total = 0;
+          for (const o of nodes) total += o.t.length;
+          const lockAt = new Array(total);
+          for (let i = 0; i < total; i++) lockAt[i] = dur * (0.3 + 0.6 * Math.random());
+          const roll = [];
+          const t0 = performance.now();
+          let last = -999;
+          function tick(now) {
+            const t = now - t0;
+            const reroll = now - last > 45;
+            if (reroll) last = now;
+            let gi = 0, done = true;
+            for (const o of nodes) {
+              let s = "";
+              for (let i = 0; i < o.t.length; i++, gi++) {
+                const c = o.t[i];
+                if (c === " " || c === "\n") { s += c; continue; }
+                if (t >= lockAt[gi]) s += c;
+                else { done = false; if (reroll || roll[gi] === undefined) roll[gi] = rnd(); s += roll[gi]; }
+              }
+              o.n.nodeValue = s;
+            }
+            if (!done) requestAnimationFrame(tick);
+            else { nodes.forEach((o) => (o.n.nodeValue = o.t)); busy.delete(el); }
+          }
+          requestAnimationFrame(tick);
+        }
+        document.addEventListener("mouseover", (e) => {
+          const el = e.target.closest(".link-fx");
+          if (!el) return;
+          if (e.relatedTarget && el.contains(e.relatedTarget)) return; // рух усередині — ігнор
+          scramble(el, 420);
+        });
       })();
     </script>
   </body>

@@ -1,9 +1,12 @@
 ---
 /**
- * CaseStudyLayout — сторінка кейсу у брутально-мінімалістичному стилі.
+ * CaseStudyLayout — двоколонковий кейс 1:1 з Figma «Case view»:
+ * ліва sticky-картка (мета) + права колонка, що скролиться (TL;DR · метрики · секції).
  */
 import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
 import BaseLayout from "./BaseLayout.astro";
+import ArrowUpRight from "../components/icons/ArrowUpRight.astro";
 import { SITE } from "../consts";
 import type { CollectionEntry } from "astro:content";
 
@@ -12,6 +15,11 @@ interface Props {
 }
 const { entry } = Astro.props;
 const d = entry.data;
+
+// Усі кейси — для бічного рейла (перемикання в будь-якому порядку)
+const all = (
+  await getCollection("projects", ({ data }) => (import.meta.env.PROD ? !data.draft : true))
+).sort((a, b) => a.data.order - b.data.order);
 
 const title = d.seoTitle ?? `${d.title} — ${d.category} | ${SITE.name}`;
 const description = d.seoDescription ?? d.summary;
@@ -28,110 +36,304 @@ const caseSchema = {
   ...(d.year ? { dateCreated: d.year } : {}),
 };
 
+// Рядки мета для сайдбара — тільки заповнені
 const meta = [
+  { k: "Industry", v: d.category },
+  { k: "Location", v: d.location },
   { k: "Role", v: d.role },
-  { k: "Timeline", v: d.timeline },
   { k: "Year", v: d.year },
-  { k: "Client", v: d.client },
+  { k: "Timeline", v: d.timeline },
+  { k: "Team", v: d.team },
+  { k: "Scope", v: d.scope },
+  { k: "Status", v: d.status },
 ].filter((m) => m.v && !String(m.v).startsWith("TODO"));
 ---
 
 <BaseLayout title={title} description={description} ogType="article" jsonLd={caseSchema}>
-  <article>
-    <!-- Шапка -->
-    <section class="wrap">
-      <a href="/projects" class="mono back">[ &lt; Work ]</a>
-      <div class="mono cat">{d.category}{d.status ? <span class="tag"> · {d.status}</span> : null}</div>
-      <h1 class="case-h">{d.title}</h1>
-      <p class="summary">{d.summary}</p>
-      {meta.length > 0 && (
-        <dl class="meta mono">
-          {meta.map((m) => (
-            <div><dt>{m.k}</dt><dd>{m.v}</dd></div>
-          ))}
-        </dl>
-      )}
-    </section>
+  <article class="case">
+    <!-- HERO: breadcrumb + велика назва + обкладинка на всю ширину -->
+    <header class="case-hero">
+      <p class="case-crumb label"><a href="/work" class="link-fx">work</a> / {d.title}</p>
+      <h1 class="case-hero-title display">{d.title}</h1>
+      {d.coverVideo ? (
+        <video class="case-cover" src={d.coverVideo} poster={d.cover?.src} muted loop playsinline preload="none" data-autoplay />
+      ) : d.cover ? (
+        <Image src={d.cover} alt={`${d.title} — cover`} widths={[768, 1280, 1600]} sizes="100vw" class="case-cover" />
+      ) : null}
+    </header>
 
-    <!-- Обкладинка -->
-    {d.cover && (
-      <section class="wrap">
-        <Image src={d.cover} alt={`${d.title} — cover`} widths={[640, 1024, 1600]} sizes="(max-width: 1200px) 100vw, 1200px" class="cover" />
-      </section>
-    )}
-
-    <!-- Метрики -->
-    {d.metrics && d.metrics.length > 0 && (
-      <section class="wrap">
-        <div class="metrics">
-          {d.metrics.map((m) => (
-            <div class="metric">
-              <div class="metric-v">{m.value}</div>
-              <div class="mono metric-l">{m.label}</div>
-            </div>
-          ))}
+    <div class="case-grid">
+      <!-- ЛІВА sticky-картка -->
+      <aside class="case-side">
+        <div class="case-card">
+          <h2 class="case-title display">{d.title}</h2>
+          {meta.length > 0 && (
+            <dl class="case-meta">
+              {meta.map((m) => (
+                <div class="cm-row"><dt class="label">{m.k}</dt><dd>{m.v}</dd></div>
+              ))}
+            </dl>
+          )}
+          {d.intro && <p class="case-intro">{d.intro}</p>}
         </div>
-      </section>
-    )}
+      </aside>
 
-    <!-- Контент -->
-    <section class="wrap">
-      <div class="case-content"><slot /></div>
-    </section>
+      <!-- ПРАВА колонка, що скролиться -->
+      <div class="case-main">
+        {d.tldr && d.tldr.length > 0 && (
+          <section class="case-tldr">
+            <span class="label tl-kicker">TL;DR</span>
+            <dl class="tl-rows">
+              {d.tldr.map((r) => (
+                <div class="tl-row"><dt class="label">{r.label}</dt><dd>{r.body}</dd></div>
+              ))}
+            </dl>
+          </section>
+        )}
 
-    <!-- CTA -->
-    <section class="wrap">
-      <div class="cta">
-        <span class="mono idx">[ Next ]</span>
-        <a href="/contact" class="cta-h">Like what you see?<br />Let's build something. <span class="sl">&gt;</span></a>
+        {d.metrics && d.metrics.length > 0 && (
+          <section class="case-metrics">
+            {d.metrics.map((m) => (
+              <div class="cmet">
+                <div class="cmet-v display">{m.value}</div>
+                <div class="label cmet-l">{m.label}</div>
+              </div>
+            ))}
+          </section>
+        )}
+
+        <div class="case-content"><slot /></div>
+
+        <section class="case-cta">
+          <span class="label">[ Next ]</span>
+          <a href={`mailto:${SITE.email}`} class="cta-h display">Like what you see?<br />Let's build something.</a>
+          <a href={`mailto:${SITE.email}`} class="label cta-link link-fx">Get in touch <ArrowUpRight /></a>
+        </section>
       </div>
-    </section>
+    </div>
+
+    {all.length > 1 && (
+      <nav class="case-rail" aria-label="All projects">
+        <ul class="cr-list">
+          {all.map((p) => (
+            <li class:list={["cr-item", p.id === entry.id && "is-current"]}>
+              <a href={`/projects/${p.id}`} class="cr-link" aria-current={p.id === entry.id ? "page" : undefined}>
+                <span class="cr-thumb">
+                  {p.data.cover && <Image src={p.data.cover} alt="" widths={[96, 192]} sizes="96px" />}
+                </span>
+                <span class="cr-name">{p.data.title}</span>
+                <span class="cr-dot" aria-hidden="true"></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+    )}
   </article>
 </BaseLayout>
 
 <style>
-  .wrap { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; }
-  .sl { color: var(--color-accent); }
-  .back { color: var(--color-accent); display: inline-block; margin-bottom: 2rem; }
-  .cat { color: var(--color-faint); }
-  .tag { color: var(--color-accent); }
-  .case-h { margin-top: 0.75rem; font-size: clamp(2.5rem, 9vw, 6rem); font-weight: 700; line-height: 0.9; letter-spacing: -0.04em; text-transform: uppercase; }
-  .summary { margin-top: 1.5rem; max-width: 40ch; font-size: clamp(1.25rem, 2.6vw, 1.9rem); line-height: 1.25; letter-spacing: -0.02em; color: var(--color-mute); }
-  .meta { margin-top: 2.5rem; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; border-top: 1px solid var(--color-line); padding-top: 1.5rem; }
-  .meta dt { color: var(--color-faint); }
-  .meta dd { color: var(--color-ink); margin-top: 0.2rem; }
-  @media (min-width: 720px) { .meta { grid-template-columns: repeat(4, 1fr); } }
+  /* ---------- HERO (breadcrumb + назва + обкладинка) ---------- */
+  .case-hero {
+    max-width: 1408px; margin: 0 auto; padding: 146px var(--pad-side) 0;
+  }
+  .case-crumb { color: var(--text-primary); }
+  .case-crumb a { color: var(--text-primary); }
+  .case-hero-title {
+    margin-top: 64px; font-size: clamp(2.5rem, 11vw, 150px); line-height: 0.8;
+    color: var(--text-primary); text-transform: uppercase;
+  }
 
-  .cover { width: 100%; border: 1px solid var(--color-line); }
-  .metrics { display: grid; grid-template-columns: 1fr; gap: 2rem; border-top: 1px solid var(--color-line); border-bottom: 1px solid var(--color-line); padding: 2.5rem 0; }
-  .metric-v { font-size: clamp(2.5rem, 7vw, 5rem); font-weight: 700; letter-spacing: -0.03em; line-height: 1; color: var(--color-accent); }
-  .metric-l { color: var(--color-mute); margin-top: 0.5rem; }
-  @media (min-width: 720px) { .metrics { grid-template-columns: repeat(3, 1fr); } }
+  .case-grid {
+    max-width: 1408px; margin: 0 auto; padding: 64px var(--pad-side) 0;
+    display: grid; grid-template-columns: 410px minmax(0, 1fr); gap: 48px; align-items: start;
+  }
 
-  .cta { border-top: 1px solid var(--color-line); padding-top: 2rem; }
-  .idx { color: var(--color-faint); display: block; margin-bottom: 1rem; }
-  .cta-h { font-size: clamp(1.75rem, 5vw, 3.5rem); font-weight: 500; letter-spacing: -0.03em; line-height: 1; text-transform: uppercase; }
-  .cta-h:hover { color: var(--color-accent); }
+  /* ---------- ЛІВА sticky-картка ---------- */
+  .case-side { position: sticky; top: 96px; }
+  .case-card {
+    background: var(--surface-raised); border: 1px solid var(--border-subtle);
+    border-radius: 24px; padding: 32px;
+  }
+  .case-title { font-size: clamp(2rem, 4vw, 40px); line-height: 0.9; color: var(--text-primary); text-transform: uppercase; }
+  .case-meta { margin: 28px 0 0; display: grid; }
+  .cm-row { display: flex; justify-content: space-between; gap: 1rem; padding: 14px 0; border-top: 1px solid var(--border-subtle); }
+  .cm-row dt { color: var(--text-muted); flex-shrink: 0; }
+  .cm-row dd { margin: 0; color: var(--text-primary); text-align: right; }
+  .case-intro { margin: 24px 0 0; color: var(--text-muted); font-size: 14px; line-height: 1.5; }
+
+  /* ---------- ПРАВА колонка ---------- */
+  .case-main { min-width: 0; }
+
+  .case-tldr { display: grid; grid-template-columns: 120px 1fr; gap: 40px; }
+  .tl-kicker { color: var(--text-muted); }
+  .tl-rows { display: grid; margin: 0; }
+  .tl-row { display: grid; grid-template-columns: 160px 1fr; gap: 24px; padding: 22px 0; border-top: 1px solid var(--border-subtle); }
+  .tl-row:last-child { border-bottom: 1px solid var(--border-subtle); }
+  .tl-row dt { color: var(--text-muted); }
+  .tl-row dd { margin: 0; color: var(--text-primary); line-height: 1.5; }
+
+  .case-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 56px; }
+  .cmet-v { font-size: clamp(2.5rem, 6vw, 68px); line-height: 1; color: var(--text-accent); }
+  .cmet-l { color: var(--text-muted); margin-top: 12px; display: block; }
+
+  .case-cover {
+    display: block; width: 100%; margin-top: 48px; border-radius: 16px;
+    aspect-ratio: 1392 / 900; height: auto; object-fit: cover;
+  }
+
+  .case-cta { margin-top: 80px; border-top: 1px solid var(--border-subtle); padding-top: 32px; }
+  .cta-h { display: block; margin-top: 16px; font-size: clamp(1.75rem, 4vw, 44px); line-height: 0.95; color: var(--text-primary); text-transform: uppercase; }
+  .cta-link { display: inline-flex; align-items: center; gap: 8px; margin-top: 24px; color: var(--text-accent); }
+  .cta-link :global(svg) { width: 14px; height: 14px; }
+
+  /* ---------- Бічний рейл кейсів (модальний, справа) ----------
+     Згорнутий = стовпчик рисок (поточний — золотий, довший). На hover/tap
+     розгортається у плаваючу скляну картку (не торкається країв): прев'ю +
+     назва кожного кейсу, клік — стрибок. Рядки з'являються каскадом. */
+  .case-rail { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 40; }
+  .cr-list {
+    list-style: none; margin: 0; display: flex; flex-direction: column; align-items: flex-end;
+    gap: 10px; padding: 12px; border-radius: 18px; border: 1px solid transparent;
+    transform-origin: right center; transform: scale(.96);
+    transition: background .3s ease, border-color .3s ease, box-shadow .35s ease, transform .35s cubic-bezier(.33,0,.15,1);
+  }
+  .case-rail:hover .cr-list,
+  .case-rail:focus-within .cr-list,
+  .case-rail.is-open .cr-list {
+    background: var(--surface-glass); border-color: var(--border-glass);
+    -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+    box-shadow: 0 24px 70px -20px rgba(0, 0, 0, .55);
+    transform: scale(1);
+  }
+  .cr-item { width: 100%; }
+  .cr-link {
+    display: flex; align-items: center; justify-content: flex-end; gap: 12px;
+    transition: transform .28s cubic-bezier(.33,0,.15,1);
+  }
+  .cr-link:hover { transform: translateX(-6px); }              /* мікро: рядок трохи виїжджає */
+  .cr-thumb {
+    width: 0; height: 44px; border-radius: 8px; overflow: hidden; flex-shrink: 0; opacity: 0;
+    background: var(--surface-raised); box-shadow: 0 0 0 1px transparent;
+    transition: width .34s cubic-bezier(.33,0,.15,1), opacity .28s ease, box-shadow .25s ease;
+  }
+  .cr-thumb :global(img) {
+    width: 72px; height: 44px; object-fit: cover; display: block;
+    transition: transform .45s cubic-bezier(.33,0,.15,1);
+  }
+  .cr-link:hover .cr-thumb { box-shadow: 0 0 0 1px var(--border-glass); }
+  .cr-link:hover .cr-thumb :global(img) { transform: scale(1.1); }  /* мікро: зум прев'ю */
+  /* фіксована колонка назви → прев'ю й назви вирівняні стовпчиками (не сходинками) */
+  .cr-name {
+    font-family: var(--font-display); font-size: 13px; text-transform: uppercase; text-align: left;
+    color: var(--text-primary); white-space: nowrap; width: 0; overflow: hidden; opacity: 0;
+    transition: width .34s cubic-bezier(.33,0,.15,1), opacity .28s ease;
+  }
+  .cr-item.is-current .cr-name { color: var(--text-accent); }
+  .cr-dot {
+    width: 22px; height: 3px; border-radius: 99px; background: var(--border-strong); flex-shrink: 0;
+    transition: width .25s ease, background .25s ease, box-shadow .25s ease;
+  }
+  .cr-item.is-current .cr-dot { width: 34px; background: var(--icon-accent); box-shadow: 0 0 10px -1px var(--icon-accent); }
+  .cr-link:hover .cr-dot { background: var(--text-primary); width: 30px; }
+  .cr-item.is-current .cr-link:hover .cr-dot { background: var(--icon-accent); }
+
+  .case-rail:hover .cr-thumb,
+  .case-rail:focus-within .cr-thumb,
+  .case-rail.is-open .cr-thumb { width: 72px; opacity: 1; }
+  .case-rail:hover .cr-name,
+  .case-rail:focus-within .cr-name,
+  .case-rail.is-open .cr-name { width: 150px; opacity: 1; }
+
+  /* мікро: каскадна поява рядків (прев'ю+назва) при розгортанні */
+  .cr-item:nth-child(1) .cr-thumb, .cr-item:nth-child(1) .cr-name { transition-delay: .00s; }
+  .cr-item:nth-child(2) .cr-thumb, .cr-item:nth-child(2) .cr-name { transition-delay: .04s; }
+  .cr-item:nth-child(3) .cr-thumb, .cr-item:nth-child(3) .cr-name { transition-delay: .08s; }
+  .cr-item:nth-child(4) .cr-thumb, .cr-item:nth-child(4) .cr-name { transition-delay: .12s; }
+  .cr-item:nth-child(5) .cr-thumb, .cr-item:nth-child(5) .cr-name { transition-delay: .16s; }
+  .cr-item:nth-child(6) .cr-thumb, .cr-item:nth-child(6) .cr-name { transition-delay: .20s; }
+
+  @media (max-width: 560px) {
+    .cr-thumb :global(img) { width: 56px; }
+    .case-rail:hover .cr-thumb, .case-rail:focus-within .cr-thumb, .case-rail.is-open .cr-thumb { width: 56px; }
+    .case-rail:hover .cr-name, .case-rail:focus-within .cr-name, .case-rail.is-open .cr-name { width: 118px; }
+  }
+
+  /* ---------- Адаптив: одна колонка ---------- */
+  @media (max-width: 900px) {
+    .case-grid { grid-template-columns: 1fr; gap: 32px; }
+    .case-side { position: static; }
+    .case-tldr { grid-template-columns: 1fr; gap: 16px; }
+    .tl-row { grid-template-columns: 120px 1fr; gap: 16px; }
+    .case-metrics { grid-template-columns: 1fr; gap: 32px; }
+  }
 </style>
 
 <style is:global>
-  .case-content { max-width: 720px; }
-  .case-content > * + * { margin-top: 1.25rem; }
-  .case-content h2 { margin-top: 3rem; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; letter-spacing: -0.02em; text-transform: uppercase; color: var(--color-ink); }
-  .case-content h3 { margin-top: 2rem; font-size: 1.3rem; font-weight: 500; color: var(--color-ink); }
-  .case-content h4 { margin-top: 2rem; font-size: 1.05rem; font-weight: 700; color: var(--color-ink); }
-  .case-content p, .case-content li { color: var(--color-mute); line-height: 1.7; font-size: 1.05rem; }
-  .case-content strong { color: var(--color-ink); font-weight: 700; }
-  .case-content ul { list-style: none; padding-left: 0; }
+  /* ---------- MDX-контент: kicker (h2) + headline (h3) + body ---------- */
+  .case-content { margin-top: 24px; }
+  .case-content > * + * { margin-top: 1.1rem; }
+  /* h2 = kicker "01 — Starting point" */
+  .case-content h2 {
+    margin: 72px 0 0; padding-top: 22px; border-top: 1px solid var(--border-subtle);
+    font-family: var(--font-display); font-size: var(--size-sm); text-transform: uppercase;
+    letter-spacing: 0.04em; color: var(--text-muted); font-weight: 400;
+  }
+  /* h3 = headline sentence */
+  .case-content h3 {
+    margin: 14px 0 0; font-family: var(--font-body); font-weight: 500;
+    font-size: clamp(1.5rem, 3vw, 2.1rem); line-height: 1.12; letter-spacing: -0.02em;
+    color: var(--text-primary);
+  }
+  .case-content h2 + h3 { margin-top: 14px; }
+  .case-content p, .case-content li { color: var(--text-muted); line-height: 1.7; font-size: 1.05rem; }
+  .case-content strong { color: var(--text-primary); font-weight: 500; }
+  .case-content ol, .case-content ul { padding-left: 0; list-style: none; display: grid; gap: 10px; }
+  .case-content ol { counter-reset: step; }
+  .case-content ol li { padding-left: 2rem; position: relative; }
+  .case-content ol li::before { counter-increment: step; content: counter(step); position: absolute; left: 0; color: var(--text-accent); font-family: var(--font-display); }
   .case-content ul li { padding-left: 1.25rem; position: relative; }
-  .case-content ul li::before { content: "/"; position: absolute; left: 0; color: var(--color-accent); }
-  .case-content a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 2px; }
-  .case-content img { display: block; width: 100%; margin: 2rem 0; border: 1px solid var(--color-line); }
-  .case-content blockquote { margin: 2rem 0; padding: 1.25rem 1.5rem; border-left: 3px solid var(--color-accent); background: #ececec; }
-  .case-content blockquote p { color: var(--color-ink); font-size: 1.2rem; }
-  .case-content table { width: 100%; border-collapse: collapse; margin: 2rem 0; font-family: var(--font-mono); font-size: 0.85rem; }
-  .case-content th, .case-content td { padding: 0.6rem 0.5rem; border-bottom: 1px solid var(--color-line); text-align: right; }
+  .case-content ul li::before { content: "/"; position: absolute; left: 0; color: var(--text-accent); }
+  .case-content a { color: var(--text-accent); text-decoration: underline; text-underline-offset: 2px; }
+  .case-content img { display: block; width: 100%; border-radius: 12px; margin: 2rem 0; }
+  /* h4 = підсекція всередині секції */
+  .case-content h4 {
+    margin: 40px 0 0; font-family: var(--font-body); font-weight: 500;
+    font-size: 1.15rem; line-height: 1.3; color: var(--text-primary);
+  }
+  /* blockquote = слот під скрін (плейсхолдер) */
+  .case-content blockquote {
+    margin: 2rem 0; padding: 20px 22px; border: 1px dashed var(--border-default);
+    border-radius: 12px; background: var(--surface-raised);
+  }
+  .case-content blockquote p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+  /* таблиця (воронка) */
+  .case-content .table-wrap, .case-content table { display: block; overflow-x: auto; }
+  .case-content table {
+    width: 100%; border-collapse: collapse; margin: 2rem 0;
+    font-family: var(--font-display); font-size: 0.85rem;
+  }
+  .case-content th, .case-content td {
+    padding: 12px 10px; border-bottom: 1px solid var(--border-subtle); text-align: right; white-space: nowrap;
+  }
   .case-content th:first-child, .case-content td:first-child { text-align: left; }
-  .case-content th { color: var(--color-faint); text-transform: uppercase; font-weight: 400; }
-  .case-content thead th { border-bottom-color: var(--color-ink); }
+  .case-content th { color: var(--text-muted); text-transform: uppercase; font-weight: 400; }
+  .case-content thead th { border-bottom-color: var(--border-strong); }
+  .case-content td { color: var(--text-muted); }
+  .case-content td strong, .case-content td:first-child { color: var(--text-primary); }
 </style>
+
+<script>
+  // Тач-пристрої (без hover): перший тап по рейлу — розкриває, тап поза ним — згортає,
+  // тап по посиланню у розкритому стані — переходить.
+  (() => {
+    const rail = document.querySelector(".case-rail");
+    if (!rail || !matchMedia("(hover: none)").matches) return;
+    rail.addEventListener("click", (e) => {
+      if (!rail.classList.contains("is-open")) { e.preventDefault(); rail.classList.add("is-open"); }
+    });
+    document.addEventListener("click", (e) => {
+      if (!rail.contains(e.target)) rail.classList.remove("is-open");
+    });
+  })();
+</script>

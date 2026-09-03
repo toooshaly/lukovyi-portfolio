@@ -6,7 +6,7 @@
 export const SITE = {
   name: "Anton Lukovyi",
   role: "Freelance UX/UI Designer",
-  url: "https://desluko.com",
+  url: "https://desluk.com",
   email: "lukovyiwork@gmail.com",
   location: "Celle, Germany",
   description:
@@ -18,7 +18,6 @@ export const NAV = [
   { num: "01", label: "Home", href: "/" },
   { num: "02", label: "About Me", href: "/about-me" },
   { num: "03", label: "Projects", href: "/projects" },
-  { num: "04", label: "Contact", href: "/contact" },
 ] as const;
 
 /** Соцмережі (реальні URL з поточного сайту). */

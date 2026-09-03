@@ -1,0 +1,92 @@
+---
+/**
+ * Повноширинна showcase-картка концепт-роботи (Nexus, MyField, Intranet).
+ * Без деталки — це самостійні концепти. Стрілка-scramble — зі скрипта BaseLayout.
+ */
+import { Image } from "astro:assets";
+import ArrowDiag from "./icons/ArrowDiag.astro";
+import Plus from "./icons/Plus.astro";
+import type { LabItem } from "../data/work";
+
+const { idx, title, sub, img, overlay, meta } = Astro.props as LabItem;
+---
+
+<article class="lab-case" style={`--ov:${overlay}`}>
+  <div class="lc-media">
+    <Image src={img} alt={sub} widths={[768, 1200, 1600, 2000]} sizes="100vw" loading="lazy" />
+  </div>
+
+  <span class="plus tl" aria-hidden="true"><Plus /></span><span class="plus tr" aria-hidden="true"><Plus /></span>
+  <span class="plus bl" aria-hidden="true"><Plus /></span><span class="plus br" aria-hidden="true"><Plus /></span>
+
+  <div class="lc-inner">
+    <div class="lc-col">
+      <dl class="lc-meta label">
+        {meta.map(([k, v]) => (
+          <div><dt>{k}:</dt><dd>{v}</dd></div>
+        ))}
+      </dl>
+
+      <div class="lc-title">
+        <span class="lc-idx">/ {idx}</span>
+        <div class="lc-word">
+          <span class="lc-name display">{title}</span>
+          <span class="lc-sub label">{`{ ${sub} }`}</span>
+        </div>
+      </div>
+    </div>
+
+    <span class="lc-arrow wc-arrow" aria-hidden="true"><span class="wc-cy"></span><ArrowDiag /></span>
+  </div>
+</article>
+
+<style>
+  .lab-case {
+    position: relative; width: 100%; aspect-ratio: 1440 / 900;
+    overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
+    transform-origin: center center; will-change: transform, border-radius;
+  }
+  .lc-media { position: absolute; inset: 0; z-index: 0; }
+  .lc-media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .lab-case::after {
+    content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: rgba(0, 0, 0, var(--ov, 0.4));
+  }
+
+  .lc-inner {
+    position: absolute; inset: 0; z-index: 2;
+    display: flex; align-items: flex-end; justify-content: space-between;
+    gap: 24px; padding: clamp(24px, 3.34vw, 48px);
+  }
+  .lc-col { align-self: stretch; min-height: 0; display: flex; flex-direction: column; justify-content: space-between; gap: 24px; }
+
+  .lc-meta { display: flex; gap: clamp(24px, 4.44vw, 64px); margin: 0; color: #fff; }
+  .lc-meta > div { display: flex; flex-direction: column; gap: 12px; }
+  .lc-meta dt { color: rgba(255, 255, 255, 0.7); }
+  .lc-meta dd { margin: 0; color: #fff; }
+
+  .lc-title { display: flex; flex-direction: column; gap: clamp(16px, 1.67vw, 24px); }
+  .lc-idx { font-family: var(--font-display); color: #fff; font-size: clamp(22px, 2.78vw, 40px); line-height: 0.8; }
+  .lc-word { display: flex; align-items: flex-end; flex-wrap: wrap; gap: clamp(20px, 3.34vw, 48px); }
+  .lc-name { font-size: clamp(3.75rem, 10.42vw, 150px); line-height: 0.8; letter-spacing: 0; color: #fff; }
+  .lc-sub { color: rgba(255, 255, 255, 0.85); }
+
+  .lc-arrow {
+    position: relative; flex-shrink: 0; display: block;
+    width: clamp(4rem, 8vw, 115px); height: clamp(4rem, 8vw, 115px);
+    color: var(--icon-accent); transition: transform 0.2s ease;
+  }
+  .lc-arrow :global(svg) { width: 100%; height: 100%; display: block; }
+  .lc-arrow .wc-cy {
+    position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+    font-family: var(--font-display); font-size: clamp(3rem, 6vw, 88px); line-height: 1; color: currentColor;
+  }
+
+  .lab-case .plus { color: rgba(255, 255, 255, 0.55); }
+
+  @media (max-width: 720px) {
+    .lc-inner { padding: 24px; gap: 16px; }
+    .lc-meta { gap: 20px; }
+    .lc-col { gap: 32px; }
+  }
+</style>

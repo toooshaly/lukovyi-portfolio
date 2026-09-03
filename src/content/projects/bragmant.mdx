@@ -1,24 +1,151 @@
 ---
 title: "BRAGMANT"
-category: "B2B SaaS Platform"
-summary: "B2B SaaS platform — product design case study (coming soon)."
+category: "Creator-marketing platform (B2B SaaS)"
+summary: "A two-sided platform connecting brands with creators for content. I was the first designer — I set the visual direction and owned the brand-side campaign flows."
 order: 2
-status: "SOON"
-role: "UX/UI Design, Product Design"
-seoTitle: "BRAGMANT — B2B SaaS Platform Case Study | Anton Lukovyi"
-seoDescription: "BRAGMANT B2B SaaS platform UX/UI case study by Anton Lukovyi — coming soon."
+draft: true
+role: "Design lead — first designer on the product"
+year: "2025–2026"
+timeline: "~1 year on the team"
+team: "~10 — a founder, ~4 developers, a design team I hired"
+location: "Remote"
+scope: "Visual direction, sign-up flows (brand + creator), brand-side campaign flows (Campaign Creation, Manage Campaign), UX, cross-product input"
+status: "In development"
+client: "Bragmant"
+cover: ../../assets/work/bragmant-cover.jpg
+intro: "An early-stage B2B platform. I was the first designer on it — I set the visual direction, owned the brand-side campaign flows, and shaped the wider product."
+metrics:
+  - value: "10 → 2"
+    label: "Steps to create a campaign"
+  - value: "~10"
+    label: "People on the team"
+  - value: "In dev"
+    label: "Current status"
+tldr:
+  - label: "Background"
+    body: "BRAGMANT connects brands with creators for content. Campaigns, product seeding, approvals, shipping and payouts run in one system — not across DMs, spreadsheets and agencies."
+  - label: "Problem"
+    body: "One product serves two opposite users. A brand builds and runs campaigns; a creator receives, decides on and delivers the work. Every action on one side becomes a state on the other — dense data, many statuses, long workflows."
+  - label: "Role"
+    body: "I was the design lead and first designer. I owned the direction, the product decisions and the client communication, ran design reviews, hired four designers and built the team, and improved the design process together with the PM."
+  - label: "Status"
+    body: "In active development."
+seoTitle: "BRAGMANT — Creator-marketing platform (B2B SaaS) | Anton Lukovyi"
+seoDescription: "BRAGMANT case study — a two-sided B2B creator-marketing platform. Product design by Anton Lukovyi: visual direction and brand-side campaign flows (Campaign Creation, Manage Campaign)."
 ---
 
-{/* Кейс зі статусом SOON. Заповни, коли буде готовий. */}
+{/* draft: true → видно лише в dev. Блоки «📷» — місця під скріни (експорт з Figma). */}
 
-## Overview
+## 01 — Starting point
+### One flow instead of DMs, sheets and agencies.
 
-TODO: короткий опис платформи BRAGMANT.
+Influencer marketing still runs on DMs, spreadsheets and agency middlemen: negotiate in chat, track deliverables in a sheet, chase content over email, handle shipping and payouts on the side. BRAGMANT's premise is to fold the whole collaboration — offer, brief, approval, shipping, payout — into one guided flow. That's where the design problem begins: everything that used to live in scattered tools now has to live in one coherent interface.
 
-## The problem
+## 02 — Two sides, one product
+### One action on one side becomes a state on the other.
 
-TODO.
+The hard part was never a single screen. One product has to serve two users with opposite jobs, and the two are wired together: a brand's action — publish a campaign, approve a draft, request a change — has to arrive as a clear state on the creator's side, and back again. My job was to keep that logic legible across a lot of data, statuses and steps, so neither side ever has to guess what happens next.
 
-## Solution
+> 📷 Brand approving a deliverable, next to the same moment on the creator's side — one action, two states.
 
-TODO.
+## 03 — My role
+### Design lead: direction, decisions, and the team.
+
+I led design end to end. I owned the visual direction and the product decisions — how it should actually work — and I ran the client communication myself, translating between the client and the designers and reviewing every design that shipped. I also built the team: I hired four designers and set up how we worked. With the PM, we reworked and tightened the design process so the team could ship faster and more consistently. I was on it for roughly a year.
+
+## 04 — Registration
+### Fast in — low friction for both sides.
+
+Both sides sign up, but they need different things. A brand adds company details — name, size, industry sector, website and social links — in a short stepped modal for contact and company info. A creator's path is lighter: sign up, then set up the profile from settings. The rule for both is the same: get the user into the product immediately, not behind a long registration wall.
+
+The client first wanted a heavy, multi-step sign-up. I pushed for fast entry — Google, Apple, or email and password — and we proved why: less entry friction means higher conversion. Most competitors gate access behind a sales call — leave a request, wait for a manager, then get in. Here, a few company fields and you're already inside: hiring creators, searching, analysing.
+
+The brand flow started multi-step too; I cut it to two, splitting the questions the same way as the creator's — ask the essentials up front, and let the rest be filled later, when the brand actually hires a creator or sets up a post. The whole thing is built to lower friction and cognitive load: ask for a piece of data only when it's genuinely needed, not all of it at once.
+
+<div class="case-embed">
+  <iframe title="Registration flow — Figma" loading="lazy" allowfullscreen src="https://embed.figma.com/design/27HQoGebesfNJ09HQovpMJ/-Registration--Bragmant--Copy-?node-id=2-40124&embed-host=share"></iframe>
+</div>
+
+## 05 — Campaign creation
+### Ten steps to two.
+
+When I picked it up, creating a campaign was a **ten-step brief** — ten screens before anything concrete was decided. I analysed it, and the conclusion was simple: ten steps is the wrong shape. We rebuilt it as **two** — the fields ~90% of users don't need moved into **additional options**, and only the essential five-to-seven kept on screen.
+
+1. **Step 1** — campaign details, additional options, creator requirements and creative guidelines.
+2. **Step 2** — content setup: exactly what content the brand needs.
+
+Most users now see only what matters and move faster; the ~10% who want finer control open the extra settings and still get to the result. Two even steps instead of ten front-loaded ones.
+
+> 📷 Step 1 — Campaign Setup · 📷 Step 2 — Content Deliverables · *(optional)* the old 10-step flow next to the new 2-step.
+
+## 06 — Manage campaign
+### Where a live campaign gets run.
+
+Everything a brand runs lives on one page — **My Campaigns**. Campaigns are grouped by state (All, Drafts, Active, Inactive, Archived) as cards, with the empty and initial states designed too, and filtering across them. It's the home base for managing every campaign at a glance.
+
+> 📷 My Campaigns — campaigns grouped by state, with filtering.
+
+A published campaign drops into a shared overview that every creator can see and apply to. Open one and you're inside the campaign's own hub, several layers deep — starting with the creators who applied (when, their price, the decision on each). From there, a set of working surfaces:
+
+#### Overview
+Counts and current status of the whole campaign, in one place.
+
+> 📷 Overview — the campaign at a glance.
+
+#### Task timeline
+Every task the brand adds to creators, tracked in real time — what's published, what's pending.
+
+> 📷 Task timeline — tasks by status.
+
+#### Messages
+The brand talks to influencers directly.
+
+> 📷 Messages — brand and influencer.
+
+#### Posting
+Track influencer posts, filter them, and jump to the live post on TikTok or Instagram.
+
+> 📷 Posting — posts, filtered and linked out.
+
+#### Tracking links
+Create and name links, hand them to a creator, and watch clicks over time, total and unique clicks, and CTR.
+
+> 📷 Tracking links — clicks, unique clicks, CTR.
+
+#### Promo codes
+Generate codes, connect them to Shopify, set discount and dates, assign to a creator — then read views, OOV, CPA, ROAS and revenue per code in real time.
+
+> 📷 Promo codes — per-code analytics.
+
+#### Content calendar
+An interactive calendar of who posts what and when: post counts, time slots, task status and details, filterable across months.
+
+> 📷 Content calendar — who posts what, when.
+
+#### Reports
+The big one — all the campaign analytics a brand gets, in depth.
+
+> 📷 Reports — full campaign analytics.
+
+Behind all of this is a lot of state and logic — every surface has its live, empty, pending and done states worked through, on both the brand and creator side.
+
+## 07 — The creator side
+### The other side of the same system.
+
+The creator side runs on the same foundation as the brand's — one design system, different components. A creator has their own surfaces: Browse Campaigns, Applies, Earnings, and the collaboration itself. Opportunities arrive in four types — Paid campaign, UGC, Gifting, Product feedback — and each shows the task, reward and deadline before the creator decides: accept, decline, or send their own price.
+
+The two sides stay in step because they're designed as one connected flow, not two separate products — a brand action lands as a state on the creator's side, and back again. Keeping that consistent was as much a team job as a design one: daily calls and design groomings three times a week, with constant iteration between the brand-side work I owned and the creator-side design.
+
+On scope: the product splits into a marketing side and a product side, and I worked the marketing side. The wider system reaches much further — AI tools, dashboards, settings, brand and creator profiles, creator search, payments — so this case is the part I owned, not the whole thing.
+
+> 📷 The creator side — Browse Campaigns, Applies and Earnings, plus an opportunity card (accept / counter-price / decline).
+
+## 08 — Design system
+### Screens in, a system out.
+
+The design system was owned by a separate designer on the team. The loop was simple: we designed and finished screens, extracted the components, and handed them over to be built and maintained as the system. My part was feeding it — consistent, resolved screens it could be built from.
+
+## 09 — Where it is now
+### In active development.
+
+The product is still being built. This case is about the design work — the direction, the flows and the decisions — not shipped metrics.
