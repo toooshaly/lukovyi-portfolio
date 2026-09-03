@@ -617,17 +617,18 @@ const year = new Date().getFullYear();
         // open=true → розкрити (знизу вгору); open=false → закрити (зверху вниз)
         function run(open) {
           el.classList.add("is-busy");
+          const from = open ? "scaleY(1)" : "scaleY(0)";
+          const to = open ? "scaleY(0)" : "scaleY(1)";
           return Promise.all(
             slats.map((s, i) => {
               const d = open ? n - 1 - i : i; // розкриття з низу, закриття зверху
               const a = s.animate(
-                open
-                  ? [{ transform: "scaleY(1)" }, { transform: "scaleY(0)" }]
-                  : [{ transform: "scaleY(0)" }, { transform: "scaleY(1)" }],
-                { duration: dur, delay: d * step, easing: ease, fill: "forwards" }
+                [{ transform: from }, { transform: to }],
+                { duration: dur, delay: d * step, easing: ease, fill: "both" }
               );
+              // commitStyles() пише кінцевий стан в inline ДО cancel() — без спалаху на 1 кадр.
               return a.finished
-                .then(() => { s.style.transform = open ? "scaleY(0)" : "scaleY(1)"; a.cancel(); })
+                .then(() => { try { a.commitStyles(); } catch (_) {} a.cancel(); })
                 .catch(() => {});
             })
           );
@@ -637,9 +638,11 @@ const year = new Date().getFullYear();
         run(true).then(() => el.classList.remove("is-busy"));
 
         // Back/forward із bfcache — сторінка приходить «закритою», розкриваємо.
+        // (scaleY, не scaleX — вісь була переплутана: слати ковзають вертикально.)
         addEventListener("pageshow", (e) => {
           if (!e.persisted) return;
-          slats.forEach((s) => (s.style.transform = "scaleX(1)"));
+          navigating = false;
+          slats.forEach((s) => (s.style.transform = "scaleY(1)"));
           run(true).then(() => el.classList.remove("is-busy"));
         });
 
