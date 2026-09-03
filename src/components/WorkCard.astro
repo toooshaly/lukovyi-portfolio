@@ -16,7 +16,7 @@ const { idx, title, sub, href, year, role, client, img, video, blend } =
 <a class:list={["work-card", blend && "is-blend"]} href={href} aria-label={sub}>
   <div class="wc-media">
     {video ? (
-      <video src={video} poster={img.src} muted loop playsinline preload="none" data-autoplay></video>
+      <video src={video} poster={img.src} autoplay muted loop playsinline preload="auto" data-autoplay></video>
     ) : (
       <Image src={img} alt={sub} widths={[768, 1200, 1600]} sizes="100vw" />
     )}

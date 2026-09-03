@@ -56,7 +56,7 @@ const meta = [
       <p class="case-crumb label"><a href="/work" class="link-fx">work</a> / {d.title}</p>
       <h1 class="case-hero-title display">{d.title}</h1>
       {d.coverVideo ? (
-        <video class="case-cover" src={d.coverVideo} poster={d.cover?.src} muted loop playsinline preload="none" data-autoplay />
+        <video class="case-cover" src={d.coverVideo} poster={d.cover?.src} autoplay muted loop playsinline preload="auto" data-autoplay />
       ) : d.cover ? (
         <Image src={d.cover} alt={`${d.title} — cover`} widths={[768, 1280, 1600]} sizes="100vw" class="case-cover" />
       ) : null}
