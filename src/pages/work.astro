@@ -122,10 +122,11 @@ import { clientWork, labWork } from "../data/work";
   @media (max-width: 1000px) { .wh-word { font-size: 128px; } }
   @media (max-width: 720px) {
     .work-hero { padding: 116px var(--pad-side-mobile) 40px; }
-    .wh-word { font-size: 90px; }
-    .wh-sub { width: 130px; }
+    /* vw-based → плавно масштабується й не обрізається на вузьких екранах */
+    .wh-word { font-size: min(90px, 12.6vw); }
+    .wh-sub { width: 120px; }
   }
-  @media (max-width: 500px) { .wh-word { font-size: 58px; } .wh-sub { width: 104px; } }
+  @media (max-width: 400px) { .wh-sub { width: 88px; font-size: 12px; } }
 
   /* ---------------- ГРУПА ---------------- */
   .work-group { margin-top: clamp(48px, 6vw, 96px); }

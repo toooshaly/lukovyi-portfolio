@@ -81,4 +81,11 @@ const { idx, title, sub, href, year, role, client, img, video, blend } =
     .wc-title { left: 24px; bottom: 48px; }
     .wc-arrow { right: 4px; bottom: 38px; }
   }
+  @media (max-width: 560px) {
+    /* мета не вилазить: обмежуємо правий край, дрібнимо, дозволяємо перенос */
+    .wc-meta { top: 20px; left: 20px; right: 20px; gap: 8px 16px; flex-wrap: wrap; }
+    .wc-meta dt { margin-bottom: 3px; }
+    .wc-meta dt, .wc-meta dd { font-size: 10px; line-height: 1.25; }
+    .wc-title { left: 20px; bottom: 20px; gap: 12px; }
+  }
 </style>

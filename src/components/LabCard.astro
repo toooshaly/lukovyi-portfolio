@@ -93,4 +93,11 @@ const Tag = href ? "a" : "article";
     .lc-meta { gap: 20px; }
     .lc-col { gap: 32px; }
   }
+  @media (max-width: 560px) {
+    .lc-inner { padding: 20px; }
+    /* мета не вилазить: дрібнимо, дозволяємо перенос */
+    .lc-meta { gap: 8px 16px; flex-wrap: wrap; }
+    .lc-meta > div { gap: 4px; }
+    .lc-meta dt, .lc-meta dd { font-size: 10px; line-height: 1.25; }
+  }
 </style>

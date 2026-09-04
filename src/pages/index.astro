@@ -174,11 +174,12 @@ const chips = ["UX/UI", "Product", "Design System", "AI Workflow"];
   /* Wordmark вертикально по центру; мета-тексти — по кутах (absolute) */
   .hero-inner {
     position: relative; z-index: 1; height: 100%;
-    display: grid; align-content: center; padding: 0 var(--pad-side);
+    display: grid; grid-template-columns: minmax(0, 1fr); /* колонка не розтягується під max-content */
+    align-content: center; padding: 0 var(--pad-side);
   }
   /* Обгортка wordmark — точка відліку для інтро (1:1 з Figma: інтро зверху-праворуч,
      верх на рівні верху wordmark-рядка, правий край до краю контенту). */
-  .hero-wordwrap { position: relative; }
+  .hero-wordwrap { position: relative; min-width: 0; }
   .hero-intro { position: absolute; top: 0; right: 0; width: 250px; text-align: left; color: rgba(255,255,255,.72); }
   .hero-intro .hl { color: #fff; }
   /* Слово-ротатор — окремим останнім рядком, щоб зміна довжини не «стрибала» */
@@ -188,7 +189,7 @@ const chips = ["UX/UI", "Product", "Design System", "AI Workflow"];
   .hero-foot { position: absolute; left: var(--pad-side); right: var(--pad-side); bottom: var(--hero-pad-bottom); display: flex; justify-content: space-between; gap: 1rem; color: var(--gold-500); }
 
   .hero-word {
-    position: relative; margin: 0; width: 100%;
+    position: relative; margin: 0; width: 100%; min-width: 0; max-width: 100%;
     display: grid; gap: 0.7vw; color: #fff; /* міжрядковий відступ ≈ Figma 12px */
     --ux: 42%; /* спільна вісь X: стрілка (r1) і U (r2) стоять точно одна під одною */
   }
@@ -205,7 +206,7 @@ const chips = ["UX/UI", "Product", "Design System", "AI Workflow"];
     .hero { height: 100svh; min-height: 560px; }
     .hero-intro { position: static; width: auto; max-width: none; margin: 0 0 auto; }
     .hero-cr { display: none; }
-    .hw-row { font-size: calc((100vw - var(--pad-side-mobile) * 2) / 6.8); }
+    .hw-row { font-size: calc((100vw - var(--pad-side) * 2) / 6.9); }
     .hw-row.r1 { padding: 0 22% 0 14%; }
     .hero-word { --ux: 32%; }
   }
