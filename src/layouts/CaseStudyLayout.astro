@@ -322,6 +322,9 @@ const meta = [
   /* Рівна сітка 4-в-ряд (Instagram-пости) */
   .case-content .cs-quad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 2rem 0; }
   .case-content .cs-quad img { margin: 0; }
+  /* Ряд, що вміщає ВСІ зображення в колонку без бокового скролу (App Store картки, кластери) */
+  .case-content .cs-row { display: flex; gap: 12px; margin: 2rem 0; align-items: flex-start; }
+  .case-content .cs-row img { flex: 1 1 0; min-width: 0; width: 100%; height: auto; margin: 0; border-radius: 12px; }
   /* Підписи до зображень */
   .case-content figure { margin: 2rem 0; }
   .case-content figure img { margin: 0; }
@@ -374,6 +377,8 @@ const meta = [
     .case-content .cs-quad { grid-template-columns: repeat(2, 1fr); }
     .case-content .cs-findings { grid-template-columns: 1fr; }
     .case-content .cs-principle { grid-template-columns: 56px 1fr; gap: 16px; padding: 24px 0; }
+    .case-content .cs-row { flex-wrap: wrap; }
+    .case-content .cs-row img { flex: 1 1 calc(33.333% - 8px); }
   }
   /* таблиця (воронка) */
   .case-content .table-wrap, .case-content table { display: block; overflow-x: auto; }
