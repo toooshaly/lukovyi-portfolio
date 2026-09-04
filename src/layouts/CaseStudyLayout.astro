@@ -329,8 +329,51 @@ const meta = [
     margin-top: 10px; color: var(--text-muted); font-family: var(--font-display);
     font-size: 0.78rem; letter-spacing: 0.02em;
   }
+
+  /* ── 03 — findings: 3 колонки-картки ──────────────────────────── */
+  .case-content .cs-findings {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 2rem 0;
+  }
+  .case-content .cs-find {
+    background: var(--surface-raised); border: 1px solid var(--border-subtle);
+    border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 16px;
+  }
+  .case-content .cs-find .n {
+    font-family: var(--font-display); font-size: 0.85rem; color: var(--text-accent); letter-spacing: 0.04em;
+  }
+  .case-content .cs-find .t { color: var(--text-primary); font-weight: 500; font-size: 1.1rem; line-height: 1.25; }
+  .case-content .cs-find p { margin: 0; font-size: 0.95rem; }
+  .case-content .cs-find p + p { margin-top: 12px; }
+
+  /* INSIGHT-callout — темна картка з жовтим кикером */
+  .case-content .cs-insight {
+    margin: 1.5rem 0 0; padding: 28px; border-radius: 12px;
+    background: var(--surface-raised); border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--text-accent);
+  }
+  .case-content .cs-insight .k {
+    display: block; font-family: var(--font-display); font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--text-accent); margin-bottom: 12px;
+  }
+  .case-content .cs-insight p { margin: 0; color: var(--text-primary); font-size: 1.15rem; line-height: 1.45; }
+
+  /* ── 04 — принципи: нумеровані рядки з роздільниками ───────────── */
+  .case-content .cs-principles { margin: 2rem 0; }
+  .case-content .cs-principle {
+    display: grid; grid-template-columns: 96px 1fr; gap: 28px;
+    padding: 34px 0; border-top: 1px solid var(--border-subtle);
+  }
+  .case-content .cs-principle .n {
+    font-family: var(--font-display); font-size: clamp(2.4rem, 5vw, 3.2rem);
+    line-height: 0.9; color: var(--text-accent);
+  }
+  .case-content .cs-principle .t { color: var(--text-primary); font-weight: 500; font-size: 1.2rem; margin-bottom: 12px; }
+  .case-content .cs-principle p { margin: 0; }
+
   @media (max-width: 720px) {
     .case-content .cs-quad { grid-template-columns: repeat(2, 1fr); }
+    .case-content .cs-findings { grid-template-columns: 1fr; }
+    .case-content .cs-principle { grid-template-columns: 56px 1fr; gap: 16px; padding: 24px 0; }
   }
   /* таблиця (воронка) */
   .case-content .table-wrap, .case-content table { display: block; overflow-x: auto; }

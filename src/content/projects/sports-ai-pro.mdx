@@ -66,13 +66,31 @@ I went through every screen and documented the specific places where the interfa
 
 ![Research — annotating the three trust-breaking patterns across the original screens](/media/sports/s03-research.webp)
 
-**1. The key number didn't stand out.** Confidence scores — the reason people open the app — carried the same weight as team names: same size, same colour, edge of the screen. There was nothing for the eye to catch, and a strong prediction looked exactly like a weak one. Separately, the light grey surfaces failed — highlighted match rows and league pills. White text on them fell below acceptable contrast.
+<div class="cs-findings">
+  <div class="cs-find">
+    <span class="n">01</span>
+    <span class="t">The key number didn't stand out</span>
+    <p>Confidence scores — the reason people open the app — carried the same weight as team names: same size, same colour, edge of the screen. There was nothing for the eye to catch, and a strong prediction looked exactly like a weak one.</p>
+    <p>Separately, the light grey surfaces failed — highlighted match rows and league pills. White text on them fell below acceptable contrast.</p>
+  </div>
+  <div class="cs-find">
+    <span class="n">02</span>
+    <span class="t">Data spilled out with no hierarchy or grouping</span>
+    <p>On the team screen — six identical rows in a row: Avg goals, Avg goals conceded, Avg shots on target, Avg corners, Avg fouls, Avg yellow cards. Identical bars, equal weight, no grouping.</p>
+    <p>On the stats screen the form ring, the tournament dropdown, the recent-matches strip and the league table sat one after another with no sections. Instead of leading the eye from primary to secondary, the screen showed everything at once.</p>
+  </div>
+  <div class="cs-find">
+    <span class="n">03</span>
+    <span class="t">The interface felt like several different products</span>
+    <p>Button styles differed between screens, navigation icons varied, and the bottom menu was labelled sometimes in Polish, sometimes in English.</p>
+    <p>Without a single system the app lost coherence — and with it the sense of reliability.</p>
+  </div>
+</div>
 
-**2. Data spilled out with no hierarchy or grouping.** On the team screen — six identical rows in a row: Avg goals, Avg goals conceded, Avg shots on target, Avg corners, Avg fouls, Avg yellow cards. Identical bars, equal weight, no grouping. On the stats screen the form ring, the tournament dropdown, the recent-matches strip and the league table sat one after another with no sections. Instead of leading the eye from primary to secondary, the screen showed everything at once.
-
-**3. The interface felt like several different products.** Button styles differed between screens, navigation icons varied, and the bottom menu was labelled sometimes in Polish, sometimes in English. Without a single system the app lost coherence — and with it the sense of reliability.
-
-> **Insight.** None of these problems was technical. All three were about how the interface communicates trust.
+<div class="cs-insight">
+  <span class="k">INSIGHT</span>
+  <p>None of these problems was technical. All three were about how the interface communicates trust.</p>
+</div>
 
 ## 04 — Approach
 
@@ -80,11 +98,29 @@ I went through every screen and documented the specific places where the interfa
 
 Three principles drove every design decision.
 
-**1. Hierarchy first, surface second.** Before touching colour or form, I decided on every screen what was primary, what was secondary and what could go. The confidence score became the anchor of the card — everything else was built around it. The visual language only arrived once the structure already worked in black and white.
-
-**2. One meaning per signal.** Every colour, surface and icon had to mean exactly one thing. Grey stopped meaning "selected", "collapsed" and "tappable" at the same time. It sounds like hygiene, but in a product that tells people where to put money, a predictable interface is what trust in the prediction grows out of.
-
-**3. New features are comprehension problems, not screens.** Odds comparison, the betslip and model re-training all arrived as "draw me a screen" requests. Each one was really the question "how do I show a person what the model is doing, so they can act on it?" So design started from the user's decision, not from a layout.
+<div class="cs-principles">
+  <div class="cs-principle">
+    <span class="n">01</span>
+    <div>
+      <div class="t">Hierarchy first, surface second</div>
+      <p>Before touching colour or form, I decided on every screen what was primary, what was secondary and what could go. The confidence score became the anchor of the card — everything else was built around it. The visual language only arrived once the structure already worked in black and white.</p>
+    </div>
+  </div>
+  <div class="cs-principle">
+    <span class="n">02</span>
+    <div>
+      <div class="t">One meaning per signal</div>
+      <p>Every colour, surface and icon had to mean exactly one thing. Grey stopped meaning "selected", "collapsed" and "tappable" at the same time. It sounds like hygiene, but in a product that tells people where to put money, a predictable interface is what trust in the prediction grows out of.</p>
+    </div>
+  </div>
+  <div class="cs-principle">
+    <span class="n">03</span>
+    <div>
+      <div class="t">New features are comprehension problems, not screens</div>
+      <p>Odds comparison, the betslip and model re-training all arrived as "draw me a screen" requests. Each one was really the question "how do I show a person what the model is doing, so they can act on it?" So design started from the user's decision, not from a layout.</p>
+    </div>
+  </div>
+</div>
 
 ## 05 — Core work
 
