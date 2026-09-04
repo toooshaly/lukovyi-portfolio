@@ -107,7 +107,7 @@ const year = new Date().getFullYear();
     <!-- ПЕРЕХІД МІЖ СТОРІНКАМИ — «жалюзі» (8 слатів). Стартово закриті,
          на завантаженні розкриваються з центру до боків; на кліку по
          внутрішньому посиланні закриваються з боків до центру → навігація. -->
-    <div id="pagecover" aria-hidden="true"><span class="pc-panel"></span><span class="pc-panel"></span><span class="pc-panel"></span></div>
+    <div id="pagecover" aria-hidden="true">{Array.from({ length: 12 }).map(() => <span class="pc-col" />)}</div>
 
     <!-- Прогресивний blur по верхньому й нижньому краю (ефект при скролі).
          3 шари з наростаючим блюром + градієнтна маска = плавний перехід. -->
@@ -614,7 +614,7 @@ const year = new Date().getFullYear();
           root.classList.remove("pt-arriving");
           return;
         }
-        const panels = [...el.querySelectorAll(".pc-panel")];
+        const panels = [...el.querySelectorAll(".pc-col")];
         const cs = getComputedStyle(root);
         const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 680;
         const step = parseFloat(cs.getPropertyValue("--transition-step")) || 90;

@@ -367,23 +367,22 @@
   inset: 0;
   z-index: 9998;
   pointer-events: none;
+  display: flex;              /* колони в ряд */
 }
 #pagecover.is-busy { pointer-events: auto; }
-/* 3 повноекранні шари-завіси. scaleY(0)↔(1), рух завжди вгору.
-   Легкі відтінки кремового → шаруватий край, контраст із темними сторінками. */
-#pagecover .pc-panel {
-  position: absolute;
-  inset: 0;
+/* Вертикальні колони. scaleY(0)↔(1) зі стагером по горизонталі → «колони».
+   Колір монохромний за темою: чорний у світлій, білий у темній (--surface-inverse). */
+#pagecover .pc-col {
+  flex: 1 1 0;
+  height: 100%;
+  background: var(--surface-inverse);
   transform: scaleY(0);
   transform-origin: bottom;
   will-change: transform;
 }
-#pagecover .pc-panel:nth-child(1) { background: #e7e3d6; }
-#pagecover .pc-panel:nth-child(2) { background: #efece0; }
-#pagecover .pc-panel:nth-child(3) { background: linear-gradient(80deg, #f7f4ec, #f1efe4); }
-/* Прийшли через перехід → завіса накрита ще до першого кадру (JS потім відкриває вгору). */
-html.pt-arriving #pagecover .pc-panel { transform: scaleY(1); transform-origin: top; }
-/* Хто просить менше руху — без завіси. */
+/* Прийшли через перехід → колони накрито ще до першого кадру (JS потім відкриває). */
+html.pt-arriving #pagecover .pc-col { transform: scaleY(1); transform-origin: top; }
+/* Хто просить менше руху — без переходу. */
 @media (prefers-reduced-motion: reduce) {
   #pagecover { display: none; }
 }
