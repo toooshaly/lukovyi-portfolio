@@ -62,6 +62,6 @@ export const labWork: LabItem[] = [
       ["Year", "2023"],
       ["My role", "UX/UI Designer"],
       ["Client", "Statistic Office of Slovak Republic"],
-    ],
+    ], href: "/projects/intranet-susr",
   },
 ];
