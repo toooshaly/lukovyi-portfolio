@@ -50,7 +50,7 @@ export const clientWork: WorkItem[] = [
 export const labWork: LabItem[] = [
   {
     idx: "001", title: "N_BK", sub: "NEXUS BANK APP", img: nexusImg, overlay: 0.3,
-    meta: [["Year", "2024"], ["Industry", "Mobile App"]],
+    meta: [["Year", "2024"], ["Industry", "Mobile App"]], href: "/projects/nexus-bank",
   },
   {
     idx: "002", title: "Y_FD", sub: "YOURFIELD APP", img: myfieldImg, overlay: 0.55,
