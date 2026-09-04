@@ -13,7 +13,7 @@ const { idx, title, sub, href, year, role, client, img, video, blend } =
   Astro.props as WorkItem;
 ---
 
-<a class:list={["work-card", blend && "is-blend"]} href={href} aria-label={sub}>
+<a class:list={["work-card", blend && "is-blend"]} href={href}>
   <div class="wc-media">
     {video ? (
       <video src={video} poster={img.src} autoplay muted loop playsinline preload="auto" data-autoplay></video>

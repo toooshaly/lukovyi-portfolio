@@ -19,6 +19,23 @@ export default defineConfig({
     "/lab": "/work",
   },
 
+  // Markdown/MDX-зображення (![]()) → lazy + async, щоб не вантажити всі одразу.
+  markdown: {
+    rehypePlugins: [
+      () => (tree) => {
+        const walk = (n) => {
+          if (n.type === "element" && n.tagName === "img") {
+            n.properties ||= {};
+            n.properties.loading ??= "lazy";
+            n.properties.decoding ??= "async";
+          }
+          n.children?.forEach(walk);
+        };
+        walk(tree);
+      },
+    ],
+  },
+
   vite: {
     plugins: [tailwindcss()]
   },
