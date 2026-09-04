@@ -45,6 +45,11 @@ Beyond redesigning what existed, three key features had to be designed from scra
 
 The app worked technically, but a dated, fragmented interface undermined trust — and trust is what a product that tells you where to bet stands on. The founder's goal: bring design and experience up to the level of the technology underneath.
 
+<figure>
+  <img src="/media/sports/s01-before.webp" alt="The original interface — inconsistent typography, no hierarchy, data-heavy screens" />
+  <figcaption>The starting point — the original app, annotated where the interface broke trust.</figcaption>
+</figure>
+
 ## 02 — Ownership
 
 ### Sole designer — from audit to handoff.
@@ -58,6 +63,8 @@ This was a solo project with no existing design system, no ready components and 
 ### Three patterns were breaking user trust.
 
 I went through every screen and documented the specific places where the interface broke trust. Every insight came from what was actually in the product — not from guesswork.
+
+![Research — annotating the three trust-breaking patterns across the original screens](/media/sports/s03-research.webp)
 
 **1. The key number didn't stand out.** Confidence scores — the reason people open the app — carried the same weight as team names: same size, same colour, edge of the screen. There was nothing for the eye to catch, and a strong prediction looked exactly like a weak one. Separately, the light grey surfaces failed — highlighted match rows and league pills. White text on them fell below acceptable contrast.
 
@@ -132,6 +139,25 @@ Launch assets carried the same visual language as the app. App Store screens led
 - Explore detailed stats.
 - Head-to-head stats for smarter picks.
 
+<div class="cs-scroll" style="--h:560px">
+  <img src="/media/sports/s07-appstore-1.webp" alt="App Store screen 1 — AI-powered insights for every sport" />
+  <img src="/media/sports/s07-appstore-2.webp" alt="App Store screen 2 — build your custom AI model" />
+  <img src="/media/sports/s07-appstore-3.webp" alt="App Store screen 3 — create your personal Prediction Slip" />
+  <img src="/media/sports/s07-appstore-4.webp" alt="App Store screen 4 — analyse leagues and teams" />
+  <img src="/media/sports/s07-appstore-5.webp" alt="App Store screen 5 — explore detailed stats" />
+  <img src="/media/sports/s07-appstore-6.webp" alt="App Store screen 6 — head-to-head stats for smarter picks" />
+</div>
+
+<figure>
+  <img src="/media/sports/s07-landing.webp" alt="Landing page — carrying the app's visual language to the web" />
+  <figcaption>Landing page — the same visual language, carried to the web.</figcaption>
+</figure>
+
+<figure>
+  <img src="/media/sports/s07-paywall-strip.webp" alt="Paywall variants — each leads with the value before asking for payment" />
+  <figcaption>Paywall variants — every screen leads with what's unlocked before the price.</figcaption>
+</figure>
+
 ## 08 — Impact
 
 ### The release gave a strong start. Analytics showed where the real bottleneck was.
@@ -145,6 +171,8 @@ Launch assets carried the same visual language as the app. App Store screens led
 | Purchase conversion | 2.4% | **3.3%** | 3.2% |
 
 The redesign lifted purchase conversion and drove a strong January peak. But revenue peaked and then fell back by spring — acquisition and first-purchase worked; keeping subscribers did not.
+
+![Revenue, subscriptions and conversion — the December launch through the spring fall-back](/media/sports/s08-impact.webp)
 
 ## 09 — Retention
 
@@ -164,6 +192,8 @@ Before v3 I proposed doing it properly, and this time the argument landed. Token
 
 The effect is structural: a change is made in one place and propagates across every screen. What used to mean manually walking through dozens of mockups now takes minutes, and new features assemble from ready components instead of being drawn from scratch. Iterations got faster, and inconsistencies between screens disappeared as a category.
 
+![The v3 design system — tokens, variables and components in a dedicated file](/media/sports/s10-designsystem.webp)
+
 #### Workflow: AI → Figma → system
 
 This is not "AI draws the design". It is a pipeline where generation takes the routine, while framing the problem, the decisions and the quality stay with me.
@@ -173,6 +203,11 @@ In v2 no such pipeline existed: there was no MCP link to Figma yet, and mockups 
 The steps: receive a brief from the client → in Claude Code rewrite it into a structured, unambiguous brief for generation (the most important step — mockup quality is set by the framing, not by a random prompt) → pass it to Claude Design for a first version → several iterations through Claude Code → Claude Design until the mockup is right → show the client → once approved, move it into Figma → finish by hand (grid, spacing, states) → second review → extract components into the design system → review, fix, publish the library → assemble the next screens from published components.
 
 The gain is not that there is less drawing. The gain is that the cycle "brief → approved mockup → component in the system" closes in a single pass, and the system grows together with the product.
+
+<figure>
+  <img src="/media/sports/s10-workflow.webp" alt="The v3 pipeline — client brief to Claude Code to Claude Design, iterate, into Figma, extract components, publish the system" />
+  <figcaption>Workflow: AI → Figma → system — generation takes the routine; framing, decisions and quality stay with me.</figcaption>
+</figure>
 
 #### iOS only — a decision from the data
 
@@ -186,19 +221,40 @@ The hypothesis: a finished answer from an AI leaves the user passive, while cont
 
 The screen structure and scroll behaviour were also rebuilt — the feature broke on long lists.
 
+![New onboarding — the user tunes the AI model to a match from the first minutes](/media/sports/s10-onboarding.webp)
+
 #### Trial: the result is visible before payment
 
 Two paywall variants — an annual plan with a 7-day trial and weekly access with a 3-day one. Both first show exactly what is being unlocked: 16 sports, custom AI models, personalised betslips, detailed team stats.
 
 The hypothesis from section 09: if the value is visible before payment, fewer people drop off in the first week.
 
+![Two paywall variants — annual with a 7-day trial and weekly with a 3-day, each showing what's unlocked first](/media/sports/s10-trial.webp)
+
 #### Depth worth coming back for
 
 Reworked prediction cards and match details, a new H2H, an Analysis Panel with new charts. The betslip remains as a supporting feature — the place where selected predictions accumulate and the combined probability is visible.
 
+![Reworked prediction cards and the new Analysis Panel](/media/sports/s10-depth-1.webp)
+
+<div class="cs-scroll" style="--h:500px">
+  <img src="/media/sports/s10-depth-2.webp" alt="Match details — v3" />
+  <img src="/media/sports/s10-depth-3.webp" alt="Prediction panel — v3" />
+  <img src="/media/sports/s10-depth-4.webp" alt="New H2H — v3" />
+</div>
+
 Bookmaker odds are being added: the user sees odds from different bookmakers for an event and moves through to the app's partners. This used to send them outside — now it is both a reason to stay in the product and a monetisation channel. For the Polish market first.
 
+![Bookmaker odds inside the product — a reason to stay and a monetisation channel](/media/sports/s10-odds.webp)
+
 **Accessibility.** Interface contrast was checked, including for different types of colour vision deficiency.
+
+<div class="cs-quad">
+  <img src="/media/sports/s11-ig-1.webp" alt="Social post — Sports AI-Pro" />
+  <img src="/media/sports/s11-ig-2.webp" alt="Social post — Sports AI-Pro" />
+  <img src="/media/sports/s11-ig-3.webp" alt="Social post — Sports AI-Pro" />
+  <img src="/media/sports/s11-ig-4.webp" alt="Social post — Sports AI-Pro" />
+</div>
 
 ## What I learned
 

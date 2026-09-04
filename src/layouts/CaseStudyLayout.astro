@@ -301,12 +301,37 @@ const meta = [
     margin: 40px 0 0; font-family: var(--font-body); font-weight: 500;
     font-size: 1.15rem; line-height: 1.3; color: var(--text-primary);
   }
-  /* blockquote = слот під скрін (плейсхолдер) */
+  /* blockquote = INSIGHT-callout (акцентна ліва межа) */
   .case-content blockquote {
-    margin: 2rem 0; padding: 20px 22px; border: 1px dashed var(--border-default);
-    border-radius: 12px; background: var(--surface-raised);
+    margin: 2rem 0; padding: 20px 24px; border: 1px solid var(--border-subtle);
+    border-left: 3px solid var(--text-accent); border-radius: 12px; background: var(--surface-raised);
   }
-  .case-content blockquote p { color: var(--text-muted); font-size: 0.95rem; margin: 0; }
+  .case-content blockquote p { color: var(--text-primary); font-size: 1rem; line-height: 1.6; margin: 0; }
+  .case-content blockquote strong { color: var(--text-accent); }
+
+  /* ── Ряди/галереї зображень (1:1 з макетом) ───────────────────── */
+  /* Горизонтальний скрол, вирівнювання за висотою (App Store картки, пейволи, телефонні шоти) */
+  .case-content .cs-scroll {
+    display: flex; gap: 16px; overflow-x: auto; margin: 2rem 0;
+    padding-bottom: 10px; scroll-snap-type: x proximity;
+  }
+  .case-content .cs-scroll img {
+    height: var(--h, 520px); width: auto; flex: 0 0 auto; margin: 0;
+    border-radius: 12px; scroll-snap-align: start;
+  }
+  /* Рівна сітка 4-в-ряд (Instagram-пости) */
+  .case-content .cs-quad { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin: 2rem 0; }
+  .case-content .cs-quad img { margin: 0; }
+  /* Підписи до зображень */
+  .case-content figure { margin: 2rem 0; }
+  .case-content figure img { margin: 0; }
+  .case-content figcaption {
+    margin-top: 10px; color: var(--text-muted); font-family: var(--font-display);
+    font-size: 0.78rem; letter-spacing: 0.02em;
+  }
+  @media (max-width: 720px) {
+    .case-content .cs-quad { grid-template-columns: repeat(2, 1fr); }
+  }
   /* таблиця (воронка) */
   .case-content .table-wrap, .case-content table { display: block; overflow-x: auto; }
   .case-content table {
