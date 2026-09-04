@@ -20,6 +20,8 @@ const projects = defineCollection({
       order: z.number(),
       /** Показати першим/виділеним на головній */
       featured: z.boolean().default(false),
+      /** Концепт-кейс із Lab (не комерційний) */
+      lab: z.boolean().default(false),
       /** Мітка статусу, напр. "SOON" (кейс ще готується) */
       status: z.string().optional(),
       /** Мета для sticky-сайдбара кейсу */

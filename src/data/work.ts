@@ -30,6 +30,8 @@ export type LabItem = {
   img: ImageMetadata;
   overlay: number;
   meta: [string, string][];
+  /** Якщо є — картка стає посиланням на сторінку-кейс */
+  href?: string;
 };
 
 export const clientWork: WorkItem[] = [
@@ -51,8 +53,8 @@ export const labWork: LabItem[] = [
     meta: [["Year", "2024"], ["Industry", "Mobile App"]],
   },
   {
-    idx: "002", title: "M_FD", sub: "MYFIELD APP", img: myfieldImg, overlay: 0.55,
-    meta: [["Year", "2024"], ["Industry", "Mobile App"]],
+    idx: "002", title: "Y_FD", sub: "YOURFIELD APP", img: myfieldImg, overlay: 0.55,
+    meta: [["Year", "2024"], ["Industry", "Mobile App"]], href: "/projects/yourfield",
   },
   {
     idx: "003", title: "S_SR", sub: "INTRANET WEBSITE", img: intranetImg, overlay: 0.6,

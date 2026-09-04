@@ -8,10 +8,12 @@ import ArrowDiag from "./icons/ArrowDiag.astro";
 import Plus from "./icons/Plus.astro";
 import type { LabItem } from "../data/work";
 
-const { idx, title, sub, img, overlay, meta } = Astro.props as LabItem;
+const { idx, title, sub, img, overlay, meta, href } = Astro.props as LabItem;
+// Клікабельна, якщо є href (концепт має власну сторінку-кейс).
+const Tag = href ? "a" : "article";
 ---
 
-<article class="lab-case" style={`--ov:${overlay}`}>
+<Tag class:list={["lab-case", href && "is-link"]} style={`--ov:${overlay}`} href={href} aria-label={href ? sub : undefined}>
   <div class="lc-media">
     <Image src={img} alt={sub} widths={[768, 1200, 1600, 2000]} sizes="100vw" loading="lazy" />
   </div>
@@ -38,7 +40,7 @@ const { idx, title, sub, img, overlay, meta } = Astro.props as LabItem;
 
     <span class="lc-arrow wc-arrow" aria-hidden="true"><span class="wc-cy"></span><ArrowDiag /></span>
   </div>
-</article>
+</Tag>
 
 <style>
   .lab-case {
@@ -46,6 +48,8 @@ const { idx, title, sub, img, overlay, meta } = Astro.props as LabItem;
     overflow: hidden; color: var(--text-on-media); background: var(--surface-raised);
     transform-origin: center center; will-change: transform, border-radius;
   }
+  a.lab-case { display: block; text-decoration: none; }
+  a.lab-case:hover .lc-arrow { transform: translate(4px, -4px); }
   .lc-media { position: absolute; inset: 0; z-index: 0; }
   .lc-media :global(img) { width: 100%; height: 100%; object-fit: cover; }
   .lab-case::after {
