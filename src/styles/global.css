@@ -372,31 +372,28 @@
 #pagecover.is-busy { pointer-events: auto; }
 /* Вертикальні колони. scaleY(0)↔(1) зі стагером по горизонталі → «колони».
    Колір монохромний за темою: чорний у світлій, білий у темній (--surface-inverse). */
+#pagecover.pt-cover { pointer-events: auto; }
 #pagecover .pc-col {
   flex: 1 1 0;
   height: 100%;
   background: var(--surface-inverse);
+  /* Безпечний дефолт: якщо анімацій нема — колони відкриті, сторінка видима (жодного залипання). */
   transform: scaleY(0);
-  transform-origin: bottom;
+  transform-origin: top;
   will-change: transform;
+  /* Відкриття авто-грає на КОЖНОМУ завантаженні: from=накрито(scaleY1) → to=відкрито(scaleY0).
+     backwards-fill тримає «накрито» ще до старту (під час delay) → без спалаху контенту. */
+  animation: pc-reveal var(--transition-dur, 560ms) cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation-delay: calc(var(--i, 0) * var(--transition-step, 34ms));
 }
-/* Прийшли через перехід → колони накрито ще до першого кадру (CSS-анімація потім відкриває). */
-html.pt-arriving #pagecover .pc-col { transform: scaleY(1); transform-origin: top; }
-
-/* Накриття (клік): колони ростуть знизу, зсув зліва направо. */
+/* Накриття при переході (клік): колони ростуть знизу вгору, зсув зліва направо. */
 #pagecover.pt-cover .pc-col {
   transform-origin: bottom;
   animation: pc-cover var(--transition-dur, 560ms) cubic-bezier(0.76, 0, 0.24, 1) both;
   animation-delay: calc(var(--i, 0) * var(--transition-step, 34ms));
 }
-/* Відкриття (нова сторінка): колони йдуть угору. */
-#pagecover.pt-reveal .pc-col {
-  transform-origin: top;
-  animation: pc-reveal var(--transition-dur, 560ms) cubic-bezier(0.76, 0, 0.24, 1) both;
-  animation-delay: calc(var(--i, 0) * var(--transition-step, 34ms));
-}
-@keyframes pc-cover { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes pc-reveal { from { transform: scaleY(1); } to { transform: scaleY(0); } }
+@keyframes pc-cover { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 
 /* Хто просить менше руху — без переходу. */
 @media (prefers-reduced-motion: reduce) {

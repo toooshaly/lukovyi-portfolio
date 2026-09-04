@@ -86,10 +86,6 @@ const year = new Date().getFullYear();
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
-    <script is:inline>
-      // Якщо прийшли через перехід — накрити завісою ДО першого кадру (без спалаху контенту).
-      try { if (sessionStorage.getItem("pt-cover")) document.documentElement.classList.add("pt-arriving"); } catch (e) {}
-    </script>
     {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
     {/* No-FOUC: застосувати збережену тему до першого малювання */}
     <script is:inline>
@@ -604,29 +600,22 @@ const year = new Date().getFullYear();
 
     <script>
       // ── ПЕРЕХІД «КОЛОНИ» між сторінками (у стилі steviaplease.me) ─────
-      // 12 вертикальних колон, keyframes-анімація зі стагером зліва направо.
-      // Керується ЛИШЕ CSS-класами (pt-cover / pt-reveal) — надійно, без WAAPI,
-      // тому не деградує після кількох переходів.
+      // Відкриття (reveal) грає САМО через CSS-анімацію на кожному завантаженні.
+      // JS лише накриває (pt-cover) при кліку по внутрішньому посиланню й переходить.
       (() => {
         const el = document.getElementById("pagecover");
-        const root = document.documentElement;
-        if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) {
-          root.classList.remove("pt-arriving");
-          return;
-        }
+        if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
         const cols = [...el.querySelectorAll(".pc-col")];
+        if (!cols.length) return;
         const last = cols[cols.length - 1];
-        const KEY = "pt-cover";
         let navigating = false;
 
-        // Скільки триває вся хвиля (остання колона + її затримка) — для страховки.
         function totalMs() {
-          const cs = getComputedStyle(root);
+          const cs = getComputedStyle(document.documentElement);
           const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 560;
           const step = parseFloat(cs.getPropertyValue("--transition-step")) || 34;
-          return dur + cols.length * step + 120;
+          return dur + cols.length * step + 150;
         }
-
         // Викликає cb, коли остання колона доанімувала (+ страховка, якщо animationend не прийшов).
         function onDone(cb) {
           let fired = false;
@@ -635,28 +624,11 @@ const year = new Date().getFullYear();
           setTimeout(fin, totalMs() + 250);
         }
 
-        function reset() {
-          navigating = false;
-          el.classList.remove("is-busy", "pt-cover", "pt-reveal");
-          root.classList.remove("pt-arriving");
-        }
-
-        // Відкриття — ЛИШЕ якщо прийшли через перехід (прапорець). Свіже завантаження/refresh → сторінка одразу.
-        let arriving = false;
-        try { arriving = !!sessionStorage.getItem(KEY); if (arriving) sessionStorage.removeItem(KEY); } catch (_) {}
-        if (arriving) {
-          el.classList.add("is-busy", "pt-reveal");   // колони накрито (pt-arriving) → їдуть угору
-          onDone(reset);
-        } else {
-          root.classList.remove("pt-arriving");
-        }
-
-        // bfcache back/forward — показати сторінку без залишків завіси.
-        addEventListener("pageshow", (e) => { if (e.persisted) reset(); });
-        // Заморозка у bfcache — прибрати накриття, щоб при поверненні не залипло.
+        // bfcache back/forward — прибрати накриття, показати сторінку.
+        addEventListener("pageshow", (e) => { if (e.persisted) { navigating = false; el.classList.remove("pt-cover"); } });
         addEventListener("pagehide", () => { el.classList.remove("pt-cover"); });
 
-        // Перехоплюємо внутрішні переходи: накрити колонами → перейти.
+        // Внутрішній перехід: накрити колонами → перейти (нова сторінка сама відкриється).
         addEventListener("click", (e) => {
           if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           const a = e.target.closest("a");
@@ -671,8 +643,7 @@ const year = new Date().getFullYear();
           e.preventDefault();
           if (navigating) return;
           navigating = true;
-          try { sessionStorage.setItem(KEY, "1"); } catch (_) {}
-          el.classList.add("is-busy", "pt-cover");
+          el.classList.add("pt-cover");
           onDone(() => { location.href = a.href; });
         });
       })();
