@@ -86,6 +86,10 @@ const year = new Date().getFullYear();
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      // Якщо прийшли через перехід — накрити завісою ДО першого кадру (без спалаху контенту).
+      try { if (sessionStorage.getItem("pt-cover")) document.documentElement.classList.add("pt-arriving"); } catch (e) {}
+    </script>
     {schemas.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
     {/* No-FOUC: застосувати збережену тему до першого малювання */}
     <script is:inline>
@@ -605,17 +609,20 @@ const year = new Date().getFullYear();
       // 3 шари з невеликим зсувом → плавна багатошарова завіса.
       (() => {
         const el = document.getElementById("pagecover");
-        if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const root = document.documentElement;
+        if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) {
+          root.classList.remove("pt-arriving");
+          return;
+        }
         const panels = [...el.querySelectorAll(".pc-panel")];
-        const cs = getComputedStyle(document.documentElement);
-        const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 640;
-        const step = parseFloat(cs.getPropertyValue("--transition-step")) || 70;
+        const cs = getComputedStyle(root);
+        const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 680;
+        const step = parseFloat(cs.getPropertyValue("--transition-step")) || 90;
         const ease = "cubic-bezier(.76,0,.24,1)"; // плавний in-out, як завіса
-
+        const KEY = "pt-cover";
         let navigating = false;
 
-        // cover=true → підняти завісу знизу (накрити); cover=false → підняти й піти вгору (відкрити).
-        // Рух завжди вгору: накриття — origin bottom (росте вгору), відкриття — origin top (тане вгору).
+        // cover=true → підняти завісу знизу (накрити); cover=false → відкрити (тане вгору).
         function run(cover) {
           el.classList.add("is-busy");
           const from = cover ? "scaleY(0)" : "scaleY(1)";
@@ -628,24 +635,35 @@ const year = new Date().getFullYear();
                 [{ transform: from }, { transform: to }],
                 { duration: dur, delay: i * step, easing: ease, fill: "both" }
               );
+              // Інлайн-стиль напряму (без commitStyles — той кидає в Safari й лишає екран накритим).
               return a.finished
-                .then(() => { try { a.commitStyles(); } catch (_) {} a.cancel(); })
-                .catch(() => {});
+                .then(() => { p.style.transform = to; a.cancel(); })
+                .catch(() => { p.style.transform = to; });
             })
           );
         }
 
-        // На завантаженні: завіса стоїть накрита зверху → їде вгору геть.
-        panels.forEach((p) => { p.style.transformOrigin = "top"; p.style.transform = "scaleY(1)"; });
-        requestAnimationFrame(() => run(false).then(() => el.classList.remove("is-busy")));
+        function clearCover() {
+          panels.forEach((p) => { p.style.transform = "scaleY(0)"; });
+          root.classList.remove("pt-arriving");
+          el.classList.remove("is-busy");
+        }
 
-        // Back/forward із bfcache — накриваємо зверху й відкриваємо.
-        addEventListener("pageshow", (e) => {
-          if (!e.persisted) return;
-          navigating = false;
+        // Відкриваємо ЛИШЕ якщо прийшли через перехід (прапорець). Свіже завантаження/refresh — сторінка одразу.
+        let arriving = false;
+        try { arriving = !!sessionStorage.getItem(KEY); if (arriving) sessionStorage.removeItem(KEY); } catch (_) {}
+        if (arriving) {
           panels.forEach((p) => { p.style.transformOrigin = "top"; p.style.transform = "scaleY(1)"; });
-          run(false).then(() => el.classList.remove("is-busy"));
-        });
+          const fail = setTimeout(clearCover, dur + panels.length * step + 700); // страховка
+          requestAnimationFrame(() =>
+            run(false).then(() => { clearTimeout(fail); root.classList.remove("pt-arriving"); el.classList.remove("is-busy"); })
+          );
+        } else {
+          clearCover();
+        }
+
+        // Back/forward із bfcache: сторінка могла лишитись накрита — прибрати.
+        addEventListener("pageshow", (e) => { if (e.persisted) { navigating = false; clearCover(); } });
 
         // Перехоплюємо внутрішні переходи: накрити → перейти.
         addEventListener("click", (e) => {
@@ -662,6 +680,7 @@ const year = new Date().getFullYear();
           e.preventDefault();
           if (navigating) return;
           navigating = true;
+          try { sessionStorage.setItem(KEY, "1"); } catch (_) {}
           run(true).then(() => { location.href = a.href; });
         });
       })();

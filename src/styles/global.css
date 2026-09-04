@@ -381,6 +381,8 @@
 #pagecover .pc-panel:nth-child(1) { background: #e7e3d6; }
 #pagecover .pc-panel:nth-child(2) { background: #efece0; }
 #pagecover .pc-panel:nth-child(3) { background: linear-gradient(80deg, #f7f4ec, #f1efe4); }
+/* Прийшли через перехід → завіса накрита ще до першого кадру (JS потім відкриває вгору). */
+html.pt-arriving #pagecover .pc-panel { transform: scaleY(1); transform-origin: top; }
 /* Хто просить менше руху — без завіси. */
 @media (prefers-reduced-motion: reduce) {
   #pagecover { display: none; }
