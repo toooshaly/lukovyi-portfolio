@@ -103,7 +103,7 @@ const year = new Date().getFullYear();
     <!-- ПЕРЕХІД МІЖ СТОРІНКАМИ — «жалюзі» (8 слатів). Стартово закриті,
          на завантаженні розкриваються з центру до боків; на кліку по
          внутрішньому посиланні закриваються з боків до центру → навігація. -->
-    <div id="pageblinds" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <div id="pagecover" aria-hidden="true"><span class="pc-panel"></span><span class="pc-panel"></span><span class="pc-panel"></span></div>
 
     <!-- Прогресивний blur по верхньому й нижньому краю (ефект при скролі).
          3 шари з наростаючим блюром + градієнтна маска = плавний перехід. -->
@@ -599,34 +599,35 @@ const year = new Date().getFullYear();
     </script>
 
     <script>
-      // ── ПЕРЕХІД «ХВИЛЯ» між сторінками ───────────────────────────────
-      // 8 горизонтальних слатів. scaleY(0)↔(1). Стагер по вертикалі:
-      //   закриття (при кліку) — зверху вниз;
-      //   розкриття (нова сторінка) — знизу вгору.
+      // ── ПЕРЕХІД «ЗАВІСА» між сторінками (у стилі steviaplease.me) ─────
+      // Суцільна панель піднімається знизу вгору й накриває екран, тоді на
+      // новій сторінці продовжує рух угору й іде геть, відкриваючи контент.
+      // 3 шари з невеликим зсувом → плавна багатошарова завіса.
       (() => {
-        const el = document.getElementById("pageblinds");
+        const el = document.getElementById("pagecover");
         if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-        const slats = [...el.querySelectorAll("i")];
-        const n = slats.length;
+        const panels = [...el.querySelectorAll(".pc-panel")];
         const cs = getComputedStyle(document.documentElement);
-        const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 460;
-        const step = parseFloat(cs.getPropertyValue("--transition-step")) || 60;
-        const ease = "cubic-bezier(.33,0,.15,1)"; // м'який, без різкого старту/стопу
+        const dur = parseFloat(cs.getPropertyValue("--transition-dur")) || 640;
+        const step = parseFloat(cs.getPropertyValue("--transition-step")) || 70;
+        const ease = "cubic-bezier(.76,0,.24,1)"; // плавний in-out, як завіса
+
         let navigating = false;
 
-        // open=true → розкрити (знизу вгору); open=false → закрити (зверху вниз)
-        function run(open) {
+        // cover=true → підняти завісу знизу (накрити); cover=false → підняти й піти вгору (відкрити).
+        // Рух завжди вгору: накриття — origin bottom (росте вгору), відкриття — origin top (тане вгору).
+        function run(cover) {
           el.classList.add("is-busy");
-          const from = open ? "scaleY(1)" : "scaleY(0)";
-          const to = open ? "scaleY(0)" : "scaleY(1)";
+          const from = cover ? "scaleY(0)" : "scaleY(1)";
+          const to = cover ? "scaleY(1)" : "scaleY(0)";
+          const origin = cover ? "bottom" : "top";
           return Promise.all(
-            slats.map((s, i) => {
-              const d = open ? n - 1 - i : i; // розкриття з низу, закриття зверху
-              const a = s.animate(
+            panels.map((p, i) => {
+              p.style.transformOrigin = origin;
+              const a = p.animate(
                 [{ transform: from }, { transform: to }],
-                { duration: dur, delay: d * step, easing: ease, fill: "both" }
+                { duration: dur, delay: i * step, easing: ease, fill: "both" }
               );
-              // commitStyles() пише кінцевий стан в inline ДО cancel() — без спалаху на 1 кадр.
               return a.finished
                 .then(() => { try { a.commitStyles(); } catch (_) {} a.cancel(); })
                 .catch(() => {});
@@ -634,19 +635,19 @@ const year = new Date().getFullYear();
           );
         }
 
-        // Розкриваємо на завантаженні кожної сторінки.
-        run(true).then(() => el.classList.remove("is-busy"));
+        // На завантаженні: завіса стоїть накрита зверху → їде вгору геть.
+        panels.forEach((p) => { p.style.transformOrigin = "top"; p.style.transform = "scaleY(1)"; });
+        requestAnimationFrame(() => run(false).then(() => el.classList.remove("is-busy")));
 
-        // Back/forward із bfcache — сторінка приходить «закритою», розкриваємо.
-        // (scaleY, не scaleX — вісь була переплутана: слати ковзають вертикально.)
+        // Back/forward із bfcache — накриваємо зверху й відкриваємо.
         addEventListener("pageshow", (e) => {
           if (!e.persisted) return;
           navigating = false;
-          slats.forEach((s) => (s.style.transform = "scaleY(1)"));
-          run(true).then(() => el.classList.remove("is-busy"));
+          panels.forEach((p) => { p.style.transformOrigin = "top"; p.style.transform = "scaleY(1)"; });
+          run(false).then(() => el.classList.remove("is-busy"));
         });
 
-        // Перехоплюємо внутрішні переходи: закрити → перейти.
+        // Перехоплюємо внутрішні переходи: накрити → перейти.
         addEventListener("click", (e) => {
           if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
           const a = e.target.closest("a");
@@ -661,7 +662,7 @@ const year = new Date().getFullYear();
           e.preventDefault();
           if (navigating) return;
           navigating = true;
-          run(false).then(() => { location.href = a.href; });
+          run(true).then(() => { location.href = a.href; });
         });
       })();
     </script>
